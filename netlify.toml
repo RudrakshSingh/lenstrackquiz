@@ -4,3 +4,7 @@
 
 [build.environment]
   SECRETS_SCAN_ENABLED = "false"
+
+  [build.environment]
+  SECRETS_SCAN_OMIT_KEYS = "FIREBASE_UNIVERSE_DOMAIN,FIREBASE_PRIVATE_KEY"
+

@@ -11,7 +11,10 @@ export default function Result() {
 
   useEffect(() => {
     if (!id) return;
-    fetch(`/api/result?id=${id}`)
+
+    // Prod-friendly fetch
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    fetch(`${origin}/api/result?id=${id}`)
       .then(res => res.json())
       .then(data => {
         if (!data.success) throw new Error(data.error || "Failed");
@@ -30,23 +33,20 @@ export default function Result() {
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>🎯 Your Perfect Lens</h1>
-      <p className={styles.sub}><strong>{user.name}</strong>, here’s what suits you best:</p>
-      
-      <div className={styles.card + " " + styles.fadeIn}>
-        <h2 className={styles.primary}>Primary: {recommendation.primary}</h2>
-        {recommendation.addons.length > 0 && (
-          <div>
-            <h3>Add-ons:</h3>
-            <ul className={styles.list}>{recommendation.addons.map(a => <li key={a}>{a}</li>)}</ul>
-          </div>
-        )}
-        {recommendation.notes.length > 0 && (
-          <div>
-            <h3>Notes:</h3>
-            <ul className={styles.list}>{recommendation.notes.map(n => <li key={n}>{n}</li>)}</ul>
-          </div>
-        )}
-      </div>
+      <p><strong>{user.name}</strong>, here’s what suits you best:</p>
+      <h2>Primary: {recommendation.primary}</h2>
+      {recommendation.addons.length > 0 && (
+        <div className={styles.addonsSection}>
+          <h3 className={styles.sectionTitle}>Add-ons:</h3>
+          <ul className={styles.list}>{recommendation.addons.map(a => <li key={a}>{a}</li>)}</ul>
+        </div>
+      )}
+      {recommendation.notes.length > 0 && (
+        <div className={styles.notesSection}>
+          <h3 className={styles.sectionTitle}>Notes:</h3>
+          <ul className={styles.list}>{recommendation.notes.map(n => <li key={n}>{n}</li>)}</ul>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,0 +1,257 @@
+/* styles/quiz.module.css */
+
+/* Import Poppins font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: #000; /* black background */
+  color: #fff;
+}
+
+/* Container */
+.container {
+  max-width: 500px;
+  margin: 50px auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Titles */
+.title {
+  text-align: center;
+  font-size: 2rem;
+  color: #00bfff;
+  margin-bottom: 10px;
+}
+
+.sub {
+  text-align: center;
+  font-size: 1rem;
+  margin-bottom: 30px;
+  color: #ccc;
+}
+
+/* Glass Card */
+.card {
+  width: 100%;
+  max-width: 480px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  padding: 30px 25px;  
+  border-radius: 20px;
+  margin-bottom: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-sizing: border-box; 
+  transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.5s ease;
+  overflow: hidden; 
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.card.fadeIn {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Row wrapper for label + input */
+.row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+.row label {
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+/* Input fields */
+.inputField {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box; 
+  padding: 14px;
+  margin: 0;
+  border-radius: 12px;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  backdrop-filter: blur(5px);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.inputField:focus {
+  transform: scale(1.02);
+  box-shadow: 0 0 10px rgba(0,191,255,0.4);
+}
+
+/* Options */
+.optionsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.optionLabel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  border-radius: 15px;
+  background-color: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.optionLabel:hover {
+  background-color: rgba(0, 191, 255, 0.2);
+  transform: scale(1.03);
+  box-shadow: 0 8px 20px rgba(0,191,255,0.3);
+}
+
+.optionLabel input {
+  accent-color: #00bfff;
+  width: 18px;
+  height: 18px;
+}
+
+/* Navigation inside card */
+.nav {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 25px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.buttonPrimary, .buttonBack, .buttonSubmit {
+  padding: 12px 28px;
+  border-radius: 12px;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.buttonPrimary {
+  background-color: #00bfff;
+  color: #000;
+}
+
+.buttonPrimary:hover {
+  transform: scale(1.05);
+  background-color: #009acd;
+  box-shadow: 0 6px 20px rgba(0,191,255,0.35);
+}
+
+.buttonBack {
+  background-color: rgba(255,255,255,0.12);
+  color: #fff;
+}
+
+.buttonBack:hover {
+  transform: scale(1.05);
+  background-color: rgba(255,255,255,0.25);
+  box-shadow: 0 6px 20px rgba(255,255,255,0.2);
+}
+
+.buttonSubmit {
+  background-color: #00bfff;
+  color: #000;
+}
+
+.buttonSubmit:hover {
+  transform: scale(1.05);
+  background-color: #009acd;
+  box-shadow: 0 6px 20px rgba(0,191,255,0.4);
+}
+
+/* Error message */
+.error {
+  color: #ff4d4d;
+  margin-top: 15px;
+  text-align: center;
+  font-weight: bold;
+}
+
+/* Progress bar */
+.progressBar {
+  height: 10px;
+  width: 100%;
+  background-color: rgba(255,255,255,0.1);
+  border-radius: 15px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.progress {
+  height: 100%;
+  width: 0;
+  background-color: #00bfff;
+  border-radius: 15px;
+  transition: width 0.4s ease;
+}
+
+/* Card fade-in animation */
+@keyframes fadeInSlide {
+  0% { opacity: 0; transform: translateY(30px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Result Page */
+.resultContainer {
+  max-width: 500px;
+  margin: 50px auto;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(15px);
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.1);
+  box-sizing: border-box;
+  color: #fff;
+  text-align: center;
+}
+
+.resultTitle {
+  font-size: 2rem;
+  color: #00bfff;
+  margin-bottom: 15px;
+}
+
+.resultPrimary {
+  font-size: 1.5rem;
+  margin: 15px 0;
+}
+
+.resultList {
+  list-style: none;
+  padding-left: 0;
+}
+
+.resultList li {
+  background-color: rgba(0,191,255,0.1);
+  padding: 10px 15px;
+  border-radius: 10px;
+  margin: 8px 0;
+  color: #fff;
+}
+
+/* Animated GIF */
+.resultGif {
+  width: 150px;
+  margin: 20px auto;
+  display: block;
+  animation: bounce 1.2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+}

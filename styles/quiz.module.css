@@ -1,9 +1,9 @@
 /* styles/quiz.module.css */
 
-/* Glass quiz card styling + animations + colors */
+/* Font Import */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
-/* ---------------- CONTAINER ---------------- */
+/* ---------------- BASE CONTAINER ---------------- */
 .container {
   max-width: 500px;
   margin: 50px auto;
@@ -11,23 +11,24 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-/* ---------------- TITLES ---------------- */
-.title {
-  text-align: center;
-  font-size: 2rem;
-  color: #00bfff;
-  margin-bottom: 10px;
   font-family: 'Poppins', sans-serif;
 }
 
+/* ---------------- TITLE ---------------- */
+.title {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #00bfff;
+  margin-bottom: 10px;
+}
+
+/* ---------------- SUB TITLE ---------------- */
 .sub {
   text-align: center;
   font-size: 1rem;
   margin-bottom: 30px;
-  color: #ccc;
-  font-family: 'Poppins', sans-serif;
+  color: #bbb;
 }
 
 /* ---------------- GLASS CARD ---------------- */
@@ -37,13 +38,12 @@
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
-  padding: 30px 25px;  
+  padding: 30px 25px;
   border-radius: 20px;
   margin-bottom: 25px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  box-sizing: border-box; 
+  box-sizing: border-box;
   transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.5s ease;
-  overflow: hidden; 
   opacity: 0;
   transform: translateY(30px);
 }
@@ -61,10 +61,9 @@
   color: #e0e0e0;
 }
 
-/* ---------------- INPUT FIELDS ---------------- */
+/* ---------------- INPUT FIELD ---------------- */
 .inputField {
   width: 100%;
-  box-sizing: border-box; 
   padding: 14px;
   margin: 10px 0 20px 0;
   border-radius: 12px;
@@ -73,14 +72,12 @@
   font-size: 1rem;
   background-color: rgba(255, 255, 255, 0.05);
   color: #fff;
-  backdrop-filter: blur(5px);
-  font-family: 'Poppins', sans-serif;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .inputField:focus {
   transform: scale(1.02);
-  box-shadow: 0 0 10px rgba(0,191,255,0.4);
+  box-shadow: 0 0 10px rgba(0, 191, 255, 0.4);
 }
 
 /* ---------------- OPTIONS ---------------- */
@@ -100,13 +97,12 @@
   background-color: rgba(255, 255, 255, 0.05);
   cursor: pointer;
   transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-  font-family: 'Poppins', sans-serif;
 }
 
 .optionLabel:hover {
   background-color: rgba(0, 191, 255, 0.2);
   transform: scale(1.03);
-  box-shadow: 0 8px 20px rgba(0,191,255,0.3);
+  box-shadow: 0 8px 20px rgba(0, 191, 255, 0.3);
 }
 
 .optionLabel input {
@@ -131,18 +127,18 @@
   border: none;
   cursor: pointer;
   transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
-  font-family: 'Poppins', sans-serif;
 }
 
 .buttonPrimary {
   background-color: #00bfff;
   color: #000;
+  font-weight: 600;
 }
 
 .buttonPrimary:hover {
   transform: scale(1.05);
   background-color: #009acd;
-  box-shadow: 0 6px 20px rgba(0,191,255,0.35);
+  box-shadow: 0 6px 20px rgba(0, 191, 255, 0.35);
 }
 
 .buttonBack {
@@ -159,12 +155,13 @@
 .buttonSubmit {
   background-color: #00bfff;
   color: #000;
+  font-weight: 600;
 }
 
 .buttonSubmit:hover {
   transform: scale(1.05);
   background-color: #009acd;
-  box-shadow: 0 6px 20px rgba(0,191,255,0.4);
+  box-shadow: 0 6px 20px rgba(0, 191, 255, 0.4);
 }
 
 /* ---------------- ERROR MESSAGE ---------------- */
@@ -193,34 +190,27 @@
   transition: width 0.4s ease;
 }
 
-/* ---------------- CARD FADE-IN ANIMATION ---------------- */
-@keyframes fadeInSlide {
-  0% { opacity: 0; transform: translateY(30px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-
-/* ---------------- RESULT PAGE SPECIFIC ---------------- */
+/* ---------------- RESULT PAGE ---------------- */
 .resultContainer {
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 30px;
-  max-width: 500px;
+  max-width: 550px;
   margin: 50px auto;
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(20px);
   border-radius: 25px;
   border: 1px solid rgba(255,255,255,0.12);
-  font-family: 'Poppins', sans-serif;
   color: #fff;
   box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+  text-align: center;
 }
 
 .resultTitle {
   font-size: 2rem;
   color: #00bfff;
   margin-bottom: 20px;
-  text-align: center;
 }
 
 .resultItem {
@@ -229,15 +219,41 @@
   color: #e0e0e0;
 }
 
+/* Add-ons & Notes section */
+.resultSection {
+  width: 100%;
+  margin-top: 20px;
+  text-align: left;
+}
+
+.resultSection h3 {
+  font-size: 1.2rem;
+  color: #fff;
+  margin-bottom: 10px;
+}
+
 .resultList {
   list-style: none;
   padding-left: 0;
-  margin-bottom: 20px;
+  margin: 0;
 }
 
 .resultList li {
-  padding: 8px 12px;
+  padding: 10px 14px;
   margin-bottom: 8px;
-  background: rgba(0,191,255,0.1);
+  background: rgba(0, 191, 255, 0.12);
   border-radius: 12px;
+  color: #d9f6ff;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.resultList li:hover {
+  transform: scale(1.02);
+  background: rgba(0, 191, 255, 0.22);
+}
+
+/* ---------------- ANIMATIONS ---------------- */
+@keyframes fadeInSlide {
+  0% { opacity: 0; transform: translateY(30px); }
+  100% { opacity: 1; transform: translateY(0); }
 }

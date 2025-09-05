@@ -9,7 +9,6 @@ export default async function handler(req, res) {
       .status(405)
       .json({ success: false, error: "Method not allowed" });
   }
-
   try {
     const { user, answers } = req.body;
 
@@ -20,7 +19,10 @@ export default async function handler(req, res) {
         .json({ success: false, error: "Invalid body" });
     }
 
+    // Generate a unique submission ID
     const submissionId = uuidv4();
+
+    // Compute lens recommendation
     const recommendation = getLensRecommendation(answers);
 
     // 🔥 Save submission to Firestore

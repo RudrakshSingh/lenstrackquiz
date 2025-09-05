@@ -1,0 +1,91 @@
+/* Popup Overlay */
+.popupOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.55); /* dim background */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  /* Popup Box */
+  .popupBox {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(14px) saturate(160%);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+    border-radius: 18px;
+    padding: 20px 25px;
+    max-width: 400px;
+    width: 90%;
+    color: #fff;
+    text-align: center;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.25);
+    transform: scale(0.85);
+    animation: scaleIn 0.25s ease forwards;
+  }
+  
+  /* Popup Image */
+  .popupImage {
+    max-width: 160px;    /* keep small */
+    max-height: 140px;
+    object-fit: contain;
+    border-radius: 8px;
+    margin-bottom: 12px;
+  }
+  
+  
+  /* Popup Text */
+  .popupText {
+    font-size: 1.1rem;
+    font-weight: 500;
+    line-height: 1.5;
+    color: #f9f9f9;
+  }
+  
+  /* Close Button */
+  .closeBtn {
+    position: absolute;
+    top: 12px;
+    right: 18px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .closeBtn:hover {
+    transform: scale(1.2);
+  }
+  
+  /* Animations */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes scaleIn {
+    from { transform: scale(0.85); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .popupCard {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    text-align: center;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  .popupTextCard {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #333;
+  }
+  
+  

@@ -74,7 +74,6 @@
   flex-direction: column;
   align-items: center;
   font-family: 'Poppins', sans-serif;
-<<<<<<< HEAD
   position: relative;
   animation: fadeInSlide 0.8s ease-out;
 }
@@ -94,9 +93,6 @@
   );
   animation: gradientShift 15s ease infinite;
   z-index: -1;
-=======
-  color: #fff;
->>>>>>> fbc289c (ui updated)
 }
 
 /* ---------------- TITLE ---------------- */
@@ -397,7 +393,7 @@
   text-shadow: 0 0 10px rgba(255, 77, 77, 0.5);
 }
 
-<<<<<<< HEAD
+
 /* ---------------- PROGRESS BAR ---------------- */
 .progressBar {
   height: 10px;
@@ -523,8 +519,6 @@
 .sparkle:nth-child(5) { top: 50%; left: 10%; animation-delay: 1.2s; }
 .sparkle:nth-child(6) { top: 50%; left: 90%; animation-delay: 1.5s; }
 
-=======
->>>>>>> fbc289c (ui updated)
 /* ---------------- RESULT PAGE ---------------- */
 .resultContainer {
   display: flex;
@@ -650,8 +644,6 @@
   width: 100%;
   animation: fadeInSlide 0.8s ease-out;
 }
-
-<<<<<<< HEAD
 .lensCard {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.05));
   backdrop-filter: blur(20px);
@@ -901,7 +893,6 @@
   animation: fadeInSlide 1s ease-out;
 }
 
-=======
 .submitContainer {
   margin-top: 24px;
   text-align: center;
@@ -1002,7 +993,17 @@
 .slideIn {
   animation: slideInFromBottom 0.5s ease-out;
 }
-
-
-
->>>>>>> fbc289c (ui updated)
+@keyframes fadeInSlide {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}

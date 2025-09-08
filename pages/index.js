@@ -14,21 +14,21 @@ export default function Quiz() {
   const [popupData, setPopupData] = useState(null);
 
   const questions = [
-    { id: "vibe", label: "How do you want your glasses to feel on you?", options: ["Blends in", "Total signature look", "Honestly, whatever"] },
-    { id: "gender", label: "Gender matters only if you want it to", options: ["Male", "Female", "Other"] },
-    { id: "glassesAttachment", label: "How attached are you to your glasses?", options: ["Occasionally fling them on", "Mostly glued", "Forget them all the time", "It’s literally my lifeline"] },
-    { id: "blur", label: "Do things blur for you?", options: ["Near", "Distance", "Both", "I can’t tell anymore"] },
-    { id: "blurScale", label: "On a blur scale, where are you?", options: ["Crystal clear", "Just a little fuzzy", "Pretty bad", "Close to blind-mode"] },
-    { id: "screenTime", label: "How many hours do you battle screens?", options: ["<4", "4–8", "8–12", "Zero (I live in 1980s)"] },
-    { id: "lifestyle", label: "What’s your lifestyle cocktail?", options: ["Screens", "Paperwork", "People-facing", "Lone wolf"] },
-    { id: "workWith", label: "Do you wrestle more with?", options: ["Colors", "Text"] },
-    { id: "environment", label: "Your environment is usually?", options: ["Dusty chaos", "Spotless clean", "Full sun", "Mix of all"] },
-    { id: "movement", label: "Where do you live most?", options: ["Indoors", "Outdoors", "Balanced", "Everywhere at once"] },
-    { id: "driving", label: "How often are you behind the wheel?", options: ["Day drives", "Night owl", "Both", "Never"] },
-    { id: "breakFreq", label: "How often do you break or misplace your glasses?", options: ["Never", "Sometimes", "Always"] },
-    { id: "smoke", label: "Cigarettes?", options: ["Nope", "Around 2 a day", "10-ish", "Chain-smoker vibes"] },
-    { id: "drink", label: "Drinks?", options: ["Nope", "Once a week ritual", "More than once a week"] },
-    { id: "tint", label: "Should your lenses have superpowers?", options: ["Change with the sun", "Stay stylishly tinted", "Keep it simple clear"] },
+    { id: "vibe", label: "How do you want your glasses to look?", options: ["Simple and subtle", "Bold and stylish", "No preference"] },
+    { id: "gender", label: "Select your gender", options: ["Male", "Female", "Other"] },
+    { id: "glassesAttachment", label: "How often do you use glasses?", options: ["Sometimes", "Most of the time", "I forget them often", "I can’t do without them"] },
+    { id: "blur", label: "Where do you face blur?", options: ["Near", "Far", "Both", "Not sure"] },
+    { id: "blurScale", label: "How bad is your blur?", options: ["Almost clear", "Slightly blurry", "Quite blurry", "Very blurry"] },
+    { id: "screenTime", label: "How many hours are you on screens daily?", options: ["Less than 4", "4–8", "8–12", "None"] },
+    { id: "lifestyle", label: "What do you do most of the time?", options: ["Screen work", "Paperwork", "Meeting people", "Mostly alone"] },
+    { id: "workWith", label: "What do you work more with?", options: ["Colors/design", "Text/documents"] },
+    { id: "environment", label: "What’s your usual environment?", options: ["Dusty", "Clean", "Sunny", "Mixed"] },
+    { id: "movement", label: "Where do you spend most of your time?", options: ["Indoors", "Outdoors", "Balanced", "Everywhere"] },
+    { id: "driving", label: "How often do you drive?", options: ["Daytime", "Nighttime", "Both", "Never"] },
+    { id: "breakFreq", label: "Do you often break or lose your glasses?", options: ["Never", "Sometimes", "Always"] },
+    { id: "smoke", label: "Do you smoke?", options: ["No", "2 a day", "Around 10 a day", "A lot"] },
+    { id: "drink", label: "Do you drink alcohol?", options: ["No", "Once a week", "More than once a week"] },
+    { id: "tint", label: "Do you want your lenses to have extra features?", options: ["Change with sunlight", "Always tinted", "Clear only"] },
   ];
 
   const popupMessages = {

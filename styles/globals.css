@@ -48,6 +48,19 @@ a {
   text-decoration: none; 
 }
 
+/* Easter egg logo placement */
+.eggLogo {
+  display: block;
+  margin: 24px auto 8px auto; /* center by default (mobile) */
+}
+
+@media (min-width: 768px) {
+  .eggLogo {
+    margin: 24px 16px 8px auto; /* align right on larger screens */
+    display: block;
+  }
+}
+
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;

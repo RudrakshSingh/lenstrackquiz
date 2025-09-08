@@ -35,11 +35,8 @@ export default function EasterEgg() {
       alt="Lenstrack logo"
       onClick={showToast}
       title="Tap the Lenstrack logo for a surprise"
+      className="eggLogo"
       style={{
-        position: "fixed",
-        right: 12,
-        bottom: 12,
-        zIndex: 1000,
         width: 110,
         height: 26,
         cursor: "pointer",

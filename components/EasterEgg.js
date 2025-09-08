@@ -30,21 +30,13 @@ export default function EasterEgg() {
   };
 
   return (
-    <img
-      src="/lenstrack-logo.svg"
-      alt="Lenstrack logo"
+    <div
+      className="eggLogoText"
       onClick={showToast}
       title="Tap the Lenstrack logo for a surprise"
-      className="eggLogo"
-      style={{
-        width: 110,
-        height: 26,
-        cursor: "pointer",
-        userSelect: "none",
-        WebkitUserDrag: "none",
-        filter: "drop-shadow(0 6px 14px rgba(17,24,39,0.15))",
-      }}
-    />
+    >
+      Lenstrack<sup>®</sup>
+    </div>
   );
 }
 

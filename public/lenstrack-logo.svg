@@ -1,5 +1,7 @@
-<svg width="120" height="28" viewBox="0 0 120 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <text x="0" y="20" font-family="Inter, Arial, Helvetica, sans-serif" font-size="18" font-weight="800" fill="#111827">Lenstrack</text>
+<svg width="220" height="40" viewBox="0 0 220 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <text x="0" y="28" font-family="Inter, Arial, Helvetica, sans-serif" font-size="26" font-weight="900" fill="#111827">
+    Lenstrack<tspan dx="0" baseline-shift="super" font-size="12" font-weight="900">®</tspan>
+  </text>
 </svg>
 
 

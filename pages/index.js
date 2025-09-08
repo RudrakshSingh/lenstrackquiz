@@ -14,7 +14,7 @@ export default function Quiz() {
   const [popupData, setPopupData] = useState(null);
 
   const questions = [
-    { id: "vibe", label: "What’s your vibe?", options: ["Blends in", "Total signature look", "Honestly, whatever"] },
+    { id: "vibe", label: "How do you want your glasses to feel on you?", options: ["Blends in", "Total signature look", "Honestly, whatever"] },
     { id: "gender", label: "Gender matters only if you want it to", options: ["Male", "Female", "Other"] },
     { id: "glassesAttachment", label: "How attached are you to your glasses?", options: ["Occasionally fling them on", "Mostly glued", "Forget them all the time", "It’s literally my lifeline"] },
     { id: "blur", label: "Do things blur for you?", options: ["Near", "Distance", "Both", "I can’t tell anymore"] },
@@ -27,7 +27,7 @@ export default function Quiz() {
     { id: "driving", label: "How often are you behind the wheel?", options: ["Day drives", "Night owl", "Both", "Never"] },
     { id: "breakFreq", label: "How often do you break or misplace your glasses?", options: ["Never", "Sometimes", "Always"] },
     { id: "smoke", label: "Cigarettes?", options: ["Nope", "Around 2 a day", "10-ish", "Chain-smoker vibes"] },
-    { id: "drink", label: "Drinks?", options: ["Once a week ritual", "More than once a week"] },
+    { id: "drink", label: "Drinks?", options: ["Nope", "Once a week ritual", "More than once a week"] },
     { id: "tint", label: "Should your lenses have superpowers?", options: ["Change with the sun", "Stay stylishly tinted", "Keep it simple clear"] },
   ];
 

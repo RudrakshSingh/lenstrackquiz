@@ -19,6 +19,10 @@ const eslintConfig = [
       "build/**",
       "next-env.d.ts",
     ],
+    rules: {
+      // Avoid CI/deploy noise for content strings
+      "react/no-unescaped-entities": "off",
+    },
   },
 ];
 

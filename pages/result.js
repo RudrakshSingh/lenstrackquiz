@@ -44,7 +44,7 @@ export default function Result() {
         <div className={styles.successIcon}>✨</div>
         <h1 className={styles.resultTitle}>Your Perfect Lens Match</h1>
         <p className={styles.resultSubtitle}>
-          Hi <strong>{user.name}</strong>, we've found the ideal lenses for your lifestyle
+          Hi <strong>{user.name}</strong>, we\'ve found the ideal lenses for your lifestyle
         </p>
       </div>
 

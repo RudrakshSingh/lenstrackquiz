@@ -100,7 +100,7 @@ export default function Quiz() {
         <div className={styles.stepCard}>
           <div className={styles.stepHeader}>
             <div className={styles.stepIcon}>👋</div>
-            <h2 className={styles.stepTitle}>Let's get started</h2>
+            <h2 className={styles.stepTitle}>Let\'s get started</h2>
             <p className={styles.stepDescription}>What should we call you?</p>
           </div>
           <div className={styles.inputGroup}>
@@ -124,7 +124,7 @@ export default function Quiz() {
           <div className={styles.stepHeader}>
             <div className={styles.stepIcon}>📱</div>
             <h2 className={styles.stepTitle}>Contact information</h2>
-            <p className={styles.stepDescription}>We'll send your results via WhatsApp</p>
+            <p className={styles.stepDescription}>We\'ll send your results via WhatsApp</p>
           </div>
           <div className={styles.inputGroup}>
             <input

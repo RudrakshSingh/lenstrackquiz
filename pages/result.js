@@ -40,10 +40,13 @@ export default function Result() {
 
   return (
     <div className={styles.resultContainer}>
-      <h1 className={styles.resultTitle}>Your Perfect Lens Match</h1>
-      <p className={styles.resultItem}>
-        <strong>{user.name}</strong>, here are your top 3 lens recommendations:
-      </p>
+      <div className={styles.resultHeader}>
+        <div className={styles.successIcon}>✨</div>
+        <h1 className={styles.resultTitle}>Your Perfect Lens Match</h1>
+        <p className={styles.resultSubtitle}>
+          Hi <strong>{user.name}</strong>, we've found the ideal lenses for your lifestyle
+        </p>
+      </div>
 
       {/* Top 3 Lens Recommendations */}
       <div className={styles.lensGrid}>
@@ -52,7 +55,7 @@ export default function Result() {
             
             {/* Rank Badge */}
             <div className={styles.rankBadge}>
-              #{index + 1} {index === 0 ? 'BEST MATCH' : `${lens.score}% Match`}
+              {index === 0 ? 'Best Match' : `#${index + 1}`}
             </div>
 
             {/* Lens Details */}
@@ -64,12 +67,12 @@ export default function Result() {
             {/* Price */}
             <div className={styles.priceSection}>
               <div className={styles.mainPrice}>{lens.price}</div>
-              <div className={styles.dailyPrice}>Just {lens.dailyCost} per day</div>
+              <div className={styles.dailyPrice}>{lens.dailyCost} per day</div>
             </div>
 
             {/* Features */}
             <div className={styles.featuresSection}>
-              <h4>✨ Key Features:</h4>
+              <h4 className={styles.sectionTitle}>Key Features</h4>
               <div className={styles.featuresList}>
                 {lens.features.map((feature, idx) => (
                   <span key={idx} className={styles.featureTag}>{feature}</span>
@@ -79,7 +82,7 @@ export default function Result() {
 
             {/* Why This Lens */}
             <div className={styles.whySection}>
-              <h4>🎯 Perfect Because:</h4>
+              <h4 className={styles.sectionTitle}>Why This Works</h4>
               <ul className={styles.notesList}>
                 {lens.notes.map((note, idx) => (
                   <li key={idx}>{note}</li>
@@ -93,65 +96,82 @@ export default function Result() {
 
       {/* Primary Recommendation Summary */}
       <div className={styles.primarySection}>
-        <h2 className={styles.primaryTitle}>🏆 Our #1 Recommendation</h2>
-        <p className={styles.primaryText}>
-          <strong>{recommendation.primary}</strong>
-        </p>
+        <div className={styles.primaryCard}>
+          <div className={styles.primaryIcon}>🏆</div>
+          <h2 className={styles.primaryTitle}>Our Top Recommendation</h2>
+          <p className={styles.primaryText}>
+            {recommendation.primary}
+          </p>
+        </div>
       </div>
 
       {/* Add-ons Section */}
       {recommendation.addons && recommendation.addons.length > 0 && (
-        <div className={styles.resultSection}>
-          <h3>🔧 Recommended Add-ons:</h3>
-          <ul className={styles.resultList}>
+        <div className={styles.addonsSection}>
+          <h3 className={styles.sectionTitle}>Recommended Add-ons</h3>
+          <div className={styles.addonsList}>
             {recommendation.addons.map((addon, index) => (
-              <li key={index}>{addon}</li>
+              <div key={index} className={styles.addonItem}>
+                <div className={styles.addonIcon}>+</div>
+                <span>{addon}</span>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       )}
 
       {/* Personal Notes */}
       {recommendation.notes && recommendation.notes.length > 0 && (
-        <div className={styles.resultSection}>
-          <h3>💡 Personal Notes:</h3>
-          <ul className={styles.resultList}>
+        <div className={styles.notesSection}>
+          <h3 className={styles.sectionTitle}>Personalized Insights</h3>
+          <div className={styles.notesList}>
             {recommendation.notes.map((note, index) => (
-              <li key={index}>{note}</li>
+              <div key={index} className={styles.noteItem}>
+                <div className={styles.noteIcon}>💡</div>
+                <span>{note}</span>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       )}
 
-      {/* Appointment / WhatsApp section */}
-      <div className={styles.appointmentBox}>
-        <p className={styles.appointmentText}>
-          📅 Book your appointment for a free eye test
-        </p>
-        <a
-          href="https://wa.me/918062177325?text=Hi%20I%20want%20to%20book%20a%20free%20eye%20test"
-          target="_blank"
-          rel="noopener noreferrer"
-          className={styles.whatsappLink}
-        >
-          📲 WhatsApp: 8062177325
-        </a>
-        
-        {/* Retake Quiz Button */}
-        <div className={styles.retakeSection}>
+      {/* Action Section */}
+      <div className={styles.actionSection}>
+        <div className={styles.appointmentCard}>
+          <div className={styles.appointmentHeader}>
+            <h3 className={styles.appointmentTitle}>Ready to Get Started?</h3>
+            <p className={styles.appointmentText}>
+              Book your free eye test and consultation
+            </p>
+          </div>
+          
+          <a
+            href="https://wa.me/918062177325?text=Hi%20I%20want%20to%20book%20a%20free%20eye%20test"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.whatsappButton}
+          >
+            <span className={styles.whatsappIcon}>📱</span>
+            Book on WhatsApp
+          </a>
+          
           <button 
             onClick={() => router.push('/')}
-            className={styles.buttonPrimary}
+            className={styles.retakeButton}
           >
-            🔄 Retake Quiz
+            Take Quiz Again
           </button>
         </div>
-        {/* Easter Egg Footer */}
-<div className={styles.footerNote}>
-  Made with ❤️, peace ✌️ and happiness 😄 at <strong>Lenstrack</strong>. <br />
-  &copy; {new Date().getFullYear()} Lenstrack. All rights reserved.
-</div>
+      </div>
 
+      {/* Footer */}
+      <div className={styles.footer}>
+        <p className={styles.footerText}>
+          Made with ❤️ at <strong>Lenstrack</strong>
+        </p>
+        <p className={styles.footerCopyright}>
+          &copy; {new Date().getFullYear()} Lenstrack. All rights reserved.
+        </p>
       </div>
     </div>
   );

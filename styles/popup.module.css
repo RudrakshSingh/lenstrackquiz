@@ -1,91 +1,83 @@
-/* Popup Overlay */
-.popupOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.55); /* dim background */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    animation: fadeIn 0.3s ease-in-out;
-  }
-  
-  /* Popup Box */
-  .popupBox {
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(14px) saturate(160%);
-    -webkit-backdrop-filter: blur(14px) saturate(160%);
-    border-radius: 18px;
-    padding: 20px 25px;
-    max-width: 400px;
-    width: 90%;
-    color: #fff;
-    text-align: center;
-    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.25);
-    transform: scale(0.85);
-    animation: scaleIn 0.25s ease forwards;
-  }
-  
-  /* Popup Image */
-  .popupImage {
-    max-width: 160px;    /* keep small */
-    max-height: 140px;
-    object-fit: contain;
-    border-radius: 8px;
-    margin-bottom: 12px;
-  }
-  
-  
-  /* Popup Text */
-  .popupText {
-    font-size: 1.1rem;
-    font-weight: 500;
-    line-height: 1.5;
-    color: #f9f9f9;
-  }
-  
-  /* Close Button */
-  .closeBtn {
-    position: absolute;
-    top: 12px;
-    right: 18px;
-    font-size: 22px;
-    font-weight: bold;
-    color: #fff;
-    cursor: pointer;
-    transition: transform 0.2s;
-  }
-  .closeBtn:hover {
-    transform: scale(1.2);
-  }
-  
-  /* Animations */
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-  
-  @keyframes scaleIn {
-    from { transform: scale(0.85); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-  }
+/* Modern Popup Styles */
 
-  .popupCard {
-    background: #fff;
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    text-align: center;
-    animation: fadeIn 0.3s ease-in-out;
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+  padding: 1rem;
+}
+
+.popup {
+  background: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  max-width: 400px;
+  width: 100%;
+  position: relative;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid #e5e7eb;
+}
+
+.closeButton {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.closeButton:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.closeButton:focus {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
   }
-  
-  .popupTextCard {
-    font-size: 1.1rem;
-    font-weight: 500;
-    color: #333;
+  to {
+    opacity: 1;
   }
-  
-  
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .popup {
+    padding: 1.5rem;
+    margin: 0.5rem;
+  }
+}

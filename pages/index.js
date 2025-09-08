@@ -97,44 +97,71 @@ export default function Quiz() {
   const renderStep = () => {
     if (currentStep === 0)
       return (
-        <div className={`${styles.card} ${styles.fadeIn}`}>
-          <p className={styles.questionText}>👤 Your Name?</p>
-          <input
-            className={styles.inputField}
-            placeholder="Your Name"
-            value={user.name}
-            onChange={(e) => setUser({ ...user, name: e.target.value })}
-          />
-          <button className={styles.buttonPrimary} onClick={nextStep}>Next →</button>
+        <div className={styles.stepCard}>
+          <div className={styles.stepHeader}>
+            <div className={styles.stepIcon}>👋</div>
+            <h2 className={styles.stepTitle}>Let's get started</h2>
+            <p className={styles.stepDescription}>What should we call you?</p>
+          </div>
+          <div className={styles.inputGroup}>
+            <input
+              className={styles.inputField}
+              placeholder="Enter your name"
+              value={user.name}
+              onChange={(e) => setUser({ ...user, name: e.target.value })}
+            />
+            <button className={styles.nextButton} onClick={nextStep}>
+              Continue
+              <span className={styles.buttonArrow}>→</span>
+            </button>
+          </div>
         </div>
       );
 
     if (currentStep === 1)
       return (
-        <div className={`${styles.card} ${styles.fadeIn}`}>
-          <p className={styles.questionText}>📞 Your Number?</p>
-          <input
-            className={styles.inputField}
-            placeholder="Phone / WhatsApp"
-            value={user.number}
-            maxLength={10}
-            onChange={(e) => setUser({ ...user, number: e.target.value.replace(/\D/g, '') })}
-          />
-          <button className={styles.buttonPrimary} onClick={nextStep}>Next →</button>
+        <div className={styles.stepCard}>
+          <div className={styles.stepHeader}>
+            <div className={styles.stepIcon}>📱</div>
+            <h2 className={styles.stepTitle}>Contact information</h2>
+            <p className={styles.stepDescription}>We'll send your results via WhatsApp</p>
+          </div>
+          <div className={styles.inputGroup}>
+            <input
+              className={styles.inputField}
+              placeholder="Enter your phone number"
+              value={user.number}
+              maxLength={10}
+              onChange={(e) => setUser({ ...user, number: e.target.value.replace(/\D/g, '') })}
+            />
+            <button className={styles.nextButton} onClick={nextStep}>
+              Continue
+              <span className={styles.buttonArrow}>→</span>
+            </button>
+          </div>
         </div>
       );
 
     if (currentStep === 2)
       return (
-        <div className={`${styles.card} ${styles.fadeIn}`}>
-          <p className={styles.questionText}>✉️ Your Email (Optional)</p>
-          <input
-            className={styles.inputField}
-            placeholder="Email"
-            value={user.email}
-            onChange={(e) => setUser({ ...user, email: e.target.value })}
-          />
-          <button className={styles.buttonPrimary} onClick={nextStep}>Next →</button>
+        <div className={styles.stepCard}>
+          <div className={styles.stepHeader}>
+            <div className={styles.stepIcon}>📧</div>
+            <h2 className={styles.stepTitle}>Email (Optional)</h2>
+            <p className={styles.stepDescription}>For additional updates and offers</p>
+          </div>
+          <div className={styles.inputGroup}>
+            <input
+              className={styles.inputField}
+              placeholder="Enter your email"
+              value={user.email}
+              onChange={(e) => setUser({ ...user, email: e.target.value })}
+            />
+            <button className={styles.nextButton} onClick={nextStep}>
+              Start Quiz
+              <span className={styles.buttonArrow}>→</span>
+            </button>
+          </div>
         </div>
       );
 
@@ -145,10 +172,13 @@ export default function Quiz() {
     const isLast = qIndex === questions.length - 1;
 
     return (
-      <div className={`${styles.card} ${styles.fadeIn}`}>
-        <p className={styles.questionText}>{question.label}</p>
+      <div className={styles.stepCard}>
+        <div className={styles.stepHeader}>
+          <div className={styles.questionNumber}>Question {qIndex + 1}</div>
+          <h2 className={styles.stepTitle}>{question.label}</h2>
+        </div>
         <div className={styles.optionsContainer}>
-          {question.options.map((opt) => (
+          {question.options.map((opt, index) => (
             <label key={opt} className={styles.optionLabel}>
               <input
                 type="radio"
@@ -156,18 +186,29 @@ export default function Quiz() {
                 checked={answers[question.id] === opt}
                 onChange={() => handleAnswer(question.id, opt)}
               />
-              <span>{opt}</span>
+              <span className={styles.optionText}>{opt}</span>
+              <div className={styles.optionIndicator}></div>
             </label>
           ))}
         </div>
         {isLast && (
           <div className={styles.submitContainer}>
             <button
-              className={styles.buttonPrimary}
+              className={styles.submitButton}
               onClick={handleSubmit}
               disabled={submitting}
             >
-              {submitting ? "Submitting…" : "Reveal My Lens 🔍"}
+              {submitting ? (
+                <>
+                  <div className={styles.spinner}></div>
+                  Analyzing your responses...
+                </>
+              ) : (
+                <>
+                  Get My Recommendations
+                  <span className={styles.buttonArrow}>→</span>
+                </>
+              )}
             </button>
           </div>
         )}
@@ -177,16 +218,36 @@ export default function Quiz() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Your Eye Story Quiz</h1>
-      <p className={styles.sub}>Confess your habits. We’ll decode your eyes.</p>
+      <div className={styles.header}>
+        <h1 className={styles.title}>Find Your Perfect Lens</h1>
+        <p className={styles.subtitle}>A personalized quiz to discover the ideal eyewear for your lifestyle</p>
+        <div className={styles.progressContainer}>
+          <div className={styles.progressBar}>
+            <div 
+              className={styles.progress} 
+              style={{ width: `${((currentStep + 1) / (questions.length + 3)) * 100}%` }}
+            />
+          </div>
+          <span className={styles.progressText}>
+            {currentStep + 1} of {questions.length + 3}
+          </span>
+        </div>
+      </div>
 
-      {renderStep()}
+      <div className={styles.content}>
+        {renderStep()}
+      </div>
 
-      {error && <p className={styles.error}>{error}</p>}
+      {error && (
+        <div className={styles.errorContainer}>
+          <p className={styles.error}>{error}</p>
+        </div>
+      )}
 
       {popupData && (
         <Popup onClose={() => setPopupData(null)}>
-          <div className={`${styles.popupContent} ${styles.fadeIn}`}>
+          <div className={styles.popupContent}>
+            <div className={styles.popupIcon}>💡</div>
             <p className={styles.popupText}>{popupData}</p>
           </div>
         </Popup>

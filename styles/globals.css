@@ -51,7 +51,7 @@ a {
 /* Easter egg logo placement */
 /* Top-center fixed Lenstrack text logo */
 .eggLogoText {
-  position: fixed;
+  position:absolute;
   top: 8px;
   left: 50%;
   transform: translateX(-50%);
@@ -63,6 +63,8 @@ a {
   cursor: pointer;
   user-select: none;
   -webkit-user-drag: none;
+  background-position: 0cqmax;
+  background-color: #ffffffec;
 }
 .eggLogoText sup {
   font-size: 55%;

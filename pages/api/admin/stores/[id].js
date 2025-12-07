@@ -98,15 +98,33 @@ async function updateStoreHandler(req, res) {
       throw new NotFoundError('Store not found');
     }
 
-    console.log('Updating store:', id, 'Current store:', { code: store.code, name: store.name, status: store.status, isActive: store.isActive });
+    console.log('Updating store:', id, 'Current store:', { 
+      code: store.code, 
+      name: store.name, 
+      status: store.status, 
+      isActive: store.isActive,
+      organizationId: store.organizationId?.toString()
+    });
+    console.log('User info:', { 
+      role: user.role, 
+      organizationId: user.organizationId?.toString() 
+    });
 
     // Check organization access
-    if (store.organizationId && user.organizationId && 
-        store.organizationId.toString() !== user.organizationId.toString()) {
-      return res.status(403).json({
-        success: false,
-        error: { code: 'FORBIDDEN', message: 'Access denied to this store' }
-      });
+    // SUPER_ADMIN and ADMIN can access all stores, regardless of organization
+    // Only check organization access for other roles
+    if (user.role !== 'SUPER_ADMIN' && user.role !== 'ADMIN') {
+      if (store.organizationId && user.organizationId && 
+          store.organizationId.toString() !== user.organizationId.toString()) {
+        console.error('Organization access denied:', {
+          storeOrgId: store.organizationId.toString(),
+          userOrgId: user.organizationId.toString()
+        });
+        return res.status(403).json({
+          success: false,
+          error: { code: 'FORBIDDEN', message: 'Access denied to this store' }
+        });
+      }
     }
 
     // Clean up empty strings to null for optional fields

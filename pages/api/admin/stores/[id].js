@@ -15,17 +15,26 @@ async function getStore(req, res) {
     const { id } = req.query;
     const user = req.user;
 
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'VALIDATION_ERROR', message: 'Store ID is required' }
+      });
+    }
+
     const store = await getStoreById(id);
     if (!store) {
       throw new NotFoundError('Store not found');
     }
 
-    // Check access
-    if (store.organizationId.toString() !== user.organizationId.toString()) {
-      return res.status(403).json({
-        success: false,
-        error: { code: 'FORBIDDEN', message: 'Access denied' }
-      });
+    // Check access (only if user has organizationId)
+    if (user && user.organizationId && store.organizationId) {
+      if (store.organizationId.toString() !== user.organizationId.toString()) {
+        return res.status(403).json({
+          success: false,
+          error: { code: 'FORBIDDEN', message: 'Access denied' }
+        });
+      }
     }
 
     // Get staff list
@@ -37,7 +46,7 @@ async function getStore(req, res) {
         ...store,
         id: store._id.toString(),
         _id: undefined,
-        organizationId: store.organizationId.toString(),
+        organizationId: store.organizationId ? store.organizationId.toString() : null,
         staff: staff.map(u => ({
           id: u._id.toString(),
           name: u.name,
@@ -48,6 +57,7 @@ async function getStore(req, res) {
       }
     });
   } catch (error) {
+    console.error('Get store error:', error);
     return handleError(error, res);
   }
 }
@@ -58,15 +68,42 @@ async function updateStoreHandler(req, res) {
     const { id } = req.query;
     const user = req.user;
     
-    authorize('SUPER_ADMIN', 'ADMIN')(user);
+    // Check authorization
+    try {
+      authorize('SUPER_ADMIN', 'ADMIN')(user);
+    } catch (authError) {
+      return res.status(403).json({
+        success: false,
+        error: { code: 'FORBIDDEN', message: authError.message || 'Insufficient permissions' }
+      });
+    }
 
     const store = await getStoreById(id);
     if (!store) {
       throw new NotFoundError('Store not found');
     }
 
+    // Check organization access
+    if (store.organizationId && user.organizationId && 
+        store.organizationId.toString() !== user.organizationId.toString()) {
+      return res.status(403).json({
+        success: false,
+        error: { code: 'FORBIDDEN', message: 'Access denied to this store' }
+      });
+    }
+
+    // Clean up empty strings to null for optional fields
+    const cleanedData = {};
+    Object.keys(req.body).forEach(key => {
+      if (req.body[key] === '') {
+        cleanedData[key] = null;
+      } else {
+        cleanedData[key] = req.body[key];
+      }
+    });
+
     // Validate input
-    const validationResult = UpdateStoreSchema.safeParse(req.body);
+    const validationResult = UpdateStoreSchema.safeParse(cleanedData);
     if (!validationResult.success) {
       const details = {};
       validationResult.error.errors.forEach(err => {
@@ -81,6 +118,10 @@ async function updateStoreHandler(req, res) {
     }
 
     const updated = await updateStore(id, validationResult.data);
+    
+    if (!updated) {
+      throw new NotFoundError('Store not found or update failed');
+    }
 
     return res.status(200).json({
       success: true,
@@ -88,10 +129,11 @@ async function updateStoreHandler(req, res) {
         ...updated,
         id: updated._id.toString(),
         _id: undefined,
-        organizationId: updated.organizationId.toString()
+        organizationId: updated.organizationId ? updated.organizationId.toString() : null
       }
     });
   } catch (error) {
+    console.error('Update store error:', error);
     return handleError(error, res);
   }
 }
@@ -102,11 +144,28 @@ async function deleteStoreHandler(req, res) {
     const { id } = req.query;
     const user = req.user;
     
-    authorize('SUPER_ADMIN', 'ADMIN')(user);
+    // Check authorization
+    try {
+      authorize('SUPER_ADMIN', 'ADMIN')(user);
+    } catch (authError) {
+      return res.status(403).json({
+        success: false,
+        error: { code: 'FORBIDDEN', message: authError.message || 'Insufficient permissions' }
+      });
+    }
 
     const store = await getStoreById(id);
     if (!store) {
       throw new NotFoundError('Store not found');
+    }
+
+    // Check organization access
+    if (store.organizationId && user.organizationId && 
+        store.organizationId.toString() !== user.organizationId.toString()) {
+      return res.status(403).json({
+        success: false,
+        error: { code: 'FORBIDDEN', message: 'Access denied to this store' }
+      });
     }
 
     // Check for active sessions
@@ -126,13 +185,18 @@ async function deleteStoreHandler(req, res) {
     }
 
     // Soft delete
-    await updateStore(id, { isActive: false });
+    const updated = await updateStore(id, { isActive: false });
+    
+    if (!updated) {
+      throw new NotFoundError('Store not found or delete failed');
+    }
 
     return res.status(200).json({
       success: true,
       message: 'Store deleted successfully'
     });
   } catch (error) {
+    console.error('Delete store error:', error);
     return handleError(error, res);
   }
 }

@@ -79,6 +79,7 @@ async function createStoreHandler(req, res) {
     try {
       authorize('SUPER_ADMIN', 'ADMIN')(user);
     } catch (authError) {
+      console.error('Authorization error:', authError);
       return res.status(403).json({
         success: false,
         error: { code: 'FORBIDDEN', message: authError.message || 'Insufficient permissions' }
@@ -87,6 +88,7 @@ async function createStoreHandler(req, res) {
 
     // Validate organizationId
     if (!user.organizationId) {
+      console.error('Missing organizationId for user:', user);
       return res.status(400).json({
         success: false,
         error: { code: 'VALIDATION_ERROR', message: 'User organization ID is required' }
@@ -107,6 +109,7 @@ async function createStoreHandler(req, res) {
     // Validate input
     const validationResult = CreateStoreSchema.safeParse(cleanedData);
     if (!validationResult.success) {
+      console.error('Validation failed:', validationResult.error.errors);
       const details = {};
       validationResult.error.errors.forEach(err => {
         const path = err.path.join('.');
@@ -120,22 +123,42 @@ async function createStoreHandler(req, res) {
     }
 
     // Check if store code already exists
-    const { getStoreByCode } = await import('../../../../models/Store');
-    const existing = await getStoreByCode(user.organizationId, validationResult.data.code);
-    if (existing) {
-      return res.status(409).json({
-        success: false,
-        error: { code: 'RESOURCE_CONFLICT', message: 'Store code already exists' }
-      });
+    try {
+      const { getStoreByCode } = await import('../../../../models/Store');
+      const existing = await getStoreByCode(user.organizationId, validationResult.data.code);
+      if (existing) {
+        return res.status(409).json({
+          success: false,
+          error: { code: 'RESOURCE_CONFLICT', message: 'Store code already exists' }
+        });
+      }
+    } catch (checkError) {
+      console.error('Error checking existing store:', checkError);
+      // Continue with creation if check fails (might be connection issue)
+      // But log it for debugging
     }
 
-    const store = await createStore({
-      ...validationResult.data,
-      organizationId: user.organizationId
-    });
+    // Create the store
+    let store;
+    try {
+      store = await createStore({
+        ...validationResult.data,
+        organizationId: user.organizationId
+      });
+    } catch (createError) {
+      console.error('Error in createStore function:', createError);
+      console.error('CreateStore error details:', {
+        message: createError.message,
+        stack: createError.stack,
+        code: createError.code,
+        name: createError.name
+      });
+      throw createError;
+    }
 
     if (!store || !store._id) {
-      throw new Error('Failed to create store');
+      console.error('Store creation returned invalid result:', store);
+      throw new Error('Failed to create store - no ID returned');
     }
 
     return res.status(201).json({
@@ -159,6 +182,16 @@ async function createStoreHandler(req, res) {
     });
   } catch (error) {
     console.error('Create store error:', error);
+    console.error('Error details:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+      code: error.code,
+      envCheck: {
+        hasMongoUri: !!process.env.MONGODB_URI,
+        nodeEnv: process.env.NODE_ENV
+      }
+    });
     return handleError(error, res);
   }
 }

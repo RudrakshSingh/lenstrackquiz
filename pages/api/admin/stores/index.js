@@ -214,10 +214,13 @@ async function createStoreHandler(req, res) {
     // We'll generate it after store creation since we need the store ID
     let store;
     try {
-      store = await createStore({
+      // Ensure isActive defaults to true if not explicitly set
+      const storeData = {
         ...validationResult.data,
-        organizationId: user.organizationId
-      });
+        organizationId: user.organizationId,
+        isActive: validationResult.data.isActive !== undefined ? validationResult.data.isActive : true
+      };
+      store = await createStore(storeData);
       
       // Generate QR code URL after store creation
       if (store && store._id) {

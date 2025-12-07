@@ -166,13 +166,29 @@ async function createStoreHandler(req, res) {
       
       // Generate QR code URL after store creation
       if (store && store._id) {
-        const { generateStoreQRCode } = await import('../../../../lib/qrCode');
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || (req.headers.origin || '');
-        const qrCodeUrl = generateStoreQRCode(store._id.toString(), baseUrl);
-        
-        // Update store with QR code URL
-        const { updateStore } = await import('../../../../models/Store');
-        store = await updateStore(store._id, { qrCodeUrl });
+        try {
+          const { generateStoreQRCode } = await import('../../../../lib/qrCode');
+          const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || (req.headers.origin || '');
+          const qrCodeUrl = generateStoreQRCode(store._id.toString(), baseUrl);
+          
+          // Update store with QR code URL (non-blocking - if it fails, we still return the store)
+          const { updateStore } = await import('../../../../models/Store');
+          const updatedStore = await updateStore(store._id, { qrCodeUrl });
+          
+          // Only update store variable if update was successful, otherwise keep original
+          if (updatedStore && updatedStore._id) {
+            store = updatedStore;
+          } else {
+            // Update failed, but we still have the original store - just log it
+            console.warn('QR code URL update failed, but store was created successfully:', store._id.toString());
+            // Manually add qrCodeUrl to the store object for response
+            store.qrCodeUrl = qrCodeUrl;
+          }
+        } catch (qrError) {
+          // QR code generation/update failed, but store was created - log and continue
+          console.error('Error generating/updating QR code URL:', qrError);
+          // Store creation was successful, so we continue with the original store object
+        }
       }
     } catch (createError) {
       console.error('Error in createStore function:', createError);

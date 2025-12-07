@@ -63,7 +63,9 @@ async function listStores(req, res) {
       Object.assign(filter, activeFilter);
     }
     
+    console.log('Store list filter:', JSON.stringify(filter, null, 2));
     const stores = await getAllStores(filter);
+    console.log('Stores found:', stores.length, stores.map(s => ({ id: s._id?.toString(), code: s.code, name: s.name, isActive: s.isActive })));
     
     // Get staff count for each store (simplified - would need aggregation in production)
     const storesWithCounts = await Promise.all(stores.map(async (store) => {

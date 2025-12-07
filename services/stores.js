@@ -4,17 +4,22 @@ export const storeService = {
   list: async (params) => {
     const response = await api.get('/admin/stores', params);
     console.log('storeService.list response:', response);
+    console.log('storeService.list response type:', typeof response);
+    console.log('storeService.list response keys:', response ? Object.keys(response) : 'null');
     // API returns: { success: true, data: { stores: [...], pagination: {...} } }
     // api-client returns: data.data if exists, otherwise data
     // So response should be: { stores: [...], pagination: {...} }
     if (response?.stores && Array.isArray(response.stores)) {
+      console.log('Found stores in response.stores:', response.stores.length);
       return response.stores;
     } else if (response?.data?.stores && Array.isArray(response.data.stores)) {
+      console.log('Found stores in response.data.stores:', response.data.stores.length);
       return response.data.stores;
     } else if (Array.isArray(response)) {
+      console.log('Response is direct array:', response.length);
       return response;
     }
-    console.warn('Unexpected response format in storeService.list:', response);
+    console.warn('Unexpected response format in storeService.list:', JSON.stringify(response, null, 2));
     return [];
   },
   get: async (id) => {

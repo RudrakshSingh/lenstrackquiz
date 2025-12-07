@@ -29,20 +29,28 @@ export default function StaffPage() {
 
   const fetchStores = async () => {
     try {
+      // Fetch only active stores for staff assignment
       const response = await api.get('/admin/stores', { isActive: 'true' });
+      console.log('Staff form - stores response:', response);
       // Handle different response formats
-      if (response?.data?.stores) {
-        setStores(response.data.stores);
-      } else if (response?.stores) {
+      // API returns: { success: true, data: { stores: [...], pagination: {...} } }
+      // api-client returns: data.data if exists, otherwise data
+      // So response should be: { stores: [...], pagination: {...} }
+      if (response?.stores && Array.isArray(response.stores)) {
+        console.log('Staff form - found stores in response.stores:', response.stores.length);
         setStores(response.stores);
+      } else if (response?.data?.stores && Array.isArray(response.data.stores)) {
+        console.log('Staff form - found stores in response.data.stores:', response.data.stores.length);
+        setStores(response.data.stores);
       } else if (Array.isArray(response)) {
+        console.log('Staff form - response is direct array:', response.length);
         setStores(response);
       } else {
-        console.warn('Unexpected stores response format:', response);
+        console.warn('Staff form - unexpected stores response format:', response);
         setStores([]);
       }
     } catch (error) {
-      console.error('Failed to fetch stores:', error);
+      console.error('Staff form - failed to fetch stores:', error);
       setStores([]);
     }
   };

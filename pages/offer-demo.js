@@ -239,7 +239,11 @@ function OfferDemoContent() {
         {offerEngineResult && (
           <div className="bg-white rounded-xl shadow-lg p-6">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Applied Offers Display</h2>
-            <AppliedOffersDisplay offersApplied={offerEngineResult.appliedOffers || offerEngineResult.offersApplied || []} />
+            <AppliedOffersDisplay 
+              offersApplied={offerEngineResult.appliedOffers || offerEngineResult.offersApplied || []}
+              freeItem={offerEngineResult.freeItem}
+              bonusProduct={offerEngineResult.bonusProduct}
+            />
           </div>
         )}
 

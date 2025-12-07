@@ -9,12 +9,14 @@ export default function OfferBreakdownPanel({ result, className = '' }) {
     return null;
   }
 
-  // Support both old and new response formats
+  // Support both old and new response formats (V1.0 Spec)
   const priceComponents = result.breakdown || result.priceComponents || [];
   const offersApplied = result.appliedOffers || result.offersApplied || [];
   const finalPayable = result.finalPrice || result.finalPayable || 0;
   const baseTotal = result.baseTotal || 0;
   const totalSavings = baseTotal - finalPayable;
+  const freeItem = result.freeItem || null; // V1.0 Spec: Free item from YOPO
+  const bonusProduct = result.bonusProduct || null; // V1.0 Spec: Bonus product
 
   return (
     <div className={`${styles.panel} ${className}`}>
@@ -68,6 +70,41 @@ export default function OfferBreakdownPanel({ result, className = '' }) {
                 </span>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* V1.0 Spec: Display free item from YOPO */}
+      {freeItem && (
+        <div className={styles.freeItemSection}>
+          <h4 className={styles.freeItemTitle}>🎁 Free Item</h4>
+          <div className={styles.freeItemBadge}>
+            <CheckCircle className={styles.freeItemIcon} />
+            <span>{freeItem.description}</span>
+          </div>
+        </div>
+      )}
+
+      {/* V1.0 Spec: Display bonus product */}
+      {bonusProduct && (
+        <div className={styles.bonusProductSection}>
+          <h4 className={styles.bonusProductTitle}>🎁 Bonus Product</h4>
+          <div className={styles.bonusProductBadge}>
+            <CheckCircle className={styles.bonusProductIcon} />
+            <div className={styles.bonusProductContent}>
+              <div className={styles.bonusProductName}>
+                {bonusProduct.name} {bonusProduct.type === 'SKU_BASED' ? `(SKU: ${bonusProduct.sku})` : ''}
+              </div>
+              {bonusProduct.free ? (
+                <div className={styles.bonusProductValue}>
+                  FREE - Worth ₹{bonusProduct.value.toLocaleString('en-IN')}
+                </div>
+              ) : (
+                <div className={styles.bonusProductValue}>
+                  Pay ₹{bonusProduct.difference.toLocaleString('en-IN')} (Free up to ₹{bonusProduct.limit.toLocaleString('en-IN')})
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

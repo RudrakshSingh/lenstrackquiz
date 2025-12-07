@@ -89,6 +89,78 @@
   white-space: nowrap;
 }
 
+/* V1.0 Spec: Free Item Badge */
+.freeItemBadge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 2px solid #f59e0b;
+  border-radius: 10px;
+  margin-top: 16px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #92400e;
+}
+
+.freeItemIcon {
+  width: 24px;
+  height: 24px;
+  color: #f59e0b;
+  flex-shrink: 0;
+}
+
+/* V1.0 Spec: Bonus Product Badge */
+.bonusProductBadge {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: linear-gradient(135deg, #ddd6fe 0%, #c4b5fd 100%);
+  border: 2px solid #8b5cf6;
+  border-radius: 10px;
+  margin-top: 16px;
+}
+
+.bonusProductIcon {
+  width: 24px;
+  height: 24px;
+  color: #8b5cf6;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.bonusProductContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bonusProductTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: #6d28d9;
+}
+
+.bonusProductDetails {
+  font-size: 14px;
+  color: #5b21b6;
+  line-height: 1.5;
+}
+
+.bonusProductName {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.bonusProductValue {
+  font-size: 13px;
+  color: #7c3aed;
+  font-weight: 500;
+}
+
 @media (max-width: 768px) {
   .offerContent {
     flex-direction: column;
@@ -98,6 +170,10 @@
   
   .offerSavings {
     align-self: flex-end;
+  }
+  
+  .bonusProductBadge {
+    flex-direction: column;
   }
 }
 

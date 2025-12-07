@@ -37,7 +37,11 @@ export default function OrderSummary({ offerEngineResult, className = '' }) {
       {/* Applied Offers */}
       {appliedOffers.length > 0 && (
         <div className={styles.section}>
-          <AppliedOffersDisplay offersApplied={appliedOffers} />
+          <AppliedOffersDisplay 
+            offersApplied={appliedOffers} 
+            freeItem={offerEngineResult.freeItem}
+            bonusProduct={offerEngineResult.bonusProduct}
+          />
         </div>
       )}
 

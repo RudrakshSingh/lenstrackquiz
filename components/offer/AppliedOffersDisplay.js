@@ -4,7 +4,7 @@
 import { Tag, TrendingUp, Gift, Percent, DollarSign, Layers, Users, Ticket } from 'lucide-react';
 import styles from './AppliedOffersDisplay.module.css';
 
-export default function AppliedOffersDisplay({ offersApplied, className = '' }) {
+export default function AppliedOffersDisplay({ offersApplied, freeItem, bonusProduct, className = '' }) {
   if (!offersApplied || offersApplied.length === 0) {
     return (
       <div className={`${styles.container} ${className}`}>
@@ -32,6 +32,8 @@ export default function AppliedOffersDisplay({ offersApplied, className = '' }) 
         return <Users className={styles.icon} />;
       case 'COMBO_PRICE':
         return <Tag className={styles.icon} />;
+      case 'BONUS_FREE_PRODUCT':
+        return <Gift className={styles.icon} />;
       default:
         return <Ticket className={styles.icon} />;
     }
@@ -77,6 +79,12 @@ export default function AppliedOffersDisplay({ offersApplied, className = '' }) 
       case 'COMBO_PRICE':
         return `Combo Price Applied (Saved ₹${savings.toLocaleString('en-IN')})`;
       
+      case 'BONUS_FREE_PRODUCT':
+        if (description.includes('FREE')) {
+          return `Bonus Free Product: ${description}`;
+        }
+        return `Bonus Applied: ${description}`;
+      
       default:
         return `${description} (Saved ₹${savings.toLocaleString('en-IN')})`;
     }
@@ -102,6 +110,34 @@ export default function AppliedOffersDisplay({ offersApplied, className = '' }) 
           </div>
         ))}
       </div>
+      
+      {/* V1.0 Spec: Display free item from YOPO */}
+      {freeItem && (
+        <div className={styles.freeItemBadge}>
+          <Gift className={styles.freeItemIcon} />
+          <span>{freeItem.description}</span>
+        </div>
+      )}
+      
+      {/* V1.0 Spec: Display bonus product */}
+      {bonusProduct && (
+        <div className={styles.bonusProductBadge}>
+          <Gift className={styles.bonusProductIcon} />
+          <div className={styles.bonusProductContent}>
+            <div className={styles.bonusProductTitle}>
+              {bonusProduct.free ? '🎁 FREE' : '🎁 Bonus Applied'}
+            </div>
+            <div className={styles.bonusProductDetails}>
+              {bonusProduct.name} {bonusProduct.type === 'SKU_BASED' ? `(SKU: ${bonusProduct.sku})` : ''}
+              {bonusProduct.free ? (
+                <span className={styles.bonusProductValue}>Worth ₹{bonusProduct.value.toLocaleString('en-IN')}</span>
+              ) : (
+                <span className={styles.bonusProductValue}>Pay ₹{bonusProduct.difference.toLocaleString('en-IN')} (Free up to ₹{bonusProduct.limit.toLocaleString('en-IN')})</span>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

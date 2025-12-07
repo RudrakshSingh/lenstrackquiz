@@ -15,11 +15,17 @@ export const offerService = {
   updateRule: (id, data) => api.put(`/admin/offers/${id}`, data),
   deleteRule: (id) => api.delete(`/admin/offers/${id}`),
   
-  // Calculate offers (supports both old and new endpoints)
+  // Calculate offers (V1.0 Spec - uses /offer/calculate endpoint)
   calculate: async (data) => {
-    const response = await api.post('/offer-engine/calculate', data);
-    // API client returns data.data, so response is already the data object
-    return { data: response };
+    try {
+      // Try new V1.0 endpoint first
+      const response = await api.post('/offer/calculate', data);
+      return response;
+    } catch (error) {
+      // Fallback to old endpoint for backward compatibility
+      const response = await api.post('/offer-engine/calculate', data);
+      return { data: response };
+    }
   },
   
   // Category Discounts

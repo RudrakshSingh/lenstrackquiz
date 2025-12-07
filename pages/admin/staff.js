@@ -59,11 +59,24 @@ export default function StaffPage() {
   const fetchStaff = async () => {
     try {
       const response = await api.get('/admin/staff');
-      if (response?.data?.staff) {
+      console.log('Staff list response:', response);
+      // Handle different response formats
+      if (response?.data?.staff && Array.isArray(response.data.staff)) {
+        console.log('Found staff in response.data.staff:', response.data.staff.length);
         setStaff(response.data.staff);
+      } else if (response?.staff && Array.isArray(response.staff)) {
+        console.log('Found staff in response.staff:', response.staff.length);
+        setStaff(response.staff);
+      } else if (Array.isArray(response)) {
+        console.log('Response is direct array:', response.length);
+        setStaff(response);
+      } else {
+        console.warn('Unexpected staff response format:', response);
+        setStaff([]);
       }
     } catch (error) {
       console.error('Failed to fetch staff:', error);
+      setStaff([]);
     } finally {
       setLoading(false);
     }

@@ -50,14 +50,10 @@ async function listStores(req, res) {
         filter.isActive = false;
       }
     } else {
-      // Default: exclude deleted stores (isActive: false AND status: 'INACTIVE')
-      // Show stores where: (isActive !== false) OR (status !== 'INACTIVE')
-      // This excludes stores that are BOTH isActive: false AND status: 'INACTIVE' (deleted)
-      // But includes existing stores with isActive: false but status: 'ACTIVE' or undefined
-      filter.$or = [
-        { isActive: { $ne: false } },
-        { status: { $ne: 'INACTIVE' } }
-      ];
+      // Default: exclude deleted stores
+      // Exclude stores that have status: 'INACTIVE' (deleted stores)
+      // This is simpler and more reliable than checking isActive
+      filter.status = { $ne: 'INACTIVE' };
     }
 
     // Apply search filter if exists

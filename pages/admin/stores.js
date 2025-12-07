@@ -40,16 +40,26 @@ export default function StoresPage() {
     try {
       setLoading(true);
       const params = {};
-      if (statusFilter !== 'all') {
-        params.isActive = statusFilter === 'active';
+      // Only filter by status if explicitly set to 'active' or 'inactive'
+      // Default behavior: show all active stores (handled by backend)
+      if (statusFilter === 'active') {
+        params.isActive = 'true';
+      } else if (statusFilter === 'inactive') {
+        params.isActive = 'false';
       }
+      // If statusFilter is 'all', don't pass isActive param - backend will show active by default
       if (search) {
         params.search = search;
       }
       const data = await storeService.list(params);
-      setStores(Array.isArray(data) ? data : []);
+      // Handle different response formats
+      const storesList = Array.isArray(data) ? data : (data?.stores || []);
+      setStores(storesList);
+      console.log('Fetched stores:', storesList.length, storesList);
     } catch (error) {
+      console.error('Failed to fetch stores:', error);
       showToast('error', 'Failed to load stores');
+      setStores([]);
     } finally {
       setLoading(false);
     }

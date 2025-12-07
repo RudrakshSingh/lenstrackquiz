@@ -58,20 +58,20 @@ async function listStores(req, res) {
 
     // Apply search filter if exists
     if (searchFilter) {
-      // If we have $or filter, combine with $and
-      if (filter.$or) {
+      // Combine search filter with existing filters using $and
+      if (filter.status || filter.isActive) {
+        // If we have status or isActive filter, combine with $and
+        const existingFilters = {};
+        if (filter.status) existingFilters.status = filter.status;
+        if (filter.isActive) existingFilters.isActive = filter.isActive;
+        
         filter.$and = [
-          { $or: filter.$or },
+          existingFilters,
           searchFilter
         ];
-        delete filter.$or; // Remove direct $or, it's now in $and
-      } else if (filter.isActive) {
-        // If we have isActive filter, combine with $and
-        filter.$and = [
-          searchFilter,
-          { isActive: filter.isActive }
-        ];
-        delete filter.isActive; // Remove direct isActive, it's now in $and
+        // Remove direct filters, they're now in $and
+        delete filter.status;
+        delete filter.isActive;
       } else {
         Object.assign(filter, searchFilter);
       }

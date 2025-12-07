@@ -46,6 +46,8 @@ async function getStore(req, res) {
         ...store,
         id: store._id.toString(),
         _id: undefined,
+        status: store.status || (store.isActive ? 'ACTIVE' : 'INACTIVE'), // V1.0 Spec
+        qrCodeUrl: store.qrCodeUrl || null, // V1.0 Spec: QR code URL
         organizationId: store.organizationId ? store.organizationId.toString() : null,
         staff: staff.map(u => ({
           id: u._id.toString(),

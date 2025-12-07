@@ -1,6 +1,7 @@
 // pages/api/admin/staff/index.js
 // Staff management endpoints (V1.0 Spec)
 
+import { ObjectId } from 'mongodb';
 import { withAuth, authorize } from '../../../../middleware/auth';
 import { createStaff, getAllStaff, getStaffById, updateStaff, deleteStaff } from '../../../../models/Staff';
 import { getStoreById } from '../../../../models/Store';
@@ -13,7 +14,16 @@ async function listStaff(req, res) {
     const user = req.user || {};
 
     const filter = {};
-    if (storeId) filter.storeId = storeId;
+    if (storeId) {
+      try {
+        filter.storeId = typeof storeId === 'string' ? new ObjectId(storeId) : storeId;
+      } catch (error) {
+        return res.status(400).json({
+          success: false,
+          error: { code: 'VALIDATION_ERROR', message: 'Invalid storeId format' }
+        });
+      }
+    }
     if (status) filter.status = status;
 
     // Filter by organization if user is authenticated
@@ -22,7 +32,25 @@ async function listStaff(req, res) {
       const { getAllStores } = await import('../../../../models/Store');
       const stores = await getAllStores({ organizationId: user.organizationId });
       const storeIds = stores.map(s => s._id);
-      filter.storeId = { $in: storeIds };
+      if (storeIds.length > 0) {
+        if (filter.storeId) {
+          // If storeId is already set, check if it's in the organization's stores
+          if (!storeIds.some(id => id.toString() === filter.storeId.toString())) {
+            return res.status(200).json({
+              success: true,
+              data: { staff: [] }
+            });
+          }
+        } else {
+          filter.storeId = { $in: storeIds };
+        }
+      } else {
+        // No stores for this organization
+        return res.status(200).json({
+          success: true,
+          data: { staff: [] }
+        });
+      }
     }
 
     const staff = await getAllStaff(filter);

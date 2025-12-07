@@ -86,6 +86,12 @@ export default function StoreDashboard() {
 
       if (response?.data) {
         setStats(response.data);
+      } else if (response?.success && response?.data) {
+        setStats(response.data);
+      }
+
+      if (response?.data) {
+        setStats(response.data);
       }
     } catch (error) {
       console.error('Failed to fetch statistics:', error);

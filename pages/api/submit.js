@@ -274,10 +274,19 @@ export default async function handler(req, res) {
     }
 
     // V1.0 Spec: Create Order if frame and lens are selected
+    // Use bestMatch if available, otherwise fallback to perfectMatch
+    const selectedLens = recommendation?.bestMatch || recommendation?.perfectMatch;
     let orderId = null;
-    if (user.storeId && user.frameBrand && user.frameMRP && recommendation?.perfectMatch) {
+    if (user.storeId && user.frameBrand && user.frameMRP && selectedLens) {
       try {
         const { createOrder } = await import('../../models/Order');
+        
+        // Calculate final price from offer or use lens price
+        const finalPrice = selectedLens?.offer?.finalPrice || 
+                          selectedLens?.offerPrice || 
+                          selectedLens?.mrp || 
+                          selectedLens?.price || 0;
+        
         const order = await createOrder({
           storeId: user.storeId,
           salesMode: user.salesMode || 'SELF_SERVICE',
@@ -293,16 +302,17 @@ export default async function handler(req, res) {
             material: user.frameMaterial || null
           },
           lensData: {
-            itCode: recommendation.perfectMatch?.lens_id || recommendation.perfectMatch?.name || null,
-            name: recommendation.perfectMatch?.name || null,
-            price: recommendation.perfectMatch?.mrp || recommendation.perfectMatch?.price || 0,
-            brandLine: recommendation.perfectMatch?.brandLine || null
+            itCode: selectedLens?.itCode || selectedLens?.lens_id || selectedLens?.name || null,
+            name: selectedLens?.name || null,
+            price: selectedLens?.offerPrice || selectedLens?.mrp || selectedLens?.price || 0,
+            brandLine: selectedLens?.brandLine || null,
+            index: selectedLens?.index || null
           },
           offerData: {
-            appliedOffers: recommendation.perfectMatch?.offer || null,
-            finalPrice: recommendation.perfectMatch?.offer?.finalPrice || recommendation.perfectMatch?.mrp || 0
+            appliedOffers: selectedLens?.offer || null,
+            finalPrice: finalPrice
           },
-          finalPrice: recommendation.perfectMatch?.offer?.finalPrice || recommendation.perfectMatch?.mrp || 0
+          finalPrice: finalPrice
         });
         orderId = order._id.toString();
       } catch (orderError) {

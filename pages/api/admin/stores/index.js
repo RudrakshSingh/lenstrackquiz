@@ -71,7 +71,29 @@ async function listStores(req, res) {
     
     console.log('Store list filter:', JSON.stringify(filter, null, 2));
     const stores = await getAllStores(filter);
-    console.log('Stores found:', stores.length, stores.map(s => ({ id: s._id?.toString(), code: s.code, name: s.name, isActive: s.isActive })));
+    console.log('Stores found:', stores.length);
+    if (stores.length > 0) {
+      console.log('Store details:', stores.map(s => ({ 
+        id: s._id?.toString(), 
+        code: s.code, 
+        name: s.name, 
+        isActive: s.isActive,
+        organizationId: s.organizationId?.toString()
+      })));
+    } else {
+      // Debug: Try to find stores without any filter to see what's in DB
+      const allStores = await getAllStores({});
+      console.log('DEBUG: Total stores in DB (no filter):', allStores.length);
+      if (allStores.length > 0) {
+        console.log('DEBUG: All stores in DB:', allStores.map(s => ({ 
+          id: s._id?.toString(), 
+          code: s.code, 
+          name: s.name, 
+          isActive: s.isActive,
+          organizationId: s.organizationId?.toString()
+        })));
+      }
+    }
     
     // Get staff count for each store (simplified - would need aggregation in production)
     const storesWithCounts = await Promise.all(stores.map(async (store) => {

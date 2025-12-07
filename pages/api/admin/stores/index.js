@@ -34,33 +34,31 @@ async function listStores(req, res) {
     } : null;
 
     // Handle isActive filter from query params
-    let activeFilter = null;
     if (isActive !== undefined) {
       // Explicit filter from query params
       if (isActive === 'true' || isActive === true) {
-        activeFilter = { isActive: true };
+        filter.isActive = true;
       } else if (isActive === 'false' || isActive === false) {
-        activeFilter = { isActive: false };
+        filter.isActive = false;
       }
     } else {
       // Default: only show active stores (exclude deleted/inactive)
-      // Include stores where isActive is true OR undefined/null (new stores default to active)
-      activeFilter = {
-        $or: [
-          { isActive: true },
-          { isActive: { $exists: false } },
-          { isActive: null }
-        ]
-      };
+      // Use $ne: false to include true, undefined, and null (exclude only false)
+      filter.isActive = { $ne: false };
     }
 
-    // Combine filters: if both search and active filters exist, use $and
-    if (searchFilter && activeFilter) {
-      filter.$and = [searchFilter, activeFilter];
-    } else if (searchFilter) {
-      Object.assign(filter, searchFilter);
-    } else if (activeFilter) {
-      Object.assign(filter, activeFilter);
+    // Apply search filter if exists
+    if (searchFilter) {
+      // If we already have isActive filter, combine with $and
+      if (filter.isActive) {
+        filter.$and = [
+          searchFilter,
+          { isActive: filter.isActive }
+        ];
+        delete filter.isActive; // Remove direct isActive, it's now in $and
+      } else {
+        Object.assign(filter, searchFilter);
+      }
     }
     
     console.log('Store list filter:', JSON.stringify(filter, null, 2));

@@ -128,6 +128,10 @@ export default function StoresPage() {
       setEditingStore(null);
       // Refresh store list
       await fetchStores();
+      // Trigger dashboard refresh in other tabs/windows
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.setItem('dashboard-refresh', Date.now().toString());
+      }
     } catch (error) {
       console.error('Store save error:', error);
       if (error.code === 'RESOURCE_CONFLICT') {
@@ -147,6 +151,10 @@ export default function StoresPage() {
       setDeleteConfirm(null);
       // Refresh store list after deletion
       await fetchStores();
+      // Trigger dashboard refresh in other tabs/windows
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.setItem('dashboard-refresh', Date.now().toString());
+      }
     } catch (error) {
       console.error('Delete store error:', error);
       showToast('error', error.message || 'Failed to delete store');

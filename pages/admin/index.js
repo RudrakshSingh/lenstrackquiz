@@ -34,10 +34,10 @@ export default function AdminDashboard() {
     if (isAuthenticated && !authLoading) {
       fetchDashboardData();
       
-      // Auto-refresh every 30 seconds for real-time updates
+      // Auto-refresh every 5 seconds for real-time updates
       const interval = setInterval(() => {
         fetchDashboardData();
-      }, 30000);
+      }, 5000);
       
       return () => clearInterval(interval);
     } else if (!authLoading) {
@@ -45,6 +45,18 @@ export default function AdminDashboard() {
       setLoading(false);
     }
   }, [isAuthenticated, authLoading]);
+  
+  // Listen for storage events to refresh when data changes in other tabs
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'dashboard-refresh') {
+        fetchDashboardData();
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   const fetchDashboardData = async () => {
     try {

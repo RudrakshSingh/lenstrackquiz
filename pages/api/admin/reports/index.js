@@ -90,7 +90,8 @@ async function getOverviewReport(sessions, customers, user, res) {
 
   // Get counts for stores, users, products, questions
   const orgId = user.organizationId ? (typeof user.organizationId === 'string' ? new ObjectId(user.organizationId) : user.organizationId) : null;
-  const storeFilter = orgId ? { organizationId: orgId } : {};
+  // Only count active stores (exclude deleted stores with status: 'INACTIVE')
+  const storeFilter = orgId ? { organizationId: orgId, status: { $ne: 'INACTIVE' } } : { status: { $ne: 'INACTIVE' } };
   const userFilter = orgId ? { organizationId: orgId } : {};
   const productFilter = orgId ? { organizationId: orgId } : {};
   const questionFilter = orgId ? { organizationId: orgId } : {};

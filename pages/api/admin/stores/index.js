@@ -24,45 +24,43 @@ async function listStores(req, res) {
       filter._id = user.storeId;
     }
 
-    // Handle isActive filter from query params
-    if (isActive !== undefined) {
-      // Explicit filter from query params
-      if (isActive === 'true' || isActive === true) {
-        filter.isActive = true;
-      } else if (isActive === 'false' || isActive === false) {
-        filter.isActive = false;
-      }
-    } else {
-      // Default: only show active stores (exclude deleted/inactive)
-      // Include stores where isActive is true OR undefined (new stores default to active)
-      filter.$or = [
-        { isActive: true },
-        { isActive: { $exists: false } },
-        { isActive: null }
-      ];
-      // If there's already a $or filter (from search), we need to combine them
-      if (filter.$or && filter.$or.length > 0 && filter.$or[0].$regex) {
-        // Search filter exists, combine with AND logic
-        const searchOr = filter.$or;
-        delete filter.$or;
-        filter.$and = [
-          { $or: searchOr },
-          { $or: [
-            { isActive: true },
-            { isActive: { $exists: false } },
-            { isActive: null }
-          ]}
-        ];
-      }
-    }
-
-    // Search filter
-    if (search) {
-      filter.$or = [
+    // Search filter (apply first)
+    const searchFilter = search ? {
+      $or: [
         { name: { $regex: search, $options: 'i' } },
         { code: { $regex: search, $options: 'i' } },
         { city: { $regex: search, $options: 'i' } }
-      ];
+      ]
+    } : null;
+
+    // Handle isActive filter from query params
+    let activeFilter = null;
+    if (isActive !== undefined) {
+      // Explicit filter from query params
+      if (isActive === 'true' || isActive === true) {
+        activeFilter = { isActive: true };
+      } else if (isActive === 'false' || isActive === false) {
+        activeFilter = { isActive: false };
+      }
+    } else {
+      // Default: only show active stores (exclude deleted/inactive)
+      // Include stores where isActive is true OR undefined/null (new stores default to active)
+      activeFilter = {
+        $or: [
+          { isActive: true },
+          { isActive: { $exists: false } },
+          { isActive: null }
+        ]
+      };
+    }
+
+    // Combine filters: if both search and active filters exist, use $and
+    if (searchFilter && activeFilter) {
+      filter.$and = [searchFilter, activeFilter];
+    } else if (searchFilter) {
+      Object.assign(filter, searchFilter);
+    } else if (activeFilter) {
+      Object.assign(filter, activeFilter);
     }
     
     const stores = await getAllStores(filter);

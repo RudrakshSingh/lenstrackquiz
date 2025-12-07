@@ -106,7 +106,7 @@ export async function getStoreById(id) {
   }
 }
 
-export async function getStoreByCode(organizationId, code) {
+export async function getStoreByCode(organizationId, code, includeInactive = false) {
   try {
     if (!organizationId || !code) {
       return null;
@@ -119,7 +119,21 @@ export async function getStoreByCode(organizationId, code) {
       console.error('Invalid organizationId format:', organizationId);
       return null;
     }
-    return await collection.findOne({ organizationId: orgId, code });
+    
+    // Normalize code: trim and convert to uppercase for case-insensitive comparison
+    const normalizedCode = String(code).trim().toUpperCase();
+    
+    // Build query - only check active stores unless includeInactive is true
+    const query = {
+      organizationId: orgId,
+      code: { $regex: new RegExp(`^${normalizedCode.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') }
+    };
+    
+    if (!includeInactive) {
+      query.isActive = { $ne: false }; // Check for active stores (isActive !== false)
+    }
+    
+    return await collection.findOne(query);
   } catch (error) {
     console.error('getStoreByCode error:', error);
     throw error;

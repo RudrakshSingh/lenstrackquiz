@@ -130,6 +130,26 @@ async function updateStoreHandler(req, res) {
     // Use validated data (organizationId already removed)
     const updateData = validationResult.data;
     
+    // If code is being updated, check for duplicates (excluding current store)
+    if (updateData.code && updateData.code !== store.code) {
+      try {
+        const { getStoreByCode } = await import('../../../../models/Store');
+        const existing = await getStoreByCode(user.organizationId, updateData.code, false);
+        if (existing && existing._id.toString() !== id) {
+          return res.status(409).json({
+            success: false,
+            error: { 
+              code: 'RESOURCE_CONFLICT', 
+              message: `Store code "${updateData.code}" already exists in your organization. Please use a different code.`
+            }
+          });
+        }
+      } catch (checkError) {
+        console.error('Error checking existing store code:', checkError);
+        // Continue with update if check fails
+      }
+    }
+    
     const updated = await updateStore(id, updateData);
     
     if (!updated) {

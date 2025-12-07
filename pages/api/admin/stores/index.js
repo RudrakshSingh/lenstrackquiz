@@ -111,7 +111,12 @@ async function createStoreHandler(req, res) {
       if (value === '') {
         cleanedData[key] = null;
       } else if (value !== undefined && value !== null) {
-        cleanedData[key] = value;
+        // Normalize code: trim whitespace
+        if (key === 'code' && typeof value === 'string') {
+          cleanedData[key] = value.trim();
+        } else {
+          cleanedData[key] = value;
+        }
       }
     });
 
@@ -131,14 +136,17 @@ async function createStoreHandler(req, res) {
       });
     }
 
-    // Check if store code already exists
+    // Check if store code already exists (only active stores)
     try {
       const { getStoreByCode } = await import('../../../../models/Store');
-      const existing = await getStoreByCode(user.organizationId, validationResult.data.code);
+      const existing = await getStoreByCode(user.organizationId, validationResult.data.code, false);
       if (existing) {
         return res.status(409).json({
           success: false,
-          error: { code: 'RESOURCE_CONFLICT', message: 'Store code already exists' }
+          error: { 
+            code: 'RESOURCE_CONFLICT', 
+            message: `Store code "${validationResult.data.code}" already exists in your organization. Please use a different code.`
+          }
         });
       }
     } catch (checkError) {

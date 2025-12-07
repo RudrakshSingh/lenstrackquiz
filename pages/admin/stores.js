@@ -145,8 +145,10 @@ export default function StoresPage() {
       await storeService.delete(deleteConfirm.id || deleteConfirm._id);
       showToast('success', 'Store deleted successfully');
       setDeleteConfirm(null);
-      fetchStores();
+      // Refresh store list after deletion
+      await fetchStores();
     } catch (error) {
+      console.error('Delete store error:', error);
       showToast('error', error.message || 'Failed to delete store');
     }
   };

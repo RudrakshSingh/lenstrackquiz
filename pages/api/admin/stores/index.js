@@ -42,8 +42,6 @@ async function listStores(req, res) {
     } : null;
 
     // Handle isActive filter from query params
-    // TEMPORARILY: Show all stores by default (user requested to see all stores)
-    // Only filter if explicitly requested
     if (isActive !== undefined) {
       // Explicit filter from query params
       if (isActive === 'true' || isActive === true) {
@@ -51,8 +49,12 @@ async function listStores(req, res) {
       } else if (isActive === 'false' || isActive === false) {
         filter.isActive = false;
       }
+    } else {
+      // Default: exclude deleted stores (isActive: false)
+      // Include stores where isActive is true, undefined, or null
+      // This excludes soft-deleted stores but includes new stores
+      filter.isActive = { $ne: false };
     }
-    // Removed default filter - show all stores by default
 
     // Apply search filter if exists
     if (searchFilter) {

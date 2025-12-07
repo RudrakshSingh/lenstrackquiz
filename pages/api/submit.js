@@ -115,10 +115,19 @@ export default async function handler(req, res) {
       cyl: rightCyl || leftCyl || 0,
       rightSph,
       rightCyl,
+      rightAxis: user.rightAxis ? parseFloat(user.rightAxis) : null,
       leftSph,
       leftCyl,
+      leftAxis: user.leftAxis ? parseFloat(user.leftAxis) : null,
       add,
+      pd: user.pd ? parseFloat(user.pd) : null,
       frameType: user.frameType || 'full_rim_plastic',
+      frameBrand: user.frameBrand || null,
+      frameSubCategory: user.frameSubCategory || null,
+      frameMRP: user.frameMRP ? parseFloat(user.frameMRP) : null,
+      frameMaterial: user.frameMaterial || null,
+      salesMode: user.salesMode || 'SELF_SERVICE',
+      salespersonName: user.salespersonName || null,
       deviceHours,
       outdoorExposure,
       driving,
@@ -240,6 +249,12 @@ export default async function handler(req, res) {
 
     const recommendation = {
       ...recommendations,
+      // V1.0 Spec - 4 Lens Recommendations with offers
+      bestMatch: applyOfferToLens(recommendations.bestMatch),
+      indexRecommendation: applyOfferToLens(recommendations.indexRecommendation),
+      premiumOption: applyOfferToLens(recommendations.premiumOption),
+      budgetOption: applyOfferToLens(recommendations.budgetOption),
+      // Legacy support
       perfectMatch: applyOfferToLens(recommendations.perfectMatch),
       recommended: applyOfferToLens(recommendations.recommended),
       safeValue: applyOfferToLens(recommendations.safeValue),
@@ -266,17 +281,29 @@ export default async function handler(req, res) {
         name: user.name,
         number: user.number,
         email: user.email || '',
-        power: {
-          right: {
-            sph: user.rightSph ? parseFloat(user.rightSph) : (user.sph ? parseFloat(user.sph) : null),
-          cyl: user.rightCyl ? parseFloat(user.rightCyl) : (user.cyl ? parseFloat(user.cyl) : null)
+      power: {
+        right: {
+          sph: user.rightSph ? parseFloat(user.rightSph) : (user.sph ? parseFloat(user.sph) : null),
+          cyl: user.rightCyl ? parseFloat(user.rightCyl) : (user.cyl ? parseFloat(user.cyl) : null),
+          axis: user.rightAxis ? parseFloat(user.rightAxis) : null
         },
         left: {
           sph: user.leftSph ? parseFloat(user.leftSph) : null,
-          cyl: user.leftCyl ? parseFloat(user.leftCyl) : null
+          cyl: user.leftCyl ? parseFloat(user.leftCyl) : null,
+          axis: user.leftAxis ? parseFloat(user.leftAxis) : null
         }
       },
       add: user.add ? parseFloat(user.add) : null,
+      pd: user.pd ? parseFloat(user.pd) : null,
+      frame: {
+        type: user.frameType || null,
+        brand: user.frameBrand || null,
+        subCategory: user.frameSubCategory || null,
+        mrp: user.frameMRP ? parseFloat(user.frameMRP) : null,
+        material: user.frameMaterial || null
+      },
+      salesMode: user.salesMode || 'SELF_SERVICE',
+      salespersonName: user.salespersonName || null,
       frameType: user.frameType || null,
       storeId: user.storeId ? (typeof user.storeId === 'string' ? new ObjectId(user.storeId) : user.storeId) : null,
       salespersonId: user.salespersonId ? (typeof user.salespersonId === 'string' ? new ObjectId(user.salespersonId) : user.salespersonId) : null,

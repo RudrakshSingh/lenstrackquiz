@@ -53,7 +53,7 @@ export default async function handler(req, res) {
         .json({ success: false, error: "Submission not found. The ID may be invalid or the data may not have been saved." });
     }
 
-    // Format response to match expected structure
+    // Format response to match expected structure (V1.0 Spec - All Fields)
     const data = {
       user: {
         name: customer.name,
@@ -63,10 +63,19 @@ export default async function handler(req, res) {
         cyl: customer.power?.right?.cyl || customer.power?.left?.cyl || customer.cyl || null,
         rightSph: customer.power?.right?.sph || null,
         rightCyl: customer.power?.right?.cyl || null,
+        rightAxis: customer.power?.right?.axis || null,
         leftSph: customer.power?.left?.sph || null,
         leftCyl: customer.power?.left?.cyl || null,
+        leftAxis: customer.power?.left?.axis || null,
         add: customer.add || null,
-        frameType: customer.frameType || null
+        pd: customer.pd || null,
+        frameType: customer.frame?.type || customer.frameType || null,
+        frameBrand: customer.frame?.brand || null,
+        frameSubCategory: customer.frame?.subCategory || null,
+        frameMRP: customer.frame?.mrp || null,
+        frameMaterial: customer.frame?.material || null,
+        salesMode: customer.salesMode || 'SELF_SERVICE',
+        salespersonName: customer.salespersonName || null
       },
       answers: customer.answers || {},
       recommendation: customer.recommendation || {}

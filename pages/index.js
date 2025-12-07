@@ -173,6 +173,7 @@ export default function Quiz() {
     frameMaterial: "",
     storeId: "",
     salespersonId: "",
+    salespersonName: "", // For self-service mode text input
     salesMode: "SELF_SERVICE", // SELF_SERVICE or STAFF_ASSISTED
   });
   const [answers, setAnswers] = useState({});
@@ -190,6 +191,20 @@ export default function Quiz() {
   useEffect(() => {
     fetchQuestionsFromAPI();
     fetchStores();
+    
+    // Detect salesMode from URL params or context
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = urlParams.get('mode') || urlParams.get('salesMode');
+    if (mode === 'STAFF_ASSISTED' || mode === 'POS') {
+      setUser(prev => ({ ...prev, salesMode: 'STAFF_ASSISTED' }));
+    } else if (urlParams.get('storeId')) {
+      // If storeId in URL, likely self-service QR scan
+      setUser(prev => ({ 
+        ...prev, 
+        salesMode: 'SELF_SERVICE',
+        storeId: urlParams.get('storeId')
+      }));
+    }
   }, [language]); // Refetch questions when language changes
 
   const fetchStores = async () => {
@@ -221,6 +236,56 @@ export default function Quiz() {
     }
   };
 
+  // Helper function to check if question should be shown based on showIf conditions
+  const shouldShowQuestion = (question, currentAnswers) => {
+    if (!question.showIf) return true; // No condition, always show
+    
+    const condition = question.showIf;
+    
+    // Support different condition formats
+    if (typeof condition === 'object') {
+      // Format: { questionKey: 'value' } or { questionKey: { $in: ['value1', 'value2'] } }
+      for (const [key, value] of Object.entries(condition)) {
+        const answer = currentAnswers[key];
+        
+        if (value && typeof value === 'object' && value.$in) {
+          // Array check: answer must be in the array
+          if (!value.$in.includes(answer)) return false;
+        } else if (value && typeof value === 'object' && value.$ne) {
+          // Not equal check
+          if (answer === value.$ne) return false;
+        } else {
+          // Exact match
+          if (answer !== value) return false;
+        }
+      }
+      return true;
+    }
+    
+    // Legacy format: simple string check
+    if (typeof condition === 'string') {
+      return currentAnswers[condition] !== undefined;
+    }
+    
+    return true;
+  };
+
+  // Get next question based on adaptive flow
+  const getNextQuestion = (currentQuestionIndex, currentAnswers) => {
+    const availableQuestions = apiQuestions.length > 0 ? apiQuestions : questions;
+    
+    // Start from next question
+    for (let i = currentQuestionIndex + 1; i < availableQuestions.length; i++) {
+      const question = availableQuestions[i];
+      if (shouldShowQuestion(question.questionData || question, currentAnswers)) {
+        return i;
+      }
+    }
+    
+    // If no more questions match, return -1 to indicate completion
+    return -1;
+  };
+
   const fetchQuestionsFromAPI = async () => {
     try {
       setQuestionsLoading(true);
@@ -246,7 +311,8 @@ export default function Quiz() {
             id: q.key || q.id || `q_${idx}`,
             label: questionText,
             options: options.length > 0 ? options : ['Yes', 'No'], // Fallback if no options
-            questionData: q // Store full question data
+            questionData: q, // Store full question data including showIf
+            showIf: q.showIf // Store conditional logic
           };
         });
         setApiQuestions(formattedQuestions);
@@ -367,6 +433,9 @@ export default function Quiz() {
     // Don't auto-advance - let user click Next button
     // This gives them time to review their selection
   };
+
+  // Track which questions have been shown (for adaptive flow)
+  const [shownQuestionIndices, setShownQuestionIndices] = useState([]);
 
   const handlePrescriptionParsed = (data) => {
     if (data.prescription) {
@@ -964,17 +1033,26 @@ export default function Quiz() {
       );
     }
 
-    // Step 8: Salesperson Selection
+    // Step 8: Salesperson Selection (Conditional based on salesMode)
     if (currentStep === 8) {
+      const isStaffAssisted = user.salesMode === 'STAFF_ASSISTED';
+      const isOptional = !isStaffAssisted; // Self-Service: Optional, POS: Mandatory
+      
       return (
         <div className={styles.stepCard}>
           <div className={styles.stepHeader}>
             <div className={styles.stepIcon}>👤</div>
             <h2 className={styles.stepTitle}>
-              {language === 'hi' ? 'कौन सा सेल्सपर्सन आपकी सहायता कर रहा है?' : language === 'hinglish' ? 'Kaun sa salesperson aapki help kar raha hai?' : 'Which salesperson is assisting you?'}
+              {isStaffAssisted 
+                ? (language === 'hi' ? 'कौन सा सेल्सपर्सन आपकी सहायता कर रहा है?' : language === 'hinglish' ? 'Kaun sa salesperson aapki help kar raha hai?' : 'Which salesperson is assisting you?')
+                : (language === 'hi' ? 'क्या कोई सेल्सपर्सन ने आपकी सहायता की?' : language === 'hinglish' ? 'Kya koi salesperson ne aapki help ki?' : 'Did a salesperson assist you? (Optional)')
+              }
             </h2>
             <p className={styles.stepDescription}>
-              {language === 'hi' ? 'कृपया अपने सेल्सपर्सन का नाम चुनें' : language === 'hinglish' ? 'Apne salesperson ka naam select karein' : 'Please select your salesperson'}
+              {isStaffAssisted
+                ? (language === 'hi' ? 'कृपया अपने सेल्सपर्सन का नाम चुनें' : language === 'hinglish' ? 'Apne salesperson ka naam select karein' : 'Please select your salesperson')
+                : (language === 'hi' ? 'यदि कोई सेल्सपर्सन ने आपकी सहायता की है, तो कृपया उनका नाम चुनें' : language === 'hinglish' ? 'Agar koi salesperson ne help ki hai, to unka naam select karein' : 'If a salesperson assisted you, please select their name')
+              }
             </p>
           </div>
           <div className={styles.inputGroup}>
@@ -990,6 +1068,8 @@ export default function Quiz() {
                   ? (language === 'hi' ? 'पहले स्टोर चुनें' : language === 'hinglish' ? 'Pehle store select karein' : 'Please select a store first')
                   : salespeople.length === 0
                   ? (language === 'hi' ? 'कोई सेल्सपर्सन उपलब्ध नहीं' : language === 'hinglish' ? 'Koi salesperson available nahi' : 'No salesperson available')
+                  : isOptional
+                  ? (language === 'hi' ? 'सेल्सपर्सन चुनें (वैकल्पिक)...' : language === 'hinglish' ? 'Salesperson select karein (optional)...' : 'Select a salesperson (optional)...')
                   : (language === 'hi' ? 'सेल्सपर्सन चुनें...' : language === 'hinglish' ? 'Salesperson select karein...' : 'Select a salesperson...')
                 }
               </option>
@@ -999,8 +1079,25 @@ export default function Quiz() {
                 </option>
               ))}
             </select>
+            
+            {/* Text input option for self-service mode */}
+            {isOptional && (
+              <input
+                className={styles.inputField}
+                type="text"
+                placeholder={language === 'hi' ? 'या सेल्सपर्सन का नाम टाइप करें' : language === 'hinglish' ? 'Ya salesperson ka naam type karein' : 'Or type salesperson name'}
+                value={user.salespersonName || ''}
+                onChange={(e) => setUser({ ...user, salespersonName: e.target.value })}
+                style={{ marginTop: '1rem', padding: '1rem 1.25rem', fontSize: '1rem' }}
+              />
+            )}
+            
             <div style={{ marginTop: '1.5rem', width: '100%', display: 'flex', justifyContent: 'center' }}>
-              <button className={styles.nextButton} onClick={nextStep} disabled={!user.salespersonId}>
+              <button 
+                className={styles.nextButton} 
+                onClick={nextStep} 
+                disabled={isStaffAssisted && !user.salespersonId}
+              >
                 {t.startQuiz} <span className={styles.buttonArrow}>→</span>
               </button>
             </div>
@@ -1128,18 +1225,33 @@ export default function Quiz() {
       );
     }
 
-    // Steps 9+: Questions (after store and salesperson steps)
-    const qIndex = currentStep - 9;
-    const question = questions[qIndex];
+    // Steps 9+: Questions (after store and salesperson steps) - Adaptive Flow
+    const availableQuestions = apiQuestions.length > 0 ? apiQuestions : questions;
+    
+    // Filter questions based on showIf conditions (adaptive flow)
+    const filteredQuestions = availableQuestions.filter(q => 
+      shouldShowQuestion(q.questionData || q, answers)
+    );
+    
+    // Find current question index in filtered list
+    let currentQIndex = currentStep - 9;
+    if (currentQIndex < 0 || currentQIndex >= filteredQuestions.length) {
+      return null; // Invalid step
+    }
+    
+    const question = filteredQuestions[currentQIndex];
     if (!question) return null;
 
-    const isLast = qIndex === questions.length - 1;
+    // Check if this is the last question in the filtered list
+    const isLast = currentQIndex === filteredQuestions.length - 1;
     const hasAnswer = answers[question.id];
 
     return (
       <div className={styles.stepCard}>
         <div className={styles.stepHeader}>
-          <div className={styles.questionNumber}>Question {qIndex + 1} of {questions.length}</div>
+          <div className={styles.questionNumber}>
+            Question {filteredQuestions.findIndex(q => (q.id || q.questionData?.key) === question.id) + 1} of {filteredQuestions.length}
+          </div>
           <h2 className={styles.stepTitle}>{question.label}</h2>
         </div>
         <div className={styles.optionsContainer}>

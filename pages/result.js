@@ -126,6 +126,7 @@ export default function Result() {
   const [showSecondPair, setShowSecondPair] = useState(false);
   const [selectedSecondPair, setSelectedSecondPair] = useState(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [sortBy, setSortBy] = useState('price_high'); // price_high, price_low, match_high, index_thin
 
   useEffect(() => {
     if (!id) return;
@@ -306,11 +307,17 @@ export default function Result() {
         </div>
       )}
 
-      {/* Main Recommendations */}
+      {/* Main Recommendations - 4 Lens Types (V1.0 Spec) */}
       <div className={styles.lensGrid}>
-        {renderLensCard(recommendation?.perfectMatch, 'perfect')}
-        {renderLensCard(recommendation?.recommended, 'recommended')}
-        {renderLensCard(recommendation?.safeValue, 'safe')}
+        {/* Use new 4-recommendation structure if available, fallback to legacy */}
+        {recommendation?.bestMatch && renderLensCard(recommendation.bestMatch, 'best')}
+        {recommendation?.indexRecommendation && renderLensCard(recommendation.indexRecommendation, 'index')}
+        {recommendation?.premiumOption && renderLensCard(recommendation.premiumOption, 'premium')}
+        {recommendation?.budgetOption && renderLensCard(recommendation.budgetOption, 'budget')}
+        {/* Legacy fallback */}
+        {!recommendation?.bestMatch && renderLensCard(recommendation?.perfectMatch, 'perfect')}
+        {!recommendation?.indexRecommendation && renderLensCard(recommendation?.recommended, 'recommended')}
+        {!recommendation?.budgetOption && renderLensCard(recommendation?.safeValue, 'safe')}
       </div>
 
       {/* Selected Lens Offer Display */}
@@ -441,37 +448,110 @@ export default function Result() {
         </div>
       )}
 
-      {/* Full Price List */}
+      {/* Full Price List with Sorting and Thickness Warnings */}
       {recommendation?.allLenses && recommendation.allLenses.length > 0 && (
         <div className={styles.priceListSection}>
-          <h2 className={styles.priceListTitle}>{t.priceListTitle}</h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <h2 className={styles.priceListTitle}>{t.priceListTitle}</h2>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              style={{
+                padding: '0.75rem 1rem',
+                fontSize: '0.9375rem',
+                border: '2px solid #e5e7eb',
+                borderRadius: '0.5rem',
+                backgroundColor: 'white',
+                cursor: 'pointer'
+              }}
+            >
+              <option value="price_high">Price: High → Low</option>
+              <option value="price_low">Price: Low → High</option>
+              <option value="match_high">Match %: High → Low</option>
+              <option value="index_thin">Index: Thin → Thick</option>
+            </select>
+          </div>
           <div className={styles.priceListTable}>
             <div className={styles.priceListHeader}>
               <div className={styles.priceListCol}>Lens Name</div>
               <div className={styles.priceListCol}>Index</div>
               <div className={styles.priceListCol}>Features</div>
               <div className={styles.priceListCol}>MRP</div>
+              <div className={styles.priceListCol}>Match %</div>
               <div className={styles.priceListCol}>Status</div>
             </div>
-            {recommendation.allLenses.map((lens, idx) => (
-              <div key={idx} className={styles.priceListRow}>
-                <div className={styles.priceListCol} data-label="Lens Name">{lens.name}</div>
-                <div className={styles.priceListCol} data-label="Index">{lens.index}</div>
-                <div className={styles.priceListCol} data-label="Features">
-                  <div className={styles.featuresList}>
-                    {lens.features && lens.features.slice(0, 2).map((f, i) => (
-                      <span key={i} className={styles.featureTagSmall}>{f}</span>
-                    ))}
+            {(() => {
+              // Sort lenses based on selected option
+              const sortedLenses = [...recommendation.allLenses].sort((a, b) => {
+                switch (sortBy) {
+                  case 'price_high':
+                    return (b.price_mrp || b.numericPrice || 0) - (a.price_mrp || a.numericPrice || 0);
+                  case 'price_low':
+                    return (a.price_mrp || a.numericPrice || 0) - (b.price_mrp || b.numericPrice || 0);
+                  case 'match_high':
+                    return (b.matchScore || 0) - (a.matchScore || 0);
+                  case 'index_thin': {
+                    const indexA = parseFloat(a.index?.replace('INDEX_', '') || '1.56');
+                    const indexB = parseFloat(b.index?.replace('INDEX_', '') || '1.56');
+                    return indexA - indexB; // Lower index = thinner
+                  }
+                  default:
+                    return 0;
+                }
+              });
+
+              // Calculate thickness warning
+              const requiredIndex = recommendation.requiredIndex || 1.56;
+              const getThicknessWarning = (lens) => {
+                const lensIndex = parseFloat(lens.index?.replace('INDEX_', '') || '1.56');
+                if (lensIndex < requiredIndex) {
+                  // Thickness is inversely proportional to index
+                  // Lower index = thicker lens
+                  const thicknessRatio = requiredIndex / lensIndex;
+                  const thicknessPercent = ((thicknessRatio - 1) * 100).toFixed(0);
+                  return thicknessPercent > 0 ? `~${thicknessPercent}% thicker than recommended` : null;
+                }
+                return null;
+              };
+
+              return sortedLenses.map((lens, idx) => {
+                const thicknessWarning = getThicknessWarning(lens);
+                const matchPercent = lens.matchScore ? ((lens.matchScore / 85) * 100).toFixed(0) : 'N/A';
+                
+                return (
+                  <div key={idx} className={styles.priceListRow}>
+                    <div className={styles.priceListCol} data-label="Lens Name">{lens.name}</div>
+                    <div className={styles.priceListCol} data-label="Index">
+                      {lens.index}
+                      {thicknessWarning && (
+                        <div style={{ 
+                          fontSize: '0.75rem', 
+                          color: '#dc2626', 
+                          marginTop: '0.25rem',
+                          fontWeight: 600
+                        }}>
+                          ⚠️ {thicknessWarning}
+                        </div>
+                      )}
+                    </div>
+                    <div className={styles.priceListCol} data-label="Features">
+                      <div className={styles.featuresList}>
+                        {lens.features && lens.features.slice(0, 2).map((f, i) => (
+                          <span key={i} className={styles.featureTagSmall}>{f}</span>
+                        ))}
+                      </div>
+                    </div>
+                    <div className={styles.priceListCol} data-label="MRP">₹{lens.price_mrp || lens.numericPrice || 0}</div>
+                    <div className={styles.priceListCol} data-label="Match %">{matchPercent}%</div>
+                    <div className={styles.priceListCol} data-label="Status">
+                      <span className={`${styles.badge} ${getBadgeClass(lens.badge)}`}>
+                        {getBadgeLabel(lens.badge)}
+                      </span>
+                    </div>
                   </div>
-                </div>
-                <div className={styles.priceListCol} data-label="MRP">₹{lens.price_mrp || lens.numericPrice || 0}</div>
-                <div className={styles.priceListCol} data-label="Status">
-                  <span className={`${styles.badge} ${getBadgeClass(lens.badge)}`}>
-                    {getBadgeLabel(lens.badge)}
-                  </span>
-                </div>
-              </div>
-            ))}
+                );
+              });
+            })()}
           </div>
         </div>
       )}

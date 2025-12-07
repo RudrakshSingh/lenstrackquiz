@@ -208,16 +208,49 @@ export default async function handler(req, res) {
       return (a.price_mrp || a.numericPrice || 0) - (b.price_mrp || b.numericPrice || 0);
     });
 
-    // Select top 3
-    const perfectMatch = scoredLenses[0] || null;
-    const recommended = scoredLenses[1] || scoredLenses[0] || null;
+    // 4 Lens Recommendations (V1.0 Spec)
+    // 1. Best Match - Highest benefit match score
+    const bestMatch = scoredLenses[0] || null;
     
-    // Safe value: cheapest safe option
-    const safeValue = [...safeLenses].sort((a, b) => {
-      const priceA = a.price_mrp || a.numericPrice || 0;
-      const priceB = b.price_mrp || b.numericPrice || 0;
-      return priceA - priceB;
-    })[0] || null;
+    // 2. Recommended Index Lens - Thinnest & safest for Rx
+    const requiredIndex = finalRequiredIndex || 1.56;
+    const indexRecommended = [...safeLenses]
+      .filter(lens => {
+        const lensIndex = parseFloat(lens.index?.replace('INDEX_', '') || '1.56');
+        return lensIndex >= requiredIndex;
+      })
+      .sort((a, b) => {
+        const indexA = parseFloat(a.index?.replace('INDEX_', '') || '1.56');
+        const indexB = parseFloat(b.index?.replace('INDEX_', '') || '1.56');
+        if (indexA !== indexB) return indexA - indexB; // Thinnest first
+        const scoreA = scoredLenses.find(l => l.name === a.name)?.matchScore || 0;
+        const scoreB = scoredLenses.find(l => l.name === b.name)?.matchScore || 0;
+        return scoreB - scoreA;
+      })[0] || bestMatch;
+    
+    // 3. Premium Upgrade Lens - Match % exceeds 100%
+    const premiumUpgrade = scoredLenses.find(lens => {
+      const normalizedScore = (lens.matchScore / 85) * 100;
+      return normalizedScore > 100 && lens !== bestMatch && lens !== indexRecommended;
+    }) || scoredLenses.find(lens => lens.matchScore > 85 && lens !== bestMatch && lens !== indexRecommended) || bestMatch;
+    
+    // 4. Budget Walkout Prevention Lens - Lowest-price lens safe for customer's power
+    const budgetOption = [...safeLenses]
+      .filter(lens => lens !== bestMatch && lens !== indexRecommended && lens !== premiumUpgrade)
+      .sort((a, b) => {
+        const priceA = a.price_mrp || a.numericPrice || 0;
+        const priceB = b.price_mrp || b.numericPrice || 0;
+        return priceA - priceB;
+      })[0] || safeLenses.sort((a, b) => {
+        const priceA = a.price_mrp || a.numericPrice || 0;
+        const priceB = b.price_mrp || b.numericPrice || 0;
+        return priceA - priceB;
+      })[0] || null;
+    
+    // Legacy support
+    const perfectMatch = bestMatch;
+    const recommended = indexRecommended;
+    const safeValue = budgetOption;
 
     // Format recommendations
     const formatLens = (lens) => {
@@ -249,7 +282,19 @@ export default async function handler(req, res) {
       let badge = "Not suitable for your power/frame";
       
       if (isSafe && matchesVisionType) {
-        if (lens.name === perfectMatch?.name) {
+        if (lens.name === bestMatch?.name) {
+          suitability = "perfect";
+          badge = "Best Match - Highest benefit score";
+        } else if (lens.name === indexRecommended?.name) {
+          suitability = "suitable";
+          badge = "Recommended Index - Thinnest & safest";
+        } else if (lens.name === premiumUpgrade?.name) {
+          suitability = "suitable";
+          badge = "Premium Upgrade - Match > 100%";
+        } else if (lens.name === budgetOption?.name) {
+          suitability = "suitable";
+          badge = "Budget Option - Lowest safe price";
+        } else if (lens.name === perfectMatch?.name) {
           suitability = "perfect";
           badge = "Best for your usage";
         } else if (lens.name === recommended?.name) {
@@ -305,24 +350,30 @@ export default async function handler(req, res) {
     }
 
     // Return response
-    return res.status(200).json({
-      success: true,
-      usage_summary: {
-        device_severity: deviceSeverity,
-        outdoor_severity: outdoorSeverity,
-        driving_severity: drivingSeverity,
-        power_severity: powerSeverity,
-        final_required_index: finalRequiredIndex,
-        safety_notes: safetyNotes
-      },
-      recommendations: {
-        perfect_match: formatLens(perfectMatch),
-        recommended: formatLens(recommended),
-        safe_value: formatLens(safeValue)
-      },
-      full_price_list: fullPriceList,
-      session_id: sessionId
-    });
+      return res.status(200).json({
+        success: true,
+        usage_summary: {
+          device_severity: deviceSeverity,
+          outdoor_severity: outdoorSeverity,
+          driving_severity: drivingSeverity,
+          power_severity: powerSeverity,
+          final_required_index: finalRequiredIndex,
+          safety_notes: safetyNotes
+        },
+        recommendations: {
+          // V1.0 Spec - 4 Lens Recommendations
+          best_match: formatLens(bestMatch),
+          index_recommendation: formatLens(indexRecommended),
+          premium_option: formatLens(premiumUpgrade),
+          budget_option: formatLens(budgetOption),
+          // Legacy support
+          perfect_match: formatLens(perfectMatch),
+          recommended: formatLens(recommended),
+          safe_value: formatLens(safeValue)
+        },
+        full_price_list: fullPriceList,
+        session_id: sessionId
+      });
 
   } catch (error) {
     console.error("Recommend API error:", error);

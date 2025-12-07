@@ -3,14 +3,18 @@ import { api } from '../lib/api-client';
 export const storeService = {
   list: async (params) => {
     const response = await api.get('/admin/stores', params);
-    // Handle both response formats: { stores: [...] } or { data: { stores: [...] } }
-    if (response?.data?.stores) {
-      return response.data.stores;
-    } else if (response?.stores) {
+    console.log('storeService.list response:', response);
+    // API returns: { success: true, data: { stores: [...], pagination: {...} } }
+    // api-client returns: data.data if exists, otherwise data
+    // So response should be: { stores: [...], pagination: {...} }
+    if (response?.stores && Array.isArray(response.stores)) {
       return response.stores;
+    } else if (response?.data?.stores && Array.isArray(response.data.stores)) {
+      return response.data.stores;
     } else if (Array.isArray(response)) {
       return response;
     }
+    console.warn('Unexpected response format in storeService.list:', response);
     return [];
   },
   get: async (id) => {

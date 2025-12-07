@@ -5,6 +5,8 @@ import Popup from "../components/Popup";
 import PrescriptionUpload from "../components/PrescriptionUpload";
 import { parsePrescription } from "@/lib/prescriptionParser";
 import SeverityMeter from "../components/SeverityMeter";
+import Loader from "../components/Loader";
+import SkeletonLoader from "../components/SkeletonLoader";
 import { 
   calculateDeviceSeverity, 
   calculateOutdoorSeverity, 
@@ -1011,7 +1013,13 @@ export default function Quiz() {
         </div>
       </div>
 
-      <div className={styles.content}>{renderStep()}</div>
+      <div className={styles.content}>
+        {questionsLoading && currentStep >= 8 ? (
+          <SkeletonLoader type="card" count={1} />
+        ) : (
+          renderStep()
+        )}
+      </div>
 
       {error && (
         <div className={styles.errorContainer}>

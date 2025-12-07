@@ -42,6 +42,7 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: opacity 0.3s ease-in-out;
 }
 
 a { 
@@ -226,4 +227,137 @@ button:not([class*="bg-"]):not([class*="text-"]) {
 
 .gradient-info {
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+/* Admin Panel Enhancements */
+.hover-lift {
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.animate-slide-in {
+  animation: slideIn 0.4s ease-out;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s ease-out;
+}
+
+.animate-pulse-slow {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Admin Panel Color Utilities */
+.bg-primary-light {
+  background-color: rgba(99, 102, 241, 0.1);
+}
+
+.text-primary {
+  color: var(--primary-color);
+}
+
+.text-primary-hover {
+  color: var(--primary-hover);
+}
+
+.border-primary {
+  border-color: var(--primary-color);
+}
+
+.bg-success {
+  background-color: #10b981;
+}
+
+.text-success {
+  color: #10b981;
+}
+
+.border-success {
+  border-color: #10b981;
+}
+
+.bg-warning {
+  background-color: #f59e0b;
+}
+
+.text-warning {
+  color: #f59e0b;
+}
+
+.border-warning {
+  border-color: #f59e0b;
+}
+
+.bg-info {
+  background-color: #3b82f6;
+}
+
+.text-info {
+  color: #3b82f6;
+}
+
+.border-info {
+  border-color: #3b82f6;
+}
+
+.bg-danger {
+  background-color: #ef4444;
+}
+
+.text-danger {
+  color: #ef4444;
+}
+
+.border-danger {
+  border-color: #ef4444;
 }

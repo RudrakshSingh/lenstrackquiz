@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import styles from "@/styles/quiz.module.css";
+import Loader from "../components/Loader";
+import SkeletonLoader from "../components/SkeletonLoader";
 
 const translations = {
   en: {
@@ -147,9 +149,27 @@ export default function Result() {
     fetchData();
   }, [id]);
 
-  if (loading) return <p className={styles.loading}>Loading your lens recommendations…</p>;
-  if (error) return <p className={styles.error}>Error: {error}</p>;
-  if (!submission) return <p className={styles.loading}>No data found</p>;
+  if (loading) {
+    return (
+      <div className={styles.resultContainer}>
+        <Loader message="Loading your lens recommendations…" fullScreen={false} />
+        <SkeletonLoader type="card" count={3} />
+      </div>
+    );
+  }
+  if (error) return (
+    <div className={styles.resultContainer}>
+      <div className={styles.errorContainer}>
+        <div className={styles.errorIcon}>⚠️</div>
+        <p className={styles.error}>Error: {error}</p>
+      </div>
+    </div>
+  );
+  if (!submission) return (
+    <div className={styles.resultContainer}>
+      <p className={styles.loading}>No data found</p>
+    </div>
+  );
 
   const { user, recommendation } = submission;
   const language = recommendation?.language || user?.language || "en";

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
 import Button from '../../components/ui/Button';
@@ -52,12 +53,12 @@ export default function LoginPage() {
             <div className="text-center">
               <p className="text-sm text-gray-600">
                 Don't have an account?{' '}
-                <a
+                <Link
                   href="/admin/register"
                   className="font-medium text-primary hover:text-primary-hover"
                 >
                   Create one
-                </a>
+                </Link>
               </p>
             </div>
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
@@ -112,12 +113,12 @@ export default function LoginPage() {
             <div className="text-center">
               <p className="text-sm text-gray-600">
                 Don't have an account?{' '}
-                <a
+                <Link
                   href="/admin/register"
                   className="font-medium text-primary hover:text-primary-hover transition-colors"
                 >
                   Create one
-                </a>
+                </Link>
               </p>
             </div>
           </form>

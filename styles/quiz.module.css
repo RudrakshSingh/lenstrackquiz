@@ -14,6 +14,26 @@
   flex-direction: column;
   align-items: center;
   position: relative;
+  animation: fadeIn 0.6s ease-out;
+}
+
+.container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.container > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* Header Section */
@@ -29,12 +49,35 @@
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 0.5rem;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+  background-size: 200% 200%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   line-height: 1.2;
   margin-top: 70px;
+  animation: gradientShift 3s ease infinite, fadeInDown 0.8s ease-out;
+  letter-spacing: -0.02em;
+}
+
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .subtitle {
@@ -55,19 +98,32 @@
 
 .progressBar {
   width: 100%;
-  height: 6px;
+  height: 8px;
   background: var(--border-light);
   border-radius: var(--radius-lg);
   overflow: hidden;
   position: relative;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
 }
 
 .progress {
   height: 100%;
-  background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+  background-size: 200% 100%;
   border-radius: var(--radius-lg);
-  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+  animation: progressGradient 2s ease infinite;
+}
+
+@keyframes progressGradient {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 .progress::after {
@@ -142,6 +198,31 @@
   font-size: 3rem;
   margin-bottom: 1rem;
   display: block;
+  animation: iconBounce 0.6s ease-out, float 3s ease-in-out infinite;
+  animation-delay: 0s, 0.6s;
+}
+
+@keyframes iconBounce {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) translateY(-20px);
+  }
+  50% {
+    transform: scale(1.1) translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
 }
 
 .stepTitle {
@@ -196,8 +277,14 @@
 
 .inputField:focus {
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15), 0 4px 12px rgba(99, 102, 241, 0.1);
   transform: translateY(-1px);
+  background: #ffffff;
+}
+
+.inputField:focus::placeholder {
+  color: var(--text-muted);
+  opacity: 0.6;
 }
 
 .inputField::placeholder {
@@ -227,9 +314,13 @@
 
 .optionLabel:hover {
   border-color: var(--primary-color);
-  background: rgba(99, 102, 241, 0.02);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
+  background: rgba(99, 102, 241, 0.05);
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+}
+
+.optionLabel:active {
+  transform: translateY(0) scale(0.99);
 }
 
 .optionLabel input[type="radio"] {
@@ -281,8 +372,22 @@
 
 .optionLabel:has(input[type="radio"]:checked) {
   border-color: var(--primary-color);
-  background: rgba(99, 102, 241, 0.05);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(139, 92, 246, 0.05));
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15), 0 4px 12px rgba(99, 102, 241, 0.2);
+  transform: translateY(-1px);
+  animation: selectedPulse 0.4s ease-out;
+}
+
+@keyframes selectedPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* Buttons */
@@ -419,6 +524,43 @@
   margin: 0;
 }
 
+/* Enhanced Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Note: Global styles like html and *:focus-visible are defined in globals.css */
+
+/* Loading State Enhancements */
+.loading {
+  position: relative;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: loadingShimmer 1.5s infinite;
+}
+
+@keyframes loadingShimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 /* Responsive Design */
 @media (max-width: 640px) {
   .container {
@@ -440,6 +582,10 @@
   
   .stepTitle {
     font-size: 1.25rem;
+  }
+
+  .lensCard:hover {
+    transform: translateY(-2px) scale(1);
   }
 }
 
@@ -488,13 +634,37 @@
   font-size: 4rem;
   margin-bottom: 1rem;
   display: block;
-  animation: bounce 1s ease-in-out;
+  animation: successBounce 1s ease-in-out, sparkle 2s ease-in-out infinite;
+  animation-delay: 0s, 1s;
+  filter: drop-shadow(0 4px 8px rgba(99, 102, 241, 0.3));
 }
 
-@keyframes bounce {
-  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-  40% { transform: translateY(-10px); }
-  60% { transform: translateY(-5px); }
+@keyframes sparkle {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    filter: drop-shadow(0 4px 8px rgba(99, 102, 241, 0.3));
+  }
+  50% {
+    transform: scale(1.1) rotate(5deg);
+    filter: drop-shadow(0 6px 12px rgba(99, 102, 241, 0.5));
+  }
+}
+
+@keyframes successBounce {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translateY(-50px);
+  }
+  50% {
+    transform: scale(1.1) translateY(-10px);
+  }
+  70% {
+    transform: scale(0.95) translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .resultTitle {
@@ -534,13 +704,28 @@
   border: 1px solid var(--border);
   position: relative;
   overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.lensCard::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.5s;
+}
+
+.lensCard:hover::after {
+  left: 100%;
+}
+
 .lensCard:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-xl);
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(99, 102, 241, 0.1);
 }
 
 .lensCard.bestMatch {
@@ -1467,6 +1652,23 @@
   padding: 0.75rem;
   background: rgba(16, 185, 129, 0.1);
   border-radius: var(--radius-lg);
+}
+
+/* Enhanced Error Display */
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: 2rem;
+  text-align: center;
+}
+
+.errorIcon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  animation: shake 0.5s ease;
 }
 
 /* Responsive Design for Results */

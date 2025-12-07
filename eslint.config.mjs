@@ -13,15 +13,20 @@ const eslintConfig = [
   ...compat.extends("next/core-web-vitals"),
   {
     ignores: [
-      "node_modules/**",
+      "**/node_modules/**",
+      "**/.next/**",
+      "**/out/**",
+      "**/build/**",
+      "**/next-env.d.ts",
       ".next/**",
       "out/**",
       "build/**",
-      "next-env.d.ts",
     ],
     rules: {
       // Avoid CI/deploy noise for content strings
       "react/no-unescaped-entities": "off",
+      // Allow warnings for React hooks exhaustive deps (can be fixed later)
+      "react-hooks/exhaustive-deps": "warn",
     },
   },
 ];

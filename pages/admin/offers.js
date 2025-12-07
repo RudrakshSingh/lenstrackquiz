@@ -7,7 +7,7 @@ import Modal from '../../components/ui/Modal';
 import Badge from '../../components/ui/Badge';
 import { offerService } from '../../services/offers';
 import { useToast } from '../../contexts/ToastContext';
-import { Plus, Edit, Trash2, Search } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, Tag, Filter } from 'lucide-react';
 
 export default function OffersPage() {
   const router = useRouter();
@@ -101,53 +101,76 @@ export default function OffersPage() {
     <AdminLayout title="Offer Management">
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-3xl font-bold text-gray-900">Offers</h2>
-            <p className="text-sm text-gray-500 mt-1">Manage offer rules and discounts</p>
+        <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-xl shadow-xl p-8 text-white mb-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <Tag className="h-8 w-8" />
+                <h2 className="text-3xl font-bold">Offer Management</h2>
+              </div>
+              <p className="text-indigo-100 text-lg">Manage offer rules and discounts</p>
+            </div>
+            <div className="flex gap-3">
+              <Button 
+                onClick={() => router.push('/admin/offer-mapping')} 
+                variant="outline"
+                className="bg-white/20 hover:bg-white/30 text-white border-white/30"
+              >
+                View Mapping
+              </Button>
+              <Button 
+                onClick={() => router.push('/admin/offer-entry')} 
+                icon={<Plus className="h-4 w-4" />}
+                className="bg-white text-indigo-600 hover:bg-indigo-50"
+              >
+                Add Offer
+              </Button>
+            </div>
           </div>
-          <Button onClick={() => router.push('/admin/offer-entry')} icon={<Plus className="h-4 w-4" />}>
-            Add Offer
-          </Button>
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow-md p-4 flex gap-4 mb-6">
-          <div className="flex-1">
+        <div className="bg-white rounded-xl shadow-md p-4 flex gap-4 mb-6 border border-gray-200">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
             <input
               type="text"
-              placeholder="Search offers..."
+              placeholder="Search offers by name or code..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
             />
           </div>
-          <select
-            value={filter.isActive}
-            onChange={(e) => setFilter({ ...filter, isActive: e.target.value })}
-            className="px-4 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
-          >
-            <option value="all">All Offers</option>
-            <option value="true">Active Only</option>
-            <option value="false">Inactive Only</option>
-          </select>
+          <div className="flex items-center gap-2">
+            <Filter className="h-5 w-5 text-gray-400" />
+            <select
+              value={filter.isActive}
+              onChange={(e) => setFilter({ ...filter, isActive: e.target.value })}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+            >
+              <option value="all">All Offers</option>
+              <option value="true">Active Only</option>
+              <option value="false">Inactive Only</option>
+            </select>
+          </div>
         </div>
 
         {/* Table */}
-        <div className="bg-white rounded-lg shadow-md">
+        <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
           <DataTable
             columns={columns}
             data={offers}
             loading={loading}
-            emptyMessage="No offers found"
+            emptyMessage="No offers found. Create your first offer to get started!"
             rowActions={(item) => (
               <div className="flex gap-2">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    router.push(`/admin/offer-entry?id=${item.id}`);
+                    router.push(`/admin/offer-entry?id=${item._id || item.id}`);
                   }}
-                  className="text-primary hover:text-primary-hover"
+                  className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                  title="Edit"
                 >
                   <Edit className="h-4 w-4" />
                 </button>
@@ -156,7 +179,8 @@ export default function OffersPage() {
                     e.stopPropagation();
                     setDeleteConfirm(item);
                   }}
-                  className="text-danger hover:text-red-600"
+                  className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  title="Delete"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>

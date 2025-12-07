@@ -6,7 +6,7 @@ import Input from '../../components/ui/Input';
 import Select from '../../components/ui/Select';
 import { useToast } from '../../contexts/ToastContext';
 import { offerService } from '../../services/offers';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Tag, Target, Calendar, CheckCircle } from 'lucide-react';
 
 const OfferType = {
   YOPO: 'YOPO',
@@ -160,9 +160,21 @@ export default function OfferEntry() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
+          {/* Header Card */}
+          <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-xl shadow-lg p-6 text-white">
+            <div className="flex items-center gap-3 mb-2">
+              <Tag className="h-8 w-8" />
+              <h2 className="text-2xl font-bold">Offer Rule Details</h2>
+            </div>
+            <p className="text-indigo-100">Configure offer rules for frames and lenses</p>
+          </div>
+
           {/* Basic Information */}
           <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 animate-fade-in">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <Tag className="h-5 w-5 text-indigo-600" />
+              Basic Information
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Input
                 label="Offer Name *"
@@ -224,7 +236,10 @@ export default function OfferEntry() {
 
           {/* Target Filters */}
           <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Target Filters</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <Target className="h-5 w-5 text-indigo-600" />
+              Target Filters
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Input
                 label="Frame Brand"
@@ -282,7 +297,10 @@ export default function OfferEntry() {
 
           {/* Validity */}
           <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Validity</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-indigo-600" />
+              Validity Period
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Input
                 label="Start Date"
@@ -301,15 +319,23 @@ export default function OfferEntry() {
 
           {/* Status */}
           <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Status</h3>
-            <label className="flex items-center">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-indigo-600" />
+              Status
+            </h3>
+            <label className="flex items-center gap-3 cursor-pointer group">
               <input
                 type="checkbox"
                 checked={formData.isActive}
                 onChange={(e) => handleChange('isActive', e.target.checked)}
-                className="mr-2 h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                className="w-5 h-5 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded cursor-pointer"
               />
-              <span className="text-sm text-gray-700">Active (Enable this offer)</span>
+              <div>
+                <span className="text-sm font-medium text-gray-700 group-hover:text-indigo-600 transition-colors">
+                  Active (Enable this offer)
+                </span>
+                <p className="text-xs text-gray-500 mt-1">Inactive offers will not be applied to calculations</p>
+              </div>
             </label>
           </div>
 

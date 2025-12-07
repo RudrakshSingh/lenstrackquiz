@@ -119,7 +119,7 @@ export default function AdminDashboard() {
         <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 rounded-xl shadow-xl p-8 text-white animate-fade-in hover-lift">
           <div className="flex items-center justify-between">
             <div className="animate-slide-in">
-              <h1 className="text-3xl font-bold mb-2">Welcome back! 👋</h1>
+              <h1 className="text-3xl font-bold mb-2">Welcome back!</h1>
               <p className="text-indigo-100 text-lg">
                 Here's what's happening with your business today
               </p>

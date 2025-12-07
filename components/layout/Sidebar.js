@@ -10,6 +10,8 @@ import {
   FileText,
   Menu,
   X,
+  Tag,
+  Sparkles,
 } from 'lucide-react';
 import { useState } from 'react';
 import clsx from 'clsx';
@@ -21,6 +23,8 @@ const menuItems = [
   { href: '/admin/users', label: 'Users', icon: Users },
   { href: '/admin/products', label: 'Products', icon: Package },
   { href: '/admin/questions', label: 'Questions', icon: HelpCircle },
+  { href: '/admin/offers', label: 'Offers', icon: Tag },
+  { href: '/admin/offer-mapping', label: 'Offer Mapping', icon: Sparkles },
   { href: '/admin/sessions', label: 'Sessions', icon: FileText },
   { href: '/admin/reports', label: 'Reports', icon: BarChart3 },
 ];

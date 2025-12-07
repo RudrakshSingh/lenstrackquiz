@@ -22,7 +22,10 @@ export const offerService = {
     const response = await api.get('/admin/category-discounts', params);
     return response.data?.discounts || [];
   },
+  getCategoryDiscount: (id) => api.get(`/admin/category-discounts/${id}`),
   createCategoryDiscount: (data) => api.post('/admin/category-discounts', data),
+  updateCategoryDiscount: (id, data) => api.put(`/admin/category-discounts/${id}`, data),
+  deleteCategoryDiscount: (id) => api.delete(`/admin/category-discounts/${id}`),
   
   // Coupons
   listCoupons: async (params) => {

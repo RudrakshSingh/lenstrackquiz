@@ -187,11 +187,22 @@ export async function updateStore(id, updateData) {
       { returnDocument: 'after' }
     );
     
-    if (!result.value) {
+    console.log('updateStore - findOneAndUpdate result:', {
+      ok: result.ok,
+      value: result.value ? 'has value' : 'no value',
+      lastErrorObject: result.lastErrorObject
+    });
+    
+    // MongoDB driver v4+ returns result.value, but check both for compatibility
+    const updatedStore = result.value || result;
+    
+    if (!updatedStore) {
+      console.error('updateStore - No store returned from update, id:', id);
       return null;
     }
     
-    return result.value;
+    console.log('updateStore - Successfully updated store:', updatedStore._id?.toString());
+    return updatedStore;
   } catch (error) {
     console.error('updateStore error:', error);
     throw error;

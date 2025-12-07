@@ -137,7 +137,12 @@ export default async function handler(req, res) {
     console.error('Error details:', {
       name: error.name,
       message: error.message,
-      stack: error.stack
+      stack: error.stack,
+      envCheck: {
+        hasMongoUri: !!process.env.MONGODB_URI,
+        hasJwtSecret: !!process.env.JWT_SECRET,
+        nodeEnv: process.env.NODE_ENV
+      }
     });
     
     // Ensure we haven't already sent a response
@@ -146,13 +151,37 @@ export default async function handler(req, res) {
       return;
     }
     
+    // Check for missing environment variables
+    if (!process.env.MONGODB_URI) {
+      return res.status(500).json({
+        success: false,
+        error: {
+          code: 'CONFIGURATION_ERROR',
+          message: 'MONGODB_URI is not configured. Please add it to Vercel environment variables.',
+          hint: 'Go to Vercel Dashboard → Settings → Environment Variables → Add MONGODB_URI'
+        }
+      });
+    }
+    
+    if (!process.env.JWT_SECRET) {
+      return res.status(500).json({
+        success: false,
+        error: {
+          code: 'CONFIGURATION_ERROR',
+          message: 'JWT_SECRET is not configured. Please add it to Vercel environment variables.',
+          hint: 'Go to Vercel Dashboard → Settings → Environment Variables → Add JWT_SECRET'
+        }
+      });
+    }
+    
     // Check for MongoDB connection errors
-    if (error.message && (error.message.includes('MongoDB') || error.message.includes('connection') || error.message.includes('MONGODB_URI') || error.message.includes('queryTxt') || error.message.includes('ENOTFOUND') || error.message.includes('EREFUSED'))) {
+    if (error.message && (error.message.includes('MongoDB') || error.message.includes('connection') || error.message.includes('MONGODB_URI') || error.message.includes('queryTxt') || error.message.includes('ENOTFOUND') || error.message.includes('EREFUSED') || error.message.includes('not configured'))) {
       return res.status(500).json({
         success: false,
         error: {
           code: 'DATABASE_ERROR',
-          message: 'Database connection error. Please check MongoDB configuration.'
+          message: 'Database connection error. Please check MongoDB configuration.',
+          hint: 'Verify MONGODB_URI is correct and MongoDB Atlas IP whitelist includes 0.0.0.0/0'
         }
       });
     }
@@ -167,7 +196,7 @@ export default async function handler(req, res) {
         success: false,
         error: {
           code: 'INTERNAL_ERROR',
-          message: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+          message: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error. Check Vercel function logs for details.'
         }
       });
     }

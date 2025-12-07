@@ -34,8 +34,11 @@ export async function createStore(storeData) {
       throw new Error(`Invalid organizationId format: ${storeData.organizationId}`);
     }
     
+    // Normalize code: trim whitespace
+    const normalizedCode = String(storeData.code).trim();
+    
     const store = {
-      code: storeData.code,
+      code: normalizedCode,
       name: storeData.name,
       address: storeData.address || null,
       city: storeData.city || null,

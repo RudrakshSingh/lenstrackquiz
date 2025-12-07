@@ -53,7 +53,11 @@ async function listStores(req, res) {
       // Default: exclude deleted stores (isActive: false)
       // Include stores where isActive is true, undefined, or null
       // This excludes soft-deleted stores but includes new stores
-      filter.isActive = { $ne: false };
+      // NOTE: For now, show all stores (including isActive: false) since existing stores
+      // were created with isActive: false. Once stores are properly created with isActive: true,
+      // we can re-enable this filter.
+      // filter.isActive = { $ne: false };
+      // TEMPORARY: Show all stores until existing stores are updated
     }
 
     // Apply search filter if exists

@@ -213,11 +213,14 @@ export default function OfferMappingPage() {
     }
   };
 
-  // Update applicable offers when cart changes
+  // Update applicable offers when cart or rules change
   useEffect(() => {
     if (offerRules.length > 0) {
       checkApplicableOffers();
+    } else {
+      setApplicableOffers([]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [simulationCart, offerRules]);
 
   return (

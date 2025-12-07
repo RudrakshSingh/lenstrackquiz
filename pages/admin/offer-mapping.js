@@ -51,11 +51,12 @@ export default function OfferMappingPage() {
   // Simulation states
   const [simulationResult, setSimulationResult] = useState(null);
   const [simulationLoading, setSimulationLoading] = useState(false);
+  const [applicableOffers, setApplicableOffers] = useState([]);
   const [simulationCart, setSimulationCart] = useState({
-    frame: { brand: 'LENSTRACK', subCategory: 'ADVANCED', mrp: 2500 },
+    frame: { brand: 'LENSTRACK', subCategory: 'ADVANCED', mrp: 4000 },
     lens: { itCode: 'D360ASV', price: 2500, brandLine: 'DIGI360_ADVANCED', yopoEligible: true },
-    customerCategory: null,
-    couponCode: null
+    customerCategory: 'STUDENT',
+    couponCode: 'WELCOME10'
   });
 
   useEffect(() => {
@@ -148,10 +149,51 @@ export default function OfferMappingPage() {
   const activeCouponsCount = coupons.filter(c => c.isActive).length;
   const activeCategoryDiscountsCount = categoryDiscounts.filter(c => c.isActive).length;
 
+  // Check which offers are applicable for current cart
+  const checkApplicableOffers = () => {
+    const applicable = offerRules.filter(rule => {
+      if (!rule.isActive) return false;
+      
+      // Check frame brand
+      if (rule.frameBrand && rule.frameBrand !== simulationCart.frame.brand) {
+        if (!rule.frameBrands || !rule.frameBrands.includes(simulationCart.frame.brand)) {
+          return false;
+        }
+      }
+      
+      // Check frame sub category
+      if (rule.frameSubCategory && rule.frameSubCategory !== simulationCart.frame.subCategory) {
+        if (!rule.frameSubCategories || !rule.frameSubCategories.includes(simulationCart.frame.subCategory)) {
+          return false;
+        }
+      }
+      
+      // Check min/max MRP
+      if (rule.minFrameMRP && simulationCart.frame.mrp < rule.minFrameMRP) return false;
+      if (rule.maxFrameMRP && simulationCart.frame.mrp > rule.maxFrameMRP) return false;
+      
+      // Check lens brand line
+      if (rule.lensBrandLines && rule.lensBrandLines.length > 0) {
+        if (!rule.lensBrandLines.includes(simulationCart.lens.brandLine)) return false;
+      }
+      
+      // Check YOPO eligibility
+      if (rule.offerType === 'YOPO' && !simulationCart.lens.yopoEligible) return false;
+      
+      return true;
+    });
+    
+    setApplicableOffers(applicable);
+    return applicable;
+  };
+
   const runSimulation = async () => {
     setSimulationLoading(true);
     setSimulationResult(null);
     try {
+      // Check applicable offers first
+      checkApplicableOffers();
+      
       const result = await offerService.calculate({
         frame: simulationCart.frame,
         lens: simulationCart.lens,
@@ -170,6 +212,13 @@ export default function OfferMappingPage() {
       setSimulationLoading(false);
     }
   };
+
+  // Update applicable offers when cart changes
+  useEffect(() => {
+    if (offerRules.length > 0) {
+      checkApplicableOffers();
+    }
+  }, [simulationCart, offerRules]);
 
   return (
     <AdminLayout title="Offer Mapping">
@@ -736,20 +785,66 @@ export default function OfferMappingPage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4">
-                    <Button
-                      onClick={runSimulation}
-                      disabled={simulationLoading}
-                      icon={simulationLoading ? <Loader className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
-                      className="w-full md:w-auto"
-                    >
-                      {simulationLoading ? 'Calculating...' : 'Run Offer Engine'}
-                    </Button>
-                    
-                    {/* Show applicable offers count */}
-                    {offerRules.length > 0 && (
-                      <div className="text-sm text-gray-600">
-                        <span className="font-semibold">{offerRules.filter(r => r.isActive).length}</span> active offer rules available
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-4">
+                      <Button
+                        onClick={runSimulation}
+                        disabled={simulationLoading}
+                        icon={simulationLoading ? <Loader className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+                        className="w-full md:w-auto"
+                      >
+                        {simulationLoading ? 'Calculating...' : 'Run Offer Engine'}
+                      </Button>
+                      
+                      {/* Show applicable offers count */}
+                      {offerRules.length > 0 && (
+                        <div className="text-sm text-gray-600">
+                          <span className="font-semibold">{offerRules.filter(r => r.isActive).length}</span> active rules, 
+                          <span className="font-semibold text-indigo-600 ml-1">{applicableOffers.length}</span> applicable
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Show Applicable Offers */}
+                    {applicableOffers.length > 0 && (
+                      <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
+                        <h5 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                          <Target className="h-4 w-4 text-blue-600" />
+                          Applicable Offer Rules ({applicableOffers.length})
+                        </h5>
+                        <div className="space-y-2 max-h-40 overflow-y-auto">
+                          {applicableOffers
+                            .sort((a, b) => (a.priority || 100) - (b.priority || 100))
+                            .map((rule) => (
+                            <div key={rule.id || rule._id} className="bg-white rounded p-2 border border-blue-200">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  {getOfferTypeIcon(rule.offerType)}
+                                  <span className="text-sm font-medium text-gray-900">{rule.name || rule.code}</span>
+                                  <Badge color={getOfferTypeColor(rule.offerType)} variant="soft" className="text-xs">
+                                    {rule.offerType}
+                                  </Badge>
+                                </div>
+                                <span className="text-xs text-gray-500">Priority: {rule.priority || 100}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        <p className="text-xs text-gray-600 mt-2">
+                          Offers are applied in priority order. The highest priority (lowest number) offer will be applied first.
+                        </p>
+                      </div>
+                    )}
+
+                    {applicableOffers.length === 0 && offerRules.length > 0 && (
+                      <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-4">
+                        <div className="flex items-center gap-2">
+                          <AlertCircle className="h-4 w-4 text-yellow-600" />
+                          <span className="text-sm font-semibold text-yellow-800">No applicable offers</span>
+                        </div>
+                        <p className="text-xs text-yellow-700 mt-1">
+                          No active offer rules match your current cart configuration. Adjust the frame/lens details or create a new offer rule.
+                        </p>
                       </div>
                     )}
                   </div>

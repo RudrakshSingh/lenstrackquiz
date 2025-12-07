@@ -2,7 +2,8 @@
 // Authentication login endpoint
 
 import { LoginSchema } from '../../../lib/validation';
-import { verifyPassword, generateToken } from '../../../lib/auth';
+import { verifyPassword, generateToken, generateRefreshToken } from '../../../lib/auth';
+import { createRefreshToken, revokeAllUserTokens } from '../../../models/RefreshToken';
 import { handleError } from '../../../lib/errors';
 
 export default async function handler(req, res) {
@@ -100,7 +101,7 @@ export default async function handler(req, res) {
       }
     }
 
-    // Generate token - handle null organizationId
+    // Generate tokens - handle null organizationId
     const tokenPayload = {
       userId: user._id.toString(),
       email: user.email,
@@ -115,13 +116,35 @@ export default async function handler(req, res) {
       tokenPayload.storeId = user.storeId.toString();
     }
     
-    const token = generateToken(tokenPayload);
+    // Generate access token (short-lived)
+    const accessToken = generateToken(tokenPayload);
+    
+    // Generate refresh token (long-lived)
+    const refreshToken = generateRefreshToken({ userId: user._id.toString() });
+    
+    // Store refresh token in database
+    try {
+      // Revoke old tokens (optional: keep last N tokens)
+      await revokeAllUserTokens(user._id);
+      
+      // Create new refresh token
+      const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+      await createRefreshToken({
+        token: refreshToken,
+        userId: user._id,
+        expiresAt
+      });
+    } catch (tokenError) {
+      console.warn('Failed to store refresh token:', tokenError);
+      // Continue anyway - refresh token will still work but won't be revocable
+    }
 
     // Return response
     return res.status(200).json({
       success: true,
       data: {
-        token,
+        token: accessToken,
+        refreshToken: refreshToken,
         user: {
           id: user._id.toString(),
           email: user.email,

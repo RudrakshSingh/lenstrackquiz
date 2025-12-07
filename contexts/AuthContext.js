@@ -89,12 +89,57 @@ export function AuthProvider({ children }) {
       throw new Error(data.error?.message || 'Login failed');
     }
 
-    const { token, user: userData } = data.data;
+    const { token, refreshToken, user: userData } = data.data;
     if (typeof window !== 'undefined') {
       localStorage.setItem('lenstrack_token', token);
+      if (refreshToken) {
+        localStorage.setItem('lenstrack_refresh_token', refreshToken);
+      }
     }
     setUser(userData);
     setIsAuthenticated(true);
+  };
+
+  const refreshAccessToken = async () => {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+
+    const refreshToken = localStorage.getItem('lenstrack_refresh_token');
+    if (!refreshToken) {
+      return null;
+    }
+
+    try {
+      const response = await fetch('/api/auth/refresh', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ refreshToken }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Refresh token is invalid, clear auth
+        localStorage.removeItem('lenstrack_token');
+        localStorage.removeItem('lenstrack_refresh_token');
+        setUser(null);
+        setIsAuthenticated(false);
+        return null;
+      }
+
+      const { token: newToken, refreshToken: newRefreshToken } = data.data;
+      localStorage.setItem('lenstrack_token', newToken);
+      if (newRefreshToken) {
+        localStorage.setItem('lenstrack_refresh_token', newRefreshToken);
+      }
+      return newToken;
+    } catch (error) {
+      console.error('Failed to refresh token:', error);
+      return null;
+    }
   };
 
   const logout = async () => {
@@ -110,6 +155,7 @@ export function AuthProvider({ children }) {
           });
         }
         localStorage.removeItem('lenstrack_token');
+        localStorage.removeItem('lenstrack_refresh_token');
       }
     } catch (error) {
       console.error('Logout error:', error);
@@ -132,6 +178,7 @@ export function AuthProvider({ children }) {
         login,
         logout,
         refreshSession,
+        refreshAccessToken,
       }}
     >
       {children}

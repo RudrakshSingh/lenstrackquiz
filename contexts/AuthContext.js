@@ -34,14 +34,37 @@ export function AuthProvider({ children }) {
           // Invalid response format
           if (typeof window !== 'undefined') {
             localStorage.removeItem('lenstrack_token');
+            localStorage.removeItem('lenstrack_refresh_token');
           }
           setUser(null);
           setIsAuthenticated(false);
         }
       } else {
+        // 401 or other error - try to refresh token
+        if (response.status === 401) {
+          const newToken = await refreshAccessToken();
+          if (newToken) {
+            // Retry session validation with new token
+            const retryResponse = await fetch('/api/auth/session', {
+              headers: {
+                'Authorization': `Bearer ${newToken}`,
+              },
+            });
+            if (retryResponse.ok) {
+              const retryData = await retryResponse.json();
+              if (retryData.success && retryData.data && retryData.data.user) {
+                setUser(retryData.data.user);
+                setIsAuthenticated(true);
+                setIsLoading(false);
+                return;
+              }
+            }
+          }
+        }
         // 401 or other error - just clear auth state
         if (typeof window !== 'undefined') {
           localStorage.removeItem('lenstrack_token');
+          localStorage.removeItem('lenstrack_refresh_token');
         }
         setUser(null);
         setIsAuthenticated(false);
@@ -51,6 +74,7 @@ export function AuthProvider({ children }) {
       // Don't crash on network errors - just clear auth state
       if (typeof window !== 'undefined') {
         localStorage.removeItem('lenstrack_token');
+        localStorage.removeItem('lenstrack_refresh_token');
       }
       setUser(null);
       setIsAuthenticated(false);

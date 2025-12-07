@@ -34,7 +34,26 @@ async function listStores(req, res) {
       }
     } else {
       // Default: only show active stores (exclude deleted/inactive)
-      filter.isActive = { $ne: false }; // isActive !== false (excludes false, includes true and undefined)
+      // Include stores where isActive is true OR undefined (new stores default to active)
+      filter.$or = [
+        { isActive: true },
+        { isActive: { $exists: false } },
+        { isActive: null }
+      ];
+      // If there's already a $or filter (from search), we need to combine them
+      if (filter.$or && filter.$or.length > 0 && filter.$or[0].$regex) {
+        // Search filter exists, combine with AND logic
+        const searchOr = filter.$or;
+        delete filter.$or;
+        filter.$and = [
+          { $or: searchOr },
+          { $or: [
+            { isActive: true },
+            { isActive: { $exists: false } },
+            { isActive: null }
+          ]}
+        ];
+      }
     }
 
     // Search filter

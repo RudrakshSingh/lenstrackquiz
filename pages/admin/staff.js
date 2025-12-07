@@ -29,8 +29,9 @@ export default function StaffPage() {
 
   const fetchStores = async () => {
     try {
-      // Fetch only active stores for staff assignment
-      const response = await api.get('/admin/stores', { isActive: 'true' });
+      // Fetch active stores for staff assignment (default filter excludes deleted stores)
+      // Don't pass isActive param - let backend use default filter (excludes isActive: false)
+      const response = await api.get('/admin/stores');
       console.log('Staff form - stores response:', response);
       // Handle different response formats
       // API returns: { success: true, data: { stores: [...], pagination: {...} } }

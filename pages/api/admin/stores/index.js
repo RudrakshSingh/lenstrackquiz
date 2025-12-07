@@ -50,18 +50,27 @@ async function listStores(req, res) {
         filter.isActive = false;
       }
     } else {
-      // Default: exclude deleted stores (isActive: false)
-      // Include stores where isActive is true, undefined, or null
-      // This excludes soft-deleted stores but includes new stores
-      // Use $ne: false to include stores with isActive: true, undefined, or null
-      // This will exclude stores that are explicitly set to isActive: false (deleted)
-      filter.isActive = { $ne: false };
+      // Default: exclude deleted stores (isActive: false AND status: 'INACTIVE')
+      // Show stores where: (isActive !== false) OR (status !== 'INACTIVE')
+      // This excludes stores that are BOTH isActive: false AND status: 'INACTIVE' (deleted)
+      // But includes existing stores with isActive: false but status: 'ACTIVE' or undefined
+      filter.$or = [
+        { isActive: { $ne: false } },
+        { status: { $ne: 'INACTIVE' } }
+      ];
     }
 
     // Apply search filter if exists
     if (searchFilter) {
-      // If we already have isActive filter, combine with $and
-      if (filter.isActive) {
+      // If we have $or filter, combine with $and
+      if (filter.$or) {
+        filter.$and = [
+          { $or: filter.$or },
+          searchFilter
+        ];
+        delete filter.$or; // Remove direct $or, it's now in $and
+      } else if (filter.isActive) {
+        // If we have isActive filter, combine with $and
         filter.$and = [
           searchFilter,
           { isActive: filter.isActive }

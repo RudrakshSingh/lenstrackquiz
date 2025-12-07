@@ -47,21 +47,49 @@ export async function getAllStores(filter = {}) {
 }
 
 export async function updateStore(id, updateData) {
-  const collection = await getStoreCollection();
-  const objectId = typeof id === 'string' ? new ObjectId(id) : id;
-  const update = {
-    ...updateData,
-    updatedAt: new Date()
-  };
-  if (update.organizationId && typeof update.organizationId === 'string') {
-    update.organizationId = new ObjectId(update.organizationId);
+  try {
+    const collection = await getStoreCollection();
+    
+    // Validate ID format
+    if (!id) {
+      throw new Error('Store ID is required');
+    }
+    
+    let objectId;
+    try {
+      objectId = typeof id === 'string' ? new ObjectId(id) : id;
+    } catch (error) {
+      throw new Error(`Invalid store ID format: ${id}`);
+    }
+    
+    // Build update object - exclude organizationId and _id
+    const update = {
+      updatedAt: new Date()
+    };
+    
+    // Only include fields that are allowed to be updated
+    const allowedFields = ['code', 'name', 'address', 'city', 'state', 'pincode', 'phone', 'email', 'gstNumber', 'isActive'];
+    allowedFields.forEach(field => {
+      if (updateData[field] !== undefined) {
+        update[field] = updateData[field];
+      }
+    });
+    
+    const result = await collection.findOneAndUpdate(
+      { _id: objectId },
+      { $set: update },
+      { returnDocument: 'after' }
+    );
+    
+    if (!result.value) {
+      return null;
+    }
+    
+    return result.value;
+  } catch (error) {
+    console.error('updateStore error:', error);
+    throw error;
   }
-  const result = await collection.findOneAndUpdate(
-    { _id: objectId },
-    { $set: update },
-    { returnDocument: 'after' }
-  );
-  return result.value;
 }
 
 export async function deleteStore(id) {

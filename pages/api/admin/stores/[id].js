@@ -117,19 +117,39 @@ async function updateStoreHandler(req, res) {
       });
     }
 
-    const updated = await updateStore(id, validationResult.data);
+    // Don't allow updating organizationId through this endpoint
+    const updateData = { ...validationResult.data };
+    delete updateData.organizationId; // Prevent organizationId changes
+    
+    const updated = await updateStore(id, updateData);
     
     if (!updated) {
       throw new NotFoundError('Store not found or update failed');
     }
 
+    // Fetch the updated store to ensure we have all fields
+    const refreshedStore = await getStoreById(id);
+    if (!refreshedStore) {
+      throw new NotFoundError('Store not found after update');
+    }
+
     return res.status(200).json({
       success: true,
       data: {
-        ...updated,
-        id: updated._id.toString(),
-        _id: undefined,
-        organizationId: updated.organizationId ? updated.organizationId.toString() : null
+        id: refreshedStore._id.toString(),
+        code: refreshedStore.code,
+        name: refreshedStore.name,
+        address: refreshedStore.address || null,
+        city: refreshedStore.city || null,
+        state: refreshedStore.state || null,
+        pincode: refreshedStore.pincode || null,
+        phone: refreshedStore.phone || null,
+        email: refreshedStore.email || null,
+        gstNumber: refreshedStore.gstNumber || null,
+        isActive: refreshedStore.isActive !== false,
+        organizationId: refreshedStore.organizationId ? refreshedStore.organizationId.toString() : null,
+        createdAt: refreshedStore.createdAt,
+        updatedAt: refreshedStore.updatedAt
       }
     });
   } catch (error) {

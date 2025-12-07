@@ -19,7 +19,9 @@ import { useAuth } from '../../contexts/AuthContext';
 
 const menuItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/admin/store-dashboard', label: 'Store Dashboard', icon: BarChart3 },
   { href: '/admin/stores', label: 'Stores', icon: Store },
+  { href: '/admin/staff', label: 'Staff', icon: Users },
   { href: '/admin/users', label: 'Users', icon: Users },
   { href: '/admin/products', label: 'Products', icon: Package },
   { href: '/admin/questions', label: 'Questions', icon: HelpCircle },

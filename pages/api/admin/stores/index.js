@@ -138,13 +138,25 @@ async function createStoreHandler(req, res) {
       // But log it for debugging
     }
 
-    // Create the store
+    // V1.0 Spec: Generate QR code URL with storeId embedded
+    // We'll generate it after store creation since we need the store ID
     let store;
     try {
       store = await createStore({
         ...validationResult.data,
         organizationId: user.organizationId
       });
+      
+      // Generate QR code URL after store creation
+      if (store && store._id) {
+        const { generateStoreQRCode } = await import('../../../../lib/qrCode');
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || (req.headers.origin || '');
+        const qrCodeUrl = generateStoreQRCode(store._id.toString(), baseUrl);
+        
+        // Update store with QR code URL
+        const { updateStore } = await import('../../../../models/Store');
+        store = await updateStore(store._id, { qrCodeUrl });
+      }
     } catch (createError) {
       console.error('Error in createStore function:', createError);
       console.error('CreateStore error details:', {

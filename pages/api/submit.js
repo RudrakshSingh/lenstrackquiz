@@ -273,6 +273,44 @@ export default async function handler(req, res) {
       recommendation.upsellSuggestions = [];
     }
 
+    // V1.0 Spec: Create Order if frame and lens are selected
+    let orderId = null;
+    if (user.storeId && user.frameBrand && user.frameMRP && recommendation?.perfectMatch) {
+      try {
+        const { createOrder } = await import('../../models/Order');
+        const order = await createOrder({
+          storeId: user.storeId,
+          salesMode: user.salesMode || 'SELF_SERVICE',
+          assistedByStaffId: user.salespersonId || null,
+          assistedByName: user.salespersonName || null,
+          customerName: user.name || null,
+          customerPhone: user.number || null,
+          frameData: {
+            brand: user.frameBrand,
+            subCategory: user.frameSubCategory || null,
+            mrp: parseFloat(user.frameMRP) || 0,
+            type: user.frameType || null,
+            material: user.frameMaterial || null
+          },
+          lensData: {
+            itCode: recommendation.perfectMatch?.lens_id || recommendation.perfectMatch?.name || null,
+            name: recommendation.perfectMatch?.name || null,
+            price: recommendation.perfectMatch?.mrp || recommendation.perfectMatch?.price || 0,
+            brandLine: recommendation.perfectMatch?.brandLine || null
+          },
+          offerData: {
+            appliedOffers: recommendation.perfectMatch?.offer || null,
+            finalPrice: recommendation.perfectMatch?.offer?.finalPrice || recommendation.perfectMatch?.mrp || 0
+          },
+          finalPrice: recommendation.perfectMatch?.offer?.finalPrice || recommendation.perfectMatch?.mrp || 0
+        });
+        orderId = order._id.toString();
+      } catch (orderError) {
+        console.error('Order creation error:', orderError);
+        // Continue even if order creation fails
+      }
+    }
+
     // 🔥Save submission to MongoDB
     try {
       const { getCustomerCollection } = await import('../../models/Customer');
@@ -311,6 +349,7 @@ export default async function handler(req, res) {
       recommendation,
       language,
       submissionId, // Keep for backward compatibility
+      orderId: orderId || null, // V1.0 Spec: Link to order
       createdAt: new Date(),
       updatedAt: new Date()
       });

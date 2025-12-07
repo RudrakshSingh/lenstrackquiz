@@ -45,7 +45,10 @@ export async function createStore(storeData) {
       email: storeData.email || null,
       gstNumber: storeData.gstNumber || null,
       organizationId: organizationId,
-      isActive: storeData.isActive !== undefined ? storeData.isActive : true,
+      // V1.0 Spec: Store status and QR code
+      status: storeData.status || 'ACTIVE', // ACTIVE | INACTIVE
+      qrCodeUrl: storeData.qrCodeUrl || null, // QR for Lens Advisor with storeId embedded
+      isActive: storeData.isActive !== undefined ? storeData.isActive : (storeData.status === 'ACTIVE'), // Backward compatibility
       createdAt: now,
       updatedAt: now
     };

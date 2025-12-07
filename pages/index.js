@@ -225,10 +225,18 @@ export default function Quiz() {
       return;
     }
     try {
-      const res = await fetch(`/api/admin/users?storeId=${storeId}&role=SALES_EXECUTIVE&isActive=true`);
+      // V1.0 Spec: Use /api/store/{id}/staff endpoint
+      const res = await fetch(`/api/store/${storeId}/staff`);
       const data = await res.json();
-      if (data.success && data.data?.users) {
-        setSalespeople(data.data.users);
+      if (data.success && data.staff) {
+        setSalespeople(data.staff);
+      } else {
+        // Fallback to old endpoint for backward compatibility
+        const fallbackRes = await fetch(`/api/admin/users?storeId=${storeId}&role=SALES_EXECUTIVE&isActive=true`);
+        const fallbackData = await fallbackRes.json();
+        if (fallbackData.success && fallbackData.data?.users) {
+          setSalespeople(fallbackData.data.users);
+        }
       }
     } catch (err) {
       console.error('Failed to fetch salespeople:', err);
@@ -1045,13 +1053,13 @@ export default function Quiz() {
             <h2 className={styles.stepTitle}>
               {isStaffAssisted 
                 ? (language === 'hi' ? 'कौन सा सेल्सपर्सन आपकी सहायता कर रहा है?' : language === 'hinglish' ? 'Kaun sa salesperson aapki help kar raha hai?' : 'Which salesperson is assisting you?')
-                : (language === 'hi' ? 'क्या कोई सेल्सपर्सन ने आपकी सहायता की?' : language === 'hinglish' ? 'Kya koi salesperson ne aapki help ki?' : 'Did a salesperson assist you? (Optional)')
+                : (language === 'hi' ? 'क्या कोई सेल्सपर्सन ने आपकी सहायता की?' : language === 'hinglish' ? 'Kya koi salesperson ne aapki help ki?' : 'Staff Assisted (Optional)')
               }
             </h2>
             <p className={styles.stepDescription}>
               {isStaffAssisted
                 ? (language === 'hi' ? 'कृपया अपने सेल्सपर्सन का नाम चुनें' : language === 'hinglish' ? 'Apne salesperson ka naam select karein' : 'Please select your salesperson')
-                : (language === 'hi' ? 'यदि कोई सेल्सपर्सन ने आपकी सहायता की है, तो कृपया उनका नाम चुनें' : language === 'hinglish' ? 'Agar koi salesperson ne help ki hai, to unka naam select karein' : 'If a salesperson assisted you, please select their name')
+                : (language === 'hi' ? 'यदि कोई सेल्सपर्सन ने आपकी सहायता की है, तो कृपया उनका नाम चुनें' : language === 'hinglish' ? 'Agar koi salesperson ne help ki hai, to unka naam select karein' : 'Select staff if they assisted you')
               }
             </p>
           </div>

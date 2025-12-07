@@ -5,6 +5,8 @@ export default function EasterEgg() {
   const keysRef = useRef([]);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     const handler = (e) => {
       keysRef.current.push(e.key);
       keysRef.current = keysRef.current.slice(-10);

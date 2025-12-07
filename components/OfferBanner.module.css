@@ -1,0 +1,58 @@
+.offerBanner {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border: 3px solid #fbbf24;
+  border-radius: var(--radius-2xl, 1rem);
+  padding: 2.5rem;
+  text-align: center;
+  box-shadow: var(--shadow-xl, 0 20px 25px rgba(0, 0, 0, 0.1));
+  margin: 2rem 0;
+}
+
+.offerHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.offerIcon {
+  font-size: 3rem;
+}
+
+.offerTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary, #1f2937);
+  margin: 0;
+}
+
+.offerDescription {
+  font-size: 1.125rem;
+  color: var(--text-secondary, #6b7280);
+  margin: 1rem 0;
+}
+
+.savingsHighlight {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  background: rgba(16, 185, 129, 0.1);
+  border-radius: var(--radius-lg, 0.5rem);
+  border: 2px solid #10b981;
+}
+
+.savingsLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary, #6b7280);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+}
+
+.savingsValue {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #10b981;
+}
+

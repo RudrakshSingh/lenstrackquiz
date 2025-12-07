@@ -1,0 +1,74 @@
+.powerInput {
+  margin-bottom: 1.5rem;
+}
+
+.label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary, #6b7280);
+  margin-bottom: 0.5rem;
+}
+
+.inputContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.input {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border: 2px solid var(--border, #e5e7eb);
+  border-radius: var(--radius-lg, 0.5rem);
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--text-primary, #1f2937);
+  background: var(--surface-elevated, #ffffff);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary-color, #6366f1);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+.keypadButton {
+  padding: 1rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  border: 2px solid var(--border, #e5e7eb);
+  border-radius: var(--radius-md, 0.375rem);
+  background: var(--surface, #f9fafb);
+  color: var(--text-primary, #1f2937);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  touch-action: manipulation;
+}
+
+.keypadButton:hover {
+  background: var(--surface-elevated, #ffffff);
+  border-color: var(--primary-color, #6366f1);
+  transform: translateY(-1px);
+}
+
+.keypadButton:active {
+  transform: translateY(0);
+  background: var(--primary-color, #6366f1);
+  color: white;
+}
+
+@media (max-width: 640px) {
+  .keypad {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+

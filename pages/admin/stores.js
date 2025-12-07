@@ -51,11 +51,13 @@ export default function StoresPage() {
       if (search) {
         params.search = search;
       }
+      console.log('Fetching stores with params:', params);
       const data = await storeService.list(params);
+      console.log('storeService.list returned:', data);
       // Handle different response formats
       const storesList = Array.isArray(data) ? data : (data?.stores || []);
+      console.log('Final stores list:', storesList.length, storesList);
       setStores(storesList);
-      console.log('Fetched stores:', storesList.length, storesList);
     } catch (error) {
       console.error('Failed to fetch stores:', error);
       showToast('error', 'Failed to load stores');

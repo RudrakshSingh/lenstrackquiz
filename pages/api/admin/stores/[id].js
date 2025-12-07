@@ -80,10 +80,25 @@ async function updateStoreHandler(req, res) {
       });
     }
 
+    // Validate ObjectId format
+    let objectId;
+    try {
+      objectId = typeof id === 'string' ? new ObjectId(id) : id;
+    } catch (error) {
+      console.error('Invalid ObjectId format in update:', id, error);
+      return res.status(400).json({
+        success: false,
+        error: { code: 'VALIDATION_ERROR', message: `Invalid store ID format: ${id}` }
+      });
+    }
+
     const store = await getStoreById(id);
     if (!store) {
+      console.error('Store not found for update:', id);
       throw new NotFoundError('Store not found');
     }
+
+    console.log('Updating store:', id, 'Current store:', { code: store.code, name: store.name, status: store.status, isActive: store.isActive });
 
     // Check organization access
     if (store.organizationId && user.organizationId && 
@@ -106,6 +121,8 @@ async function updateStoreHandler(req, res) {
       }
     });
 
+    console.log('Cleaned update data:', cleanedData);
+
     // Remove fields that shouldn't be updated
     delete cleanedData.organizationId;
     delete cleanedData._id;
@@ -115,6 +132,7 @@ async function updateStoreHandler(req, res) {
     // Validate input
     const validationResult = UpdateStoreSchema.safeParse(cleanedData);
     if (!validationResult.success) {
+      console.error('Validation failed:', validationResult.error.errors);
       const details = {};
       validationResult.error.errors.forEach(err => {
         const path = err.path.join('.');
@@ -129,6 +147,7 @@ async function updateStoreHandler(req, res) {
 
     // Use validated data (organizationId already removed)
     const updateData = validationResult.data;
+    console.log('Validated update data:', updateData);
     
     // If code is being updated, check for duplicates (excluding current store)
     if (updateData.code && updateData.code !== store.code) {
@@ -150,9 +169,12 @@ async function updateStoreHandler(req, res) {
       }
     }
     
+    console.log('Calling updateStore with:', id, updateData);
     const updated = await updateStore(id, updateData);
+    console.log('updateStore returned:', updated ? 'Store updated' : 'null/undefined');
     
     if (!updated) {
+      console.error('Store update failed - updateStore returned null/undefined for id:', id);
       throw new NotFoundError('Store not found or update failed');
     }
 

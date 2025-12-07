@@ -1250,7 +1250,7 @@ export default function Quiz() {
       <div className={styles.stepCard}>
         <div className={styles.stepHeader}>
           <div className={styles.questionNumber}>
-            Question {filteredQuestions.findIndex(q => (q.id || q.questionData?.key) === question.id) + 1} of {filteredQuestions.length}
+            Question {currentQIndex + 1} of {filteredQuestions.length}
           </div>
           <h2 className={styles.stepTitle}>{question.label}</h2>
         </div>

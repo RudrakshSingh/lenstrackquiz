@@ -7,7 +7,8 @@ export const offerService = {
   // Offer Rules
   listRules: async (params) => {
     const response = await api.get('/admin/offers', params);
-    return response.data?.offers || [];
+    // API client returns data.data, so response is already the data object
+    return response?.offers || response || [];
   },
   getRule: (id) => api.get(`/admin/offers/${id}`),
   createRule: (data) => api.post('/admin/offers', data),
@@ -20,7 +21,8 @@ export const offerService = {
   // Category Discounts
   listCategoryDiscounts: async (params) => {
     const response = await api.get('/admin/category-discounts', params);
-    return response.data?.discounts || [];
+    // API client returns data.data, so response is already the data object
+    return response?.discounts || response || [];
   },
   getCategoryDiscount: (id) => api.get(`/admin/category-discounts/${id}`),
   createCategoryDiscount: (data) => api.post('/admin/category-discounts', data),
@@ -30,7 +32,8 @@ export const offerService = {
   // Coupons
   listCoupons: async (params) => {
     const response = await api.get('/admin/coupons', params);
-    return response.data?.coupons || [];
+    // API client returns data.data, so response is already the data object
+    return response?.coupons || response || [];
   },
   getCoupon: (id) => api.get(`/admin/coupons/${id}`),
   createCoupon: (data) => api.post('/admin/coupons', data),

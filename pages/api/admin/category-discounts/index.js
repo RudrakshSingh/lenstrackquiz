@@ -79,7 +79,7 @@ async function listCategoryDiscountsHandler(req, res) {
 
 async function handler(req, res) {
   if (req.method === 'GET') {
-    return listCategoryDiscountsHandler(req, res);
+    return withAuth(listCategoryDiscountsHandler, 'SUPER_ADMIN', 'ADMIN')(req, res);
   }
   if (req.method === 'POST') {
     return withAuth(createCategoryDiscountHandler, 'SUPER_ADMIN', 'ADMIN')(req, res);

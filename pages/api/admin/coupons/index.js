@@ -88,7 +88,7 @@ async function listCouponsHandler(req, res) {
 
 async function handler(req, res) {
   if (req.method === 'GET') {
-    return listCouponsHandler(req, res);
+    return withAuth(listCouponsHandler, 'SUPER_ADMIN', 'ADMIN')(req, res);
   }
   if (req.method === 'POST') {
     return withAuth(createCouponHandler, 'SUPER_ADMIN', 'ADMIN')(req, res);

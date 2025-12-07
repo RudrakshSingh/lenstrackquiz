@@ -104,7 +104,7 @@ async function listOfferRulesHandler(req, res) {
 
 async function handler(req, res) {
   if (req.method === 'GET') {
-    return listOfferRulesHandler(req, res);
+    return withAuth(listOfferRulesHandler, 'SUPER_ADMIN', 'ADMIN')(req, res);
   }
   if (req.method === 'POST') {
     return withAuth(createOfferRuleHandler, 'SUPER_ADMIN', 'ADMIN')(req, res);

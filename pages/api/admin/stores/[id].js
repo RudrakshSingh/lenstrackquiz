@@ -272,16 +272,20 @@ async function deleteStoreHandler(req, res) {
       });
     }
 
-    // Soft delete
-    const updated = await updateStore(id, { isActive: false, status: 'INACTIVE' });
+    // Soft delete - set both isActive and status to ensure proper filtering
+    const updateData = { isActive: false, status: 'INACTIVE' };
+    console.log('Deleting store:', id, 'with data:', updateData);
+    const updated = await updateStore(id, updateData);
     
     if (!updated) {
+      console.error('Store deletion failed - updateStore returned:', updated);
       return res.status(404).json({
         success: false,
         error: { code: 'NOT_FOUND', message: 'Store not found or delete failed' }
       });
     }
 
+    console.log('Store deleted successfully:', id, 'Updated store:', updated?._id?.toString());
     return res.status(200).json({
       success: true,
       message: 'Store deleted successfully'

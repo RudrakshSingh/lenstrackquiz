@@ -29,12 +29,21 @@ export default function StaffPage() {
 
   const fetchStores = async () => {
     try {
-      const response = await api.get('/admin/stores', { isActive: true });
+      const response = await api.get('/admin/stores', { isActive: 'true' });
+      // Handle different response formats
       if (response?.data?.stores) {
         setStores(response.data.stores);
+      } else if (response?.stores) {
+        setStores(response.stores);
+      } else if (Array.isArray(response)) {
+        setStores(response);
+      } else {
+        console.warn('Unexpected stores response format:', response);
+        setStores([]);
       }
     } catch (error) {
       console.error('Failed to fetch stores:', error);
+      setStores([]);
     }
   };
 

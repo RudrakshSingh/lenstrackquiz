@@ -10,25 +10,69 @@ export async function getStoreCollection() {
 }
 
 export async function createStore(storeData) {
-  const collection = await getStoreCollection();
-  const now = new Date();
-  const store = {
-    ...storeData,
-    organizationId: typeof storeData.organizationId === 'string' 
-      ? new ObjectId(storeData.organizationId) 
-      : storeData.organizationId,
-    isActive: storeData.isActive !== undefined ? storeData.isActive : true,
-    createdAt: now,
-    updatedAt: now
-  };
-  const result = await collection.insertOne(store);
-  return { ...store, _id: result.insertedId };
+  try {
+    const collection = await getStoreCollection();
+    const now = new Date();
+    
+    // Validate organizationId
+    if (!storeData.organizationId) {
+      throw new Error('organizationId is required');
+    }
+    
+    // Validate required fields
+    if (!storeData.code || !storeData.name) {
+      throw new Error('Store code and name are required');
+    }
+    
+    const store = {
+      code: storeData.code,
+      name: storeData.name,
+      address: storeData.address || null,
+      city: storeData.city || null,
+      state: storeData.state || null,
+      pincode: storeData.pincode || null,
+      phone: storeData.phone || null,
+      email: storeData.email || null,
+      gstNumber: storeData.gstNumber || null,
+      organizationId: typeof storeData.organizationId === 'string' 
+        ? new ObjectId(storeData.organizationId) 
+        : storeData.organizationId,
+      isActive: storeData.isActive !== undefined ? storeData.isActive : true,
+      createdAt: now,
+      updatedAt: now
+    };
+    
+    const result = await collection.insertOne(store);
+    
+    if (!result.insertedId) {
+      throw new Error('Failed to insert store');
+    }
+    
+    return { ...store, _id: result.insertedId };
+  } catch (error) {
+    console.error('createStore error:', error);
+    throw error;
+  }
 }
 
 export async function getStoreById(id) {
-  const collection = await getStoreCollection();
-  const objectId = typeof id === 'string' ? new ObjectId(id) : id;
-  return await collection.findOne({ _id: objectId });
+  try {
+    if (!id) {
+      return null;
+    }
+    const collection = await getStoreCollection();
+    let objectId;
+    try {
+      objectId = typeof id === 'string' ? new ObjectId(id) : id;
+    } catch (error) {
+      console.error('Invalid ObjectId format:', id);
+      return null;
+    }
+    return await collection.findOne({ _id: objectId });
+  } catch (error) {
+    console.error('getStoreById error:', error);
+    throw error;
+  }
 }
 
 export async function getStoreByCode(organizationId, code) {

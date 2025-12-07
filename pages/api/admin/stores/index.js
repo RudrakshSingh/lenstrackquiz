@@ -73,8 +73,39 @@ async function listStores(req, res) {
 // POST /api/admin/stores - Create store
 async function createStoreHandler(req, res) {
   try {
+    const user = req.user;
+    
+    // Check authorization
+    try {
+      authorize('SUPER_ADMIN', 'ADMIN')(user);
+    } catch (authError) {
+      return res.status(403).json({
+        success: false,
+        error: { code: 'FORBIDDEN', message: authError.message || 'Insufficient permissions' }
+      });
+    }
+
+    // Validate organizationId
+    if (!user.organizationId) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'VALIDATION_ERROR', message: 'User organization ID is required' }
+      });
+    }
+
+    // Clean up empty strings to null for optional fields
+    const cleanedData = {};
+    Object.keys(req.body).forEach(key => {
+      const value = req.body[key];
+      if (value === '') {
+        cleanedData[key] = null;
+      } else if (value !== undefined && value !== null) {
+        cleanedData[key] = value;
+      }
+    });
+
     // Validate input
-    const validationResult = CreateStoreSchema.safeParse(req.body);
+    const validationResult = CreateStoreSchema.safeParse(cleanedData);
     if (!validationResult.success) {
       const details = {};
       validationResult.error.errors.forEach(err => {
@@ -87,9 +118,6 @@ async function createStoreHandler(req, res) {
         error: { code: 'VALIDATION_ERROR', message: 'Validation failed', details }
       });
     }
-
-    const user = req.user;
-    authorize('SUPER_ADMIN', 'ADMIN')(user);
 
     // Check if store code already exists
     const { getStoreByCode } = await import('../../../../models/Store');
@@ -106,15 +134,31 @@ async function createStoreHandler(req, res) {
       organizationId: user.organizationId
     });
 
+    if (!store || !store._id) {
+      throw new Error('Failed to create store');
+    }
+
     return res.status(201).json({
       success: true,
       data: {
         id: store._id.toString(),
-        ...store,
-        _id: undefined
+        code: store.code,
+        name: store.name,
+        address: store.address || null,
+        city: store.city || null,
+        state: store.state || null,
+        pincode: store.pincode || null,
+        phone: store.phone || null,
+        email: store.email || null,
+        gstNumber: store.gstNumber || null,
+        isActive: store.isActive !== false,
+        organizationId: store.organizationId ? store.organizationId.toString() : null,
+        createdAt: store.createdAt,
+        updatedAt: store.updatedAt
       }
     });
   } catch (error) {
+    console.error('Create store error:', error);
     return handleError(error, res);
   }
 }

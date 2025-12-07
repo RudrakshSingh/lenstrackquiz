@@ -60,7 +60,11 @@ export default function AdminDashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      setLoading(true);
+      // Don't show loading spinner on auto-refresh to avoid flickering
+      const isAutoRefresh = !loading;
+      if (!isAutoRefresh) {
+        setLoading(true);
+      }
       const response = await reportService.getReport('overview');
       // Handle both old and new response structures
       const data = response.data || response;

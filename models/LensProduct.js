@@ -65,6 +65,8 @@ export async function createLensProduct(productData) {
     deliveryDays: productData.deliveryDays || 4,
     warranty: productData.warranty || null,
     yopoEligible: productData.yopoEligible !== undefined ? productData.yopoEligible : true,
+    // Rx Band Pricing - array of pricing bands based on SPH/CYL ranges
+    rxBands: productData.rxBands || [],
     isActive: productData.isActive !== undefined ? productData.isActive : true,
     createdAt: now,
     updatedAt: now

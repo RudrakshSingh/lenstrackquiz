@@ -38,7 +38,13 @@ const translations = {
     emailPlaceholder: "Enter your email",
     sphPlaceholder: "SPH (e.g., -2.00)",
     cylPlaceholder: "CYL (e.g., -0.50)",
+    axisPlaceholder: "AXIS (e.g., 90)",
     addPlaceholder: "ADD (optional, e.g., +1.00)",
+    pdPlaceholder: "PD (Pupillary Distance, e.g., 62)",
+    frameBrand: "Frame Brand",
+    frameSubCategory: "Sub-category (for Lenstrack)",
+    frameMRP: "Frame MRP (₹)",
+    frameMaterial: "Frame Material",
     questions: {
       deviceHours: "How many hours do you spend on digital devices daily?",
       outdoorExposure: "How much time do you spend outdoors?",
@@ -75,7 +81,13 @@ const translations = {
     emailPlaceholder: "अपना ईमेल दर्ज करें",
     sphPlaceholder: "SPH (उदाहरण: -2.00)",
     cylPlaceholder: "CYL (उदाहरण: -0.50)",
+    axisPlaceholder: "AXIS (उदाहरण: 90)",
     addPlaceholder: "ADD (वैकल्पिक, उदाहरण: +1.00)",
+    pdPlaceholder: "PD (पुतली दूरी, उदाहरण: 62)",
+    frameBrand: "फ्रेम ब्रांड",
+    frameSubCategory: "उप-श्रेणी (लेंसट्रैक के लिए)",
+    frameMRP: "फ्रेम MRP (₹)",
+    frameMaterial: "फ्रेम सामग्री",
     questions: {
       deviceHours: "आप दिन में कितने घंटे डिजिटल उपकरणों पर बिताते हैं?",
       outdoorExposure: "आप बाहर कितना समय बिताते हैं?",
@@ -112,7 +124,13 @@ const translations = {
     emailPlaceholder: "Apna email enter karein",
     sphPlaceholder: "SPH (e.g., -2.00)",
     cylPlaceholder: "CYL (e.g., -0.50)",
+    axisPlaceholder: "AXIS (e.g., 90)",
     addPlaceholder: "ADD (optional, e.g., +1.00)",
+    pdPlaceholder: "PD (Pupillary Distance, e.g., 62)",
+    frameBrand: "Frame Brand",
+    frameSubCategory: "Sub-category (for Lenstrack)",
+    frameMRP: "Frame MRP (₹)",
+    frameMaterial: "Frame Material",
     questions: {
       deviceHours: "Aap din mein kitne hours digital devices pe spend karte hain?",
       outdoorExposure: "Aap bahar kitna time spend karte hain?",
@@ -143,11 +161,19 @@ export default function Quiz() {
     add: "",
     rightSph: "",
     rightCyl: "",
+    rightAxis: "",
     leftSph: "",
     leftCyl: "",
+    leftAxis: "",
+    pd: "",
     frameType: "",
+    frameBrand: "",
+    frameSubCategory: "",
+    frameMRP: "",
+    frameMaterial: "",
     storeId: "",
     salespersonId: "",
+    salesMode: "SELF_SERVICE", // SELF_SERVICE or STAFF_ASSISTED
   });
   const [answers, setAnswers] = useState({});
   const [submitting, setSubmitting] = useState(false);
@@ -269,7 +295,7 @@ export default function Quiz() {
     },
   ];
 
-  const totalSteps = 1 + 3 + 1 + 1 + 1 + 1 + questions.length + 1; // lang + user info + prescription + frame + store + salesperson + questions + usage summary
+  const totalSteps = 1 + 3 + 1 + 1 + 1 + 1 + 1 + questions.length + 1; // lang + user info + prescription + frame type + frame details + store + salesperson + questions + usage summary
 
   const nextStep = () => {
     setError(null);
@@ -309,6 +335,12 @@ export default function Quiz() {
     // Frame type (step 5)
     if (currentStep === 5) {
       if (!user.frameType) return setError("Please select a frame type.");
+    }
+
+    // Frame details (step 6)
+    if (currentStep === 6) {
+      if (!user.frameBrand) return setError("Please select a frame brand.");
+      if (!user.frameMRP || parseFloat(user.frameMRP) <= 0) return setError("Please enter a valid frame MRP.");
     }
 
     const next = currentStep + 1;
@@ -454,11 +486,21 @@ export default function Quiz() {
         sph: parseFloat(user.sph) || 0,
         cyl: parseFloat(user.cyl) || 0,
         add: parseFloat(user.add) || 0,
+        pd: user.pd ? parseFloat(user.pd) : null,
         // Include separate right/left eye data if available
         rightSph: user.rightSph ? parseFloat(user.rightSph) : null,
         rightCyl: user.rightCyl ? parseFloat(user.rightCyl) : null,
+        rightAxis: user.rightAxis ? parseFloat(user.rightAxis) : null,
         leftSph: user.leftSph ? parseFloat(user.leftSph) : null,
         leftCyl: user.leftCyl ? parseFloat(user.leftCyl) : null,
+        leftAxis: user.leftAxis ? parseFloat(user.leftAxis) : null,
+        // Frame details
+        frameBrand: user.frameBrand || null,
+        frameSubCategory: user.frameSubCategory || null,
+        frameMRP: user.frameMRP ? parseFloat(user.frameMRP) : null,
+        frameMaterial: user.frameMaterial || null,
+        // Sales mode
+        salesMode: user.salesMode || 'SELF_SERVICE',
         deviceHours: parseDeviceHours(answers.deviceHours),
         outdoorExposure: answers.outdoorExposure?.toLowerCase() || 'minimal',
         driving: answers.driving?.toLowerCase() || 'none',
@@ -472,11 +514,13 @@ export default function Quiz() {
         userData.power = {
           right: {
             sph: userData.rightSph !== null ? userData.rightSph : userData.sph,
-            cyl: userData.rightCyl !== null ? userData.rightCyl : userData.cyl
+            cyl: userData.rightCyl !== null ? userData.rightCyl : userData.cyl,
+            axis: userData.rightAxis !== null ? userData.rightAxis : null
           },
           left: {
             sph: userData.leftSph !== null ? userData.leftSph : userData.sph,
-            cyl: userData.leftCyl !== null ? userData.leftCyl : userData.cyl
+            cyl: userData.leftCyl !== null ? userData.leftCyl : userData.cyl,
+            axis: userData.leftAxis !== null ? userData.leftAxis : null
           }
         };
       }
@@ -660,6 +704,17 @@ export default function Quiz() {
                   const maxCyl = rightCyl ? Math.max(Math.abs(parseFloat(rightCyl)), Math.abs(leftCyl)) : leftCyl;
                   setUser({ ...user, rightCyl, cyl: maxCyl.toString() });
                 }}
+                style={{ marginBottom: '0.5rem' }}
+              />
+              <input
+                className={styles.inputField}
+                type="number"
+                step="1"
+                min="0"
+                max="180"
+                placeholder={t.axisPlaceholder}
+                value={user.rightAxis || ''}
+                onChange={(e) => setUser({ ...user, rightAxis: e.target.value })}
               />
             </div>
             <div style={{ marginBottom: '1.5rem' }}>
@@ -692,16 +747,40 @@ export default function Quiz() {
                   const maxCyl = leftCyl ? Math.max(Math.abs(parseFloat(leftCyl)), Math.abs(rightCyl)) : rightCyl;
                   setUser({ ...user, leftCyl, cyl: maxCyl.toString() });
                 }}
+                style={{ marginBottom: '0.5rem' }}
+              />
+              <input
+                className={styles.inputField}
+                type="number"
+                step="1"
+                min="0"
+                max="180"
+                placeholder={t.axisPlaceholder}
+                value={user.leftAxis || ''}
+                onChange={(e) => setUser({ ...user, leftAxis: e.target.value })}
               />
             </div>
-            <input
-              className={styles.inputField}
-              type="number"
-              step="0.25"
-              placeholder={t.addPlaceholder}
-              value={user.add}
-              onChange={(e) => setUser({ ...user, add: e.target.value })}
-            />
+            <div style={{ marginBottom: '1.5rem' }}>
+              <input
+                className={styles.inputField}
+                type="number"
+                step="0.25"
+                placeholder={t.addPlaceholder}
+                value={user.add}
+                onChange={(e) => setUser({ ...user, add: e.target.value })}
+                style={{ marginBottom: '0.5rem' }}
+              />
+              <input
+                className={styles.inputField}
+                type="number"
+                step="0.5"
+                min="50"
+                max="80"
+                placeholder={t.pdPlaceholder}
+                value={user.pd}
+                onChange={(e) => setUser({ ...user, pd: e.target.value })}
+              />
+            </div>
             <PrescriptionUpload onParsed={handlePrescriptionParsed} />
             <div style={{ marginTop: '1.5rem', width: '100%', display: 'flex', justifyContent: 'center' }}>
               <button className={styles.nextButton} onClick={nextStep}>
@@ -745,8 +824,103 @@ export default function Quiz() {
       );
     }
 
-    // Step 6: Store Selection
+    // Step 6: Frame Details
     if (currentStep === 6) {
+      const frameBrands = ['LENSTRACK', 'RAYBAN', 'TITAN', 'FASTTRACK', 'VINCENT CHASE', 'OTHER'];
+      const lenstrackSubCategories = ['ESSENTIAL', 'ALFA', 'ADVANCED', 'PREMIUM'];
+      const frameMaterials = ['PLASTIC', 'METAL', 'ACETATE', 'TR90', 'TITANIUM', 'MIXED'];
+      
+      return (
+        <div className={styles.stepCard}>
+          <div className={styles.stepHeader}>
+            <div className={styles.stepIcon}>📋</div>
+            <h2 className={styles.stepTitle}>
+              {language === 'hi' ? 'फ्रेम विवरण' : language === 'hinglish' ? 'Frame Details' : 'Frame Details'}
+            </h2>
+            <p className={styles.stepDescription}>
+              {language === 'hi' ? 'अपने फ्रेम की जानकारी दर्ज करें' : language === 'hinglish' ? 'Apne frame ki details enter karein' : 'Enter your frame details'}
+            </p>
+          </div>
+          <div className={styles.inputGroup}>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, color: 'var(--text-secondary)', fontSize: '0.9375rem' }}>
+              {t.frameBrand} *
+            </label>
+            <select
+              className={styles.inputField}
+              value={user.frameBrand}
+              onChange={(e) => setUser({ ...user, frameBrand: e.target.value, frameSubCategory: e.target.value !== 'LENSTRACK' ? '' : user.frameSubCategory })}
+              style={{ padding: '1rem 1.25rem', fontSize: '1rem', marginBottom: '1rem' }}
+            >
+              <option value="">{language === 'hi' ? 'ब्रांड चुनें...' : language === 'hinglish' ? 'Brand select karein...' : 'Select brand...'}</option>
+              {frameBrands.map(brand => (
+                <option key={brand} value={brand}>{brand}</option>
+              ))}
+            </select>
+
+            {user.frameBrand === 'LENSTRACK' && (
+              <>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, color: 'var(--text-secondary)', fontSize: '0.9375rem' }}>
+                  {t.frameSubCategory}
+                </label>
+                <select
+                  className={styles.inputField}
+                  value={user.frameSubCategory}
+                  onChange={(e) => setUser({ ...user, frameSubCategory: e.target.value })}
+                  style={{ padding: '1rem 1.25rem', fontSize: '1rem', marginBottom: '1rem' }}
+                >
+                  <option value="">{language === 'hi' ? 'उप-श्रेणी चुनें...' : language === 'hinglish' ? 'Sub-category select karein...' : 'Select sub-category...'}</option>
+                  {lenstrackSubCategories.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </>
+            )}
+
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, color: 'var(--text-secondary)', fontSize: '0.9375rem' }}>
+              {t.frameMaterial}
+            </label>
+            <select
+              className={styles.inputField}
+              value={user.frameMaterial}
+              onChange={(e) => setUser({ ...user, frameMaterial: e.target.value })}
+              style={{ padding: '1rem 1.25rem', fontSize: '1rem', marginBottom: '1rem' }}
+            >
+              <option value="">{language === 'hi' ? 'सामग्री चुनें...' : language === 'hinglish' ? 'Material select karein...' : 'Select material...'}</option>
+              {frameMaterials.map(mat => (
+                <option key={mat} value={mat}>{mat}</option>
+              ))}
+            </select>
+
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, color: 'var(--text-secondary)', fontSize: '0.9375rem' }}>
+              {t.frameMRP} *
+            </label>
+            <input
+              className={styles.inputField}
+              type="number"
+              step="1"
+              min="0"
+              placeholder={language === 'hi' ? 'फ्रेम MRP (₹)' : language === 'hinglish' ? 'Frame MRP (₹)' : 'Frame MRP (₹)'}
+              value={user.frameMRP}
+              onChange={(e) => setUser({ ...user, frameMRP: e.target.value })}
+              style={{ marginBottom: '1rem' }}
+            />
+
+            <div style={{ marginTop: '1.5rem', width: '100%', display: 'flex', justifyContent: 'center' }}>
+              <button 
+                className={styles.nextButton} 
+                onClick={nextStep}
+                disabled={!user.frameBrand || !user.frameMRP}
+              >
+                {t.continue} <span className={styles.buttonArrow}>→</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Step 7: Store Selection
+    if (currentStep === 7) {
       return (
         <div className={styles.stepCard}>
           <div className={styles.stepHeader}>
@@ -790,8 +964,8 @@ export default function Quiz() {
       );
     }
 
-    // Step 7: Salesperson Selection
-    if (currentStep === 7) {
+    // Step 8: Salesperson Selection
+    if (currentStep === 8) {
       return (
         <div className={styles.stepCard}>
           <div className={styles.stepHeader}>
@@ -835,8 +1009,8 @@ export default function Quiz() {
       );
     }
 
-    // Step 8 + questions.length: Usage Summary (after store, salesperson, and questions)
-    const usageSummaryStep = 8 + questions.length;
+    // Step 9 + questions.length: Usage Summary (after store, salesperson, and questions)
+    const usageSummaryStep = 9 + questions.length;
     if (currentStep === usageSummaryStep) {
       // Calculate severities
       const deviceHours = parseDeviceHours(answers.deviceHours);
@@ -954,8 +1128,8 @@ export default function Quiz() {
       );
     }
 
-    // Steps 8+: Questions (after store and salesperson steps)
-    const qIndex = currentStep - 8;
+    // Steps 9+: Questions (after store and salesperson steps)
+    const qIndex = currentStep - 9;
     const question = questions[qIndex];
     if (!question) return null;
 

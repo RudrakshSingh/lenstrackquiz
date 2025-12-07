@@ -141,6 +141,27 @@ export default function StoresPage() {
     { key: 'city', header: 'City' },
     { key: 'phone', header: 'Phone' },
     {
+      key: 'qrCodeUrl',
+      header: 'QR Code',
+      render: (item) => (
+        item.qrCodeUrl ? (
+          <div className="flex items-center gap-2">
+            <a
+              href={item.qrCodeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 text-sm"
+              title="View QR Code URL"
+            >
+              View QR
+            </a>
+          </div>
+        ) : (
+          <span className="text-gray-400 text-sm">Not generated</span>
+        )
+      ),
+    },
+    {
       key: 'isActive',
       header: 'Status',
       render: (item) => (

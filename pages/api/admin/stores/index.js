@@ -49,6 +49,8 @@ async function listStores(req, res) {
         name: store.name,
         city: store.city,
         isActive: store.isActive,
+        status: store.status || (store.isActive ? 'ACTIVE' : 'INACTIVE'),
+        qrCodeUrl: store.qrCodeUrl || null, // V1.0 Spec: QR code URL
         staffCount: staff.length,
         createdAt: store.createdAt
       };
@@ -187,6 +189,8 @@ async function createStoreHandler(req, res) {
         email: store.email || null,
         gstNumber: store.gstNumber || null,
         isActive: store.isActive !== false,
+        status: store.status || (store.isActive ? 'ACTIVE' : 'INACTIVE'),
+        qrCodeUrl: store.qrCodeUrl || null, // V1.0 Spec: QR code URL
         organizationId: store.organizationId ? store.organizationId.toString() : null,
         createdAt: store.createdAt,
         updatedAt: store.updatedAt

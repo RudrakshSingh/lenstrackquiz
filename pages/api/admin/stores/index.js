@@ -24,8 +24,17 @@ async function listStores(req, res) {
       filter._id = user.storeId;
     }
 
+    // Handle isActive filter from query params
     if (isActive !== undefined) {
-      filter.isActive = isActive === 'true';
+      // Explicit filter from query params
+      if (isActive === 'true' || isActive === true) {
+        filter.isActive = true;
+      } else if (isActive === 'false' || isActive === false) {
+        filter.isActive = false;
+      }
+    } else {
+      // Default: only show active stores (exclude deleted/inactive)
+      filter.isActive = { $ne: false }; // isActive !== false (excludes false, includes true and undefined)
     }
 
     // Search filter
@@ -36,7 +45,7 @@ async function listStores(req, res) {
         { city: { $regex: search, $options: 'i' } }
       ];
     }
-
+    
     const stores = await getAllStores(filter);
     
     // Get staff count for each store (simplified - would need aggregation in production)

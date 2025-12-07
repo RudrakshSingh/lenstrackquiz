@@ -95,12 +95,20 @@ async function updateStoreHandler(req, res) {
     // Clean up empty strings to null for optional fields
     const cleanedData = {};
     Object.keys(req.body).forEach(key => {
-      if (req.body[key] === '') {
+      const value = req.body[key];
+      // Convert empty strings to null for optional fields
+      if (value === '') {
         cleanedData[key] = null;
-      } else {
-        cleanedData[key] = req.body[key];
+      } else if (value !== undefined && value !== null) {
+        cleanedData[key] = value;
       }
     });
+
+    // Remove fields that shouldn't be updated
+    delete cleanedData.organizationId;
+    delete cleanedData._id;
+    delete cleanedData.id;
+    delete cleanedData.createdAt;
 
     // Validate input
     const validationResult = UpdateStoreSchema.safeParse(cleanedData);
@@ -117,9 +125,8 @@ async function updateStoreHandler(req, res) {
       });
     }
 
-    // Don't allow updating organizationId through this endpoint
-    const updateData = { ...validationResult.data };
-    delete updateData.organizationId; // Prevent organizationId changes
+    // Use validated data (organizationId already removed)
+    const updateData = validationResult.data;
     
     const updated = await updateStore(id, updateData);
     

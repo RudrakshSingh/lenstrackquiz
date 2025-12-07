@@ -15,7 +15,9 @@ async function listStores(req, res) {
 
     // Build filter - only filter by organization if user is authenticated
     const filter = {};
-    if (user.organizationId) {
+    // For SUPER_ADMIN and ADMIN, show all stores (no organizationId filter)
+    // For other roles, filter by organizationId
+    if (user.organizationId && user.role !== 'SUPER_ADMIN' && user.role !== 'ADMIN') {
       filter.organizationId = user.organizationId;
     }
     
@@ -23,6 +25,12 @@ async function listStores(req, res) {
     if (user.role && user.role !== 'SUPER_ADMIN' && user.role !== 'ADMIN' && user.storeId) {
       filter._id = user.storeId;
     }
+    
+    console.log('User info:', { 
+      hasOrgId: !!user.organizationId, 
+      organizationId: user.organizationId?.toString(), 
+      role: user.role 
+    });
 
     // Search filter (apply first)
     const searchFilter = search ? {

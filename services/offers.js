@@ -16,7 +16,11 @@ export const offerService = {
   deleteRule: (id) => api.delete(`/admin/offers/${id}`),
   
   // Calculate offers (supports both old and new endpoints)
-  calculate: (data) => api.post('/offer-engine/calculate', data),
+  calculate: async (data) => {
+    const response = await api.post('/offer-engine/calculate', data);
+    // API client returns data.data, so response is already the data object
+    return { data: response };
+  },
   
   // Category Discounts
   listCategoryDiscounts: async (params) => {

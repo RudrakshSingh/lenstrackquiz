@@ -158,10 +158,14 @@ export default function OfferMappingPage() {
         customerCategory: simulationCart.customerCategory || null,
         couponCode: simulationCart.couponCode || null
       });
-      setSimulationResult(result.data || result);
+      // Handle response structure
+      const resultData = result?.data || result;
+      console.log('Simulation result:', resultData);
+      setSimulationResult(resultData);
     } catch (error) {
       console.error('Simulation error:', error);
       showToast('error', error.message || 'Failed to run simulation');
+      setSimulationResult({ error: error.message });
     } finally {
       setSimulationLoading(false);
     }
@@ -732,22 +736,107 @@ export default function OfferMappingPage() {
                     </div>
                   </div>
 
-                  <Button
-                    onClick={runSimulation}
-                    disabled={simulationLoading}
-                    icon={simulationLoading ? <Loader className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
-                    className="w-full md:w-auto"
-                  >
-                    {simulationLoading ? 'Calculating...' : 'Run Offer Engine'}
-                  </Button>
+                  <div className="flex items-center gap-4">
+                    <Button
+                      onClick={runSimulation}
+                      disabled={simulationLoading}
+                      icon={simulationLoading ? <Loader className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+                      className="w-full md:w-auto"
+                    >
+                      {simulationLoading ? 'Calculating...' : 'Run Offer Engine'}
+                    </Button>
+                    
+                    {/* Show applicable offers count */}
+                    {offerRules.length > 0 && (
+                      <div className="text-sm text-gray-600">
+                        <span className="font-semibold">{offerRules.filter(r => r.isActive).length}</span> active offer rules available
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Simulation Results */}
                 {simulationResult && (
                   <div className="space-y-4">
-                    <OfferBreakdownPanel result={simulationResult} />
-                    {simulationResult.upsell && (
-                      <UpsellBanner upsell={simulationResult.upsell} />
+                    {simulationResult.error ? (
+                      <div className="bg-red-50 border-2 border-red-200 rounded-lg p-4">
+                        <p className="text-red-800 font-semibold">Error: {simulationResult.error}</p>
+                      </div>
+                    ) : (
+                      <>
+                        {/* Applied Offers Display */}
+                        {simulationResult.appliedOffers && simulationResult.appliedOffers.length > 0 ? (
+                          <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border-2 border-green-200">
+                            <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                              <CheckCircle className="h-5 w-5 text-green-600" />
+                              Offers Applied ({simulationResult.appliedOffers.length})
+                            </h4>
+                            <div className="space-y-2">
+                              {simulationResult.appliedOffers.map((offer, index) => (
+                                <div key={index} className="bg-white rounded-lg p-4 border border-green-200">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                      {getOfferTypeIcon(offer.offerType)}
+                                      <div>
+                                        <div className="font-semibold text-gray-900">{offer.description || offer.ruleCode}</div>
+                                        {offer.ruleCode && (
+                                          <div className="text-sm text-gray-500">Code: {offer.ruleCode}</div>
+                                        )}
+                                      </div>
+                                    </div>
+                                    <div className="text-right">
+                                      <div className="text-lg font-bold text-green-600">
+                                        -₹{offer.savings?.toLocaleString('en-IN') || '0'}
+                                      </div>
+                                      <Badge color={getOfferTypeColor(offer.offerType)} variant="soft" className="mt-1">
+                                        {offer.offerType || 'OFFER'}
+                                      </Badge>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-4">
+                            <div className="flex items-center gap-2">
+                              <AlertCircle className="h-5 w-5 text-yellow-600" />
+                              <p className="text-yellow-800 font-semibold">No offers applied</p>
+                            </div>
+                            <p className="text-sm text-yellow-700 mt-2">
+                              No active offer rules match this cart configuration. Create an offer rule that matches:
+                            </p>
+                            <ul className="text-sm text-yellow-700 mt-2 list-disc list-inside">
+                              <li>Frame Brand: {simulationCart.frame.brand}</li>
+                              {simulationCart.frame.subCategory && (
+                                <li>Frame Sub Category: {simulationCart.frame.subCategory}</li>
+                              )}
+                              <li>Lens Brand Line: {simulationCart.lens.brandLine}</li>
+                              {simulationCart.lens.yopoEligible && (
+                                <li>YOPO Eligible: Yes</li>
+                              )}
+                            </ul>
+                          </div>
+                        )}
+
+                        {/* Price Breakdown */}
+                        <OfferBreakdownPanel result={simulationResult} />
+
+                        {/* Upsell Banner */}
+                        {simulationResult.upsell && (
+                          <UpsellBanner upsell={simulationResult.upsell} />
+                        )}
+
+                        {/* Debug Info (for development) */}
+                        {process.env.NODE_ENV === 'development' && (
+                          <details className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                            <summary className="cursor-pointer font-semibold text-gray-700">Debug Info</summary>
+                            <pre className="mt-2 text-xs overflow-auto bg-white p-4 rounded border">
+                              {JSON.stringify(simulationResult, null, 2)}
+                            </pre>
+                          </details>
+                        )}
+                      </>
                     )}
                   </div>
                 )}

@@ -209,10 +209,18 @@ export default function Quiz() {
 
   const fetchStores = async () => {
     try {
-      const res = await fetch('/api/admin/stores?isActive=true');
+      // V1.0 Spec: Use public /api/store/list endpoint for customer UI
+      const res = await fetch('/api/store/list');
       const data = await res.json();
-      if (data.success && data.data?.stores) {
-        setStores(data.data.stores);
+      if (data.success && data.stores) {
+        setStores(data.stores);
+      } else {
+        // Fallback to admin endpoint if needed
+        const fallbackRes = await fetch('/api/admin/stores?isActive=true');
+        const fallbackData = await fallbackRes.json();
+        if (fallbackData.success && fallbackData.data?.stores) {
+          setStores(fallbackData.data.stores);
+        }
       }
     } catch (err) {
       console.error('Failed to fetch stores:', err);

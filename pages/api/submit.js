@@ -277,6 +277,8 @@ export default async function handler(req, res) {
     // Use bestMatch if available, otherwise fallback to perfectMatch
     const selectedLens = recommendation?.bestMatch || recommendation?.perfectMatch;
     let orderId = null;
+    
+    // V1.0 Spec: Create order if we have storeId (from QR scan) and frame/lens data
     if (user.storeId && user.frameBrand && user.frameMRP && selectedLens) {
       try {
         const { createOrder } = await import('../../models/Order');
@@ -287,9 +289,16 @@ export default async function handler(req, res) {
                           selectedLens?.mrp || 
                           selectedLens?.price || 0;
         
+        // V1.0 Spec: Validate STAFF_ASSISTED mode requires assistedByStaffId
+        const salesMode = user.salesMode || 'SELF_SERVICE';
+        if (salesMode === 'STAFF_ASSISTED' && !user.salespersonId) {
+          console.warn('STAFF_ASSISTED mode requires salespersonId, but not provided');
+          // Continue with order creation but log warning
+        }
+        
         const order = await createOrder({
           storeId: user.storeId,
-          salesMode: user.salesMode || 'SELF_SERVICE',
+          salesMode: salesMode,
           assistedByStaffId: user.salespersonId || null,
           assistedByName: user.salespersonName || null,
           customerName: user.name || null,
@@ -315,9 +324,19 @@ export default async function handler(req, res) {
           finalPrice: finalPrice
         });
         orderId = order._id.toString();
+        console.log(`Order created successfully: ${orderId}`);
       } catch (orderError) {
         console.error('Order creation error:', orderError);
-        // Continue even if order creation fails
+        // Continue even if order creation fails - don't block submission
+      }
+    } else {
+      // Log why order wasn't created
+      if (!user.storeId) {
+        console.log('Order not created: storeId missing (QR scan not detected)');
+      } else if (!user.frameBrand || !user.frameMRP) {
+        console.log('Order not created: frame data missing');
+      } else if (!selectedLens) {
+        console.log('Order not created: lens recommendation missing');
       }
     }
 

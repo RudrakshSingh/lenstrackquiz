@@ -156,6 +156,8 @@ async function updateStoreHandler(req, res) {
         email: refreshedStore.email || null,
         gstNumber: refreshedStore.gstNumber || null,
         isActive: refreshedStore.isActive !== false,
+        status: refreshedStore.status || (refreshedStore.isActive ? 'ACTIVE' : 'INACTIVE'),
+        qrCodeUrl: refreshedStore.qrCodeUrl || null, // V1.0 Spec: QR code URL
         organizationId: refreshedStore.organizationId ? refreshedStore.organizationId.toString() : null,
         createdAt: refreshedStore.createdAt,
         updatedAt: refreshedStore.updatedAt

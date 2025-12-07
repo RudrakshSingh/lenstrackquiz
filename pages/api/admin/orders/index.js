@@ -17,7 +17,17 @@ async function handler(req, res) {
     const { storeId, status, salesMode, limit = 50 } = req.query;
 
     const filter = {};
-    if (storeId) filter.storeId = storeId;
+    if (storeId) {
+      try {
+        const { ObjectId } = await import('mongodb');
+        filter.storeId = typeof storeId === 'string' ? new ObjectId(storeId) : storeId;
+      } catch (error) {
+        return res.status(400).json({
+          success: false,
+          error: { code: 'VALIDATION_ERROR', message: 'Invalid storeId format' }
+        });
+      }
+    }
     if (status) filter.status = status;
     if (salesMode) filter.salesMode = salesMode;
 

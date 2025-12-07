@@ -56,8 +56,10 @@ async function listStaff(req, res) {
     }
     
     console.log('Staff list filter:', JSON.stringify(filter, null, 2));
+    console.log('Staff list - user:', { id: user._id?.toString(), role: user.role, organizationId: user.organizationId?.toString() });
 
     const staff = await getAllStaff(filter);
+    console.log('Staff found:', staff.length, staff.map(s => ({ id: s._id?.toString(), name: s.name, storeId: s.storeId?.toString(), status: s.status })));
 
     // Enrich with store names
     const staffWithStores = await Promise.all(staff.map(async (member) => {

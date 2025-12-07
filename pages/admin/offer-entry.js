@@ -6,7 +6,7 @@ import Input from '../../components/ui/Input';
 import Select from '../../components/ui/Select';
 import { useToast } from '../../contexts/ToastContext';
 import { offerService } from '../../services/offers';
-import { ArrowLeft, Tag, Target, Calendar, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Tag, Target, Calendar, CheckCircle, Sparkles, Gift } from 'lucide-react';
 
 const OfferType = {
   YOPO: 'YOPO',
@@ -51,6 +51,16 @@ export default function OfferEntry() {
     isActive: true,
     startDate: '',
     endDate: '',
+    // Dynamic fields based on offerType
+    freeLensRuleType: 'FULL', // FULL, PERCENTAGE_CAP, VALUE_CAP
+    percentLimit: null, // For FREE_LENS percentage cap
+    bonusLimit: null, // For BONUS_FREE_PRODUCT
+    upsellEnabled: false,
+    upsellThreshold: null,
+    upsellRewardText: '',
+    freeProductName: '',
+    freeProductValue: null,
+    config: null, // JSON config for complex rules
   });
 
   useEffect(() => {
@@ -65,6 +75,7 @@ export default function OfferEntry() {
       const response = await offerService.getRule(offerId);
       const data = response.data;
       if (data) {
+        const config = typeof data.config === 'string' ? JSON.parse(data.config || '{}') : (data.config || {});
         setFormData({
           name: data.name || '',
           code: data.code || '',
@@ -84,6 +95,15 @@ export default function OfferEntry() {
           isActive: data.isActive !== false,
           startDate: data.startDate ? new Date(data.startDate).toISOString().split('T')[0] : '',
           endDate: data.endDate ? new Date(data.endDate).toISOString().split('T')[0] : '',
+          freeLensRuleType: config.freeLensRuleType || 'FULL',
+          percentLimit: config.valueCapPercent || null,
+          bonusLimit: data.freeProductValue || null,
+          upsellEnabled: data.upsellEnabled || false,
+          upsellThreshold: data.upsellThreshold || null,
+          upsellRewardText: data.upsellRewardText || '',
+          freeProductName: data.freeProductName || '',
+          freeProductValue: data.freeProductValue || null,
+          config: data.config || null,
         });
       }
     } catch (err) {
@@ -105,6 +125,16 @@ export default function OfferEntry() {
     setSaving(true);
 
     try {
+      // Build config JSON based on offer type
+      let config = null;
+      if (formData.offerType === 'FREE_LENS' && formData.freeLensRuleType !== 'FULL') {
+        config = {
+          freeLensRuleType: formData.freeLensRuleType,
+          valueCapPercent: formData.percentLimit ? parseFloat(formData.percentLimit) : null,
+          valueCapAmount: formData.bonusLimit ? parseFloat(formData.bonusLimit) : null
+        };
+      }
+
       const submitData = {
         ...formData,
         minFrameMRP: formData.minFrameMRP ? parseFloat(formData.minFrameMRP) : null,
@@ -115,6 +145,12 @@ export default function OfferEntry() {
         priority: parseInt(formData.priority) || 100,
         startDate: formData.startDate ? new Date(formData.startDate).toISOString() : null,
         endDate: formData.endDate ? new Date(formData.endDate).toISOString() : null,
+        upsellEnabled: formData.upsellEnabled || false,
+        upsellThreshold: formData.upsellThreshold ? parseFloat(formData.upsellThreshold) : null,
+        upsellRewardText: formData.upsellRewardText || null,
+        freeProductName: formData.freeProductName || null,
+        freeProductValue: formData.freeProductValue ? parseFloat(formData.freeProductValue) : null,
+        config: config ? JSON.stringify(config) : null,
       };
 
       if (id) {
@@ -270,8 +306,116 @@ export default function OfferEntry() {
             </div>
           </div>
 
-          {/* Second Pair Rule */}
+          {/* Dynamic Fields - FREE LENS */}
+          {formData.offerType === 'FREE_LENS' && (
+            <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <Gift className="h-5 w-5 text-indigo-600" />
+                Free Lens Configuration
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Select
+                  label="Free Lens Rule Type"
+                  value={formData.freeLensRuleType}
+                  onChange={(value) => handleChange('freeLensRuleType', value)}
+                  options={[
+                    { value: 'FULL', label: 'Full Free (No Cap)' },
+                    { value: 'PERCENTAGE_CAP', label: 'Percentage Cap (e.g., 40% of frame)' },
+                    { value: 'VALUE_CAP', label: 'Value Cap (Fixed amount)' }
+                  ]}
+                />
+                {formData.freeLensRuleType === 'PERCENTAGE_CAP' && (
+                  <Input
+                    label="Percentage Cap (%)"
+                    type="number"
+                    value={formData.percentLimit?.toString() || ''}
+                    onChange={(value) => handleChange('percentLimit', value || null)}
+                    placeholder="e.g., 40 for 40% of frame MRP"
+                  />
+                )}
+                {formData.freeLensRuleType === 'VALUE_CAP' && (
+                  <Input
+                    label="Value Cap (₹)"
+                    type="number"
+                    value={formData.bonusLimit?.toString() || ''}
+                    onChange={(value) => handleChange('bonusLimit', value || null)}
+                    placeholder="e.g., 1200 for ₹1200 max free value"
+                  />
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Dynamic Fields - BONUS FREE PRODUCT */}
+          {formData.offerType === 'BONUS_FREE_PRODUCT' && (
+            <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <Gift className="h-5 w-5 text-indigo-600" />
+                Bonus Product Configuration
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Input
+                  label="Free Product Name"
+                  value={formData.freeProductName}
+                  onChange={(value) => handleChange('freeProductName', value)}
+                  placeholder="e.g., Lenstrack Sunglasses"
+                />
+                <Input
+                  label="Free Product Value (₹)"
+                  type="number"
+                  value={formData.freeProductValue?.toString() || ''}
+                  onChange={(value) => handleChange('freeProductValue', value || null)}
+                  placeholder="e.g., 1499"
+                />
+                <Input
+                  label="Bonus Limit (₹)"
+                  type="number"
+                  value={formData.bonusLimit?.toString() || ''}
+                  onChange={(value) => handleChange('bonusLimit', value || null)}
+                  placeholder="Maximum value for free product"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Dynamic Fields - Upsell Configuration */}
           <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-indigo-600" />
+              Upsell Engine Configuration
+            </h3>
+            <div className="space-y-4">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={formData.upsellEnabled}
+                  onChange={(e) => handleChange('upsellEnabled', e.target.checked)}
+                  className="mr-2 h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                />
+                <span className="text-sm text-gray-700">Enable upsell for this offer</span>
+              </label>
+              {formData.upsellEnabled && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pl-6 border-l-2 border-indigo-200">
+                  <Input
+                    label="Upsell Threshold (₹)"
+                    type="number"
+                    value={formData.upsellThreshold?.toString() || ''}
+                    onChange={(value) => handleChange('upsellThreshold', value || null)}
+                    placeholder="Minimum bill amount to trigger upsell"
+                  />
+                  <Input
+                    label="Upsell Reward Text"
+                    value={formData.upsellRewardText}
+                    onChange={(value) => handleChange('upsellRewardText', value)}
+                    placeholder="e.g., FREE Sunglasses worth ₹1499"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Second Pair Rule */}
+          <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 animate-fade-in" style={{ animationDelay: '0.25s' }}>
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Second Pair Rule</h3>
             <div className="space-y-4">
               <label className="flex items-center">

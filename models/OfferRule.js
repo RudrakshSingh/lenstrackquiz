@@ -6,11 +6,13 @@ import { getDatabase } from '../lib/mongodb';
 
 export const OfferType = {
   YOPO: 'YOPO',
-  BOGO_50: 'BOGO_50',
-  FREE_LENS: 'FREE_LENS',
   COMBO_PRICE: 'COMBO_PRICE',
+  FREE_LENS: 'FREE_LENS',
   PERCENT_OFF: 'PERCENT_OFF',
-  FLAT_OFF: 'FLAT_OFF'
+  FLAT_OFF: 'FLAT_OFF',
+  BOG50: 'BOG50',
+  CATEGORY_DISCOUNT: 'CATEGORY_DISCOUNT',
+  BONUS_FREE_PRODUCT: 'BONUS_FREE_PRODUCT'
 };
 
 export const DiscountType = {
@@ -33,8 +35,10 @@ export async function createOfferRule(offerData) {
     name: offerData.name,
     code: offerData.code,
     offerType: offerData.offerType,
-    frameBrand: offerData.frameBrand || null,
-    frameSubCategory: offerData.frameSubCategory || null,
+    frameBrand: offerData.frameBrand || null, // Legacy support
+    frameBrands: offerData.frameBrands || (offerData.frameBrand ? [offerData.frameBrand] : []), // V2: Array
+    frameSubCategory: offerData.frameSubCategory || null, // Legacy support
+    frameSubCategories: offerData.frameSubCategories || (offerData.frameSubCategory ? [offerData.frameSubCategory] : []), // V2: Array
     minFrameMRP: offerData.minFrameMRP ? (typeof offerData.minFrameMRP === 'number' ? offerData.minFrameMRP : parseFloat(offerData.minFrameMRP)) : null,
     maxFrameMRP: offerData.maxFrameMRP ? (typeof offerData.maxFrameMRP === 'number' ? offerData.maxFrameMRP : parseFloat(offerData.maxFrameMRP)) : null,
     lensBrandLines: offerData.lensBrandLines || [],
@@ -42,6 +46,7 @@ export async function createOfferRule(offerData) {
     discountType: offerData.discountType,
     discountValue: typeof offerData.discountValue === 'number' ? offerData.discountValue : parseFloat(offerData.discountValue),
     comboPrice: offerData.comboPrice ? (typeof offerData.comboPrice === 'number' ? offerData.comboPrice : parseFloat(offerData.comboPrice)) : null,
+    config: offerData.config ? (typeof offerData.config === 'string' ? offerData.config : JSON.stringify(offerData.config)) : null,
     freeProductId: offerData.freeProductId ? (typeof offerData.freeProductId === 'string' ? new ObjectId(offerData.freeProductId) : offerData.freeProductId) : null,
     isSecondPairRule: offerData.isSecondPairRule !== undefined ? offerData.isSecondPairRule : false,
     secondPairPercent: offerData.secondPairPercent ? (typeof offerData.secondPairPercent === 'number' ? offerData.secondPairPercent : parseFloat(offerData.secondPairPercent)) : null,
@@ -49,6 +54,12 @@ export async function createOfferRule(offerData) {
     isActive: offerData.isActive !== undefined ? offerData.isActive : true,
     startDate: offerData.startDate ? new Date(offerData.startDate) : null,
     endDate: offerData.endDate ? new Date(offerData.endDate) : null,
+    // Upsell fields
+    upsellEnabled: offerData.upsellEnabled !== undefined ? offerData.upsellEnabled : false,
+    upsellThreshold: offerData.upsellThreshold ? (typeof offerData.upsellThreshold === 'number' ? offerData.upsellThreshold : parseFloat(offerData.upsellThreshold)) : null,
+    upsellRewardText: offerData.upsellRewardText || null,
+    freeProductName: offerData.freeProductName || null,
+    freeProductValue: offerData.freeProductValue ? (typeof offerData.freeProductValue === 'number' ? offerData.freeProductValue : parseFloat(offerData.freeProductValue)) : null,
     createdAt: now,
     updatedAt: now
   };

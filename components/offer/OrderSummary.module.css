@@ -1,0 +1,119 @@
+/* components/offer/OrderSummary.module.css */
+
+.container {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f3f4f6;
+}
+
+.headerIcon {
+  width: 24px;
+  height: 24px;
+  color: #6366f1;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.section {
+  margin-bottom: 20px;
+}
+
+.empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #9ca3af;
+}
+
+.emptyIcon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 12px;
+  color: #d1d5db;
+}
+
+.savingsHighlight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  border: 2px solid #10b981;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.savingsIcon {
+  width: 32px;
+  height: 32px;
+  color: #059669;
+  flex-shrink: 0;
+}
+
+.savingsContent {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.savingsLabel {
+  font-size: 16px;
+  font-weight: 600;
+  color: #065f46;
+}
+
+.savingsAmount {
+  font-size: 24px;
+  font-weight: 800;
+  color: #059669;
+  font-family: 'Courier New', monospace;
+}
+
+.finalPayable {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  border-radius: 10px;
+  color: white;
+}
+
+.finalLabel {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.finalAmount {
+  font-size: 28px;
+  font-weight: 800;
+  font-family: 'Courier New', monospace;
+}
+
+@media (max-width: 768px) {
+  .savingsContent {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .savingsAmount {
+    align-self: flex-end;
+  }
+}
+

@@ -1,0 +1,103 @@
+/* components/offer/AppliedOffersDisplay.module.css */
+
+.container {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.noOffers {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 8px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.noOffersIcon {
+  width: 20px;
+  height: 20px;
+}
+
+.offersList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.offerCard {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border: 2px solid #0ea5e9;
+  border-radius: 10px;
+  padding: 16px;
+  transition: all 0.3s ease;
+}
+
+.offerCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);
+}
+
+.offerHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+  color: #0ea5e9;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.offerContent {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.offerMessage {
+  font-size: 15px;
+  font-weight: 600;
+  color: #0c4a6e;
+  line-height: 1.5;
+}
+
+.offerSavings {
+  font-size: 18px;
+  font-weight: 800;
+  color: #059669;
+  font-family: 'Courier New', monospace;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .offerContent {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .offerSavings {
+    align-self: flex-end;
+  }
+}
+

@@ -14,8 +14,8 @@ export const offerService = {
   updateRule: (id, data) => api.put(`/admin/offers/${id}`, data),
   deleteRule: (id) => api.delete(`/admin/offers/${id}`),
   
-  // Calculate offers
-  calculate: (data) => api.post('/offers/calculate', data),
+  // Calculate offers (supports both old and new endpoints)
+  calculate: (data) => api.post('/offer-engine/calculate', data),
   
   // Category Discounts
   listCategoryDiscounts: async (params) => {

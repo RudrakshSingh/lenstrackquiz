@@ -6,6 +6,8 @@ import Modal from '../../components/ui/Modal';
 import Badge from '../../components/ui/Badge';
 import { offerService } from '../../services/offers';
 import { useToast } from '../../contexts/ToastContext';
+import OfferBreakdownPanel from '../../components/offer/OfferBreakdownPanel';
+import UpsellBanner from '../../components/offer/UpsellBanner';
 import {
   Tag,
   Percent,
@@ -28,7 +30,9 @@ import {
   DollarSign,
   Gift,
   ShoppingCart,
-  Sparkles
+  Sparkles,
+  Play,
+  Loader
 } from 'lucide-react';
 
 export default function OfferMappingPage() {
@@ -43,6 +47,16 @@ export default function OfferMappingPage() {
   const [offerRules, setOfferRules] = useState([]);
   const [categoryDiscounts, setCategoryDiscounts] = useState([]);
   const [coupons, setCoupons] = useState([]);
+
+  // Simulation states
+  const [simulationResult, setSimulationResult] = useState(null);
+  const [simulationLoading, setSimulationLoading] = useState(false);
+  const [simulationCart, setSimulationCart] = useState({
+    frame: { brand: 'LENSTRACK', subCategory: 'ADVANCED', mrp: 2500 },
+    lens: { itCode: 'D360ASV', price: 2500, brandLine: 'DIGI360_ADVANCED', yopoEligible: true },
+    customerCategory: null,
+    couponCode: null
+  });
 
   useEffect(() => {
     fetchAllData();
@@ -134,6 +148,25 @@ export default function OfferMappingPage() {
   const activeCouponsCount = coupons.filter(c => c.isActive).length;
   const activeCategoryDiscountsCount = categoryDiscounts.filter(c => c.isActive).length;
 
+  const runSimulation = async () => {
+    setSimulationLoading(true);
+    setSimulationResult(null);
+    try {
+      const result = await offerService.calculate({
+        frame: simulationCart.frame,
+        lens: simulationCart.lens,
+        customerCategory: simulationCart.customerCategory || null,
+        couponCode: simulationCart.couponCode || null
+      });
+      setSimulationResult(result.data || result);
+    } catch (error) {
+      console.error('Simulation error:', error);
+      showToast('error', error.message || 'Failed to run simulation');
+    } finally {
+      setSimulationLoading(false);
+    }
+  };
+
   return (
     <AdminLayout title="Offer Mapping">
       <div className="space-y-6">
@@ -223,7 +256,8 @@ export default function OfferMappingPage() {
               {[
                 { id: 'rules', label: 'Offer Rules', icon: Tag, count: offerRules.length },
                 { id: 'categories', label: 'Category Discounts', icon: Users, count: categoryDiscounts.length },
-                { id: 'coupons', label: 'Coupons', icon: Ticket, count: coupons.length }
+                { id: 'coupons', label: 'Coupons', icon: Ticket, count: coupons.length },
+                { id: 'simulation', label: 'Simulation', icon: Play, count: null }
               ].map((tab) => {
                 const Icon = tab.icon;
                 return (
@@ -240,9 +274,11 @@ export default function OfferMappingPage() {
                   >
                     <Icon className="h-5 w-5" />
                     {tab.label}
-                    <Badge color={activeTab === tab.id ? 'blue' : 'gray'} variant="soft" size="sm">
-                      {tab.count}
-                    </Badge>
+                    {tab.count !== null && (
+                      <Badge color={activeTab === tab.id ? 'blue' : 'gray'} variant="soft" size="sm">
+                        {tab.count}
+                      </Badge>
+                    )}
                   </button>
                 );
               })}
@@ -539,6 +575,180 @@ export default function OfferMappingPage() {
                         </div>
                       </div>
                     ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === 'simulation' && (
+              <div className="space-y-6">
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border-2 border-blue-200">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <Play className="h-6 w-6 text-blue-600" />
+                    Offer Engine Simulation
+                  </h3>
+                  <p className="text-gray-600 mb-6">
+                    Test how offers are calculated with sample cart data. This helps validate rules before going live.
+                  </p>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    {/* Frame Input */}
+                    <div className="space-y-4">
+                      <h4 className="font-semibold text-gray-900">Frame Details</h4>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Brand</label>
+                        <input
+                          type="text"
+                          value={simulationCart.frame.brand}
+                          onChange={(e) => setSimulationCart({
+                            ...simulationCart,
+                            frame: { ...simulationCart.frame, brand: e.target.value }
+                          })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                          placeholder="LENSTRACK"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Sub Category</label>
+                        <input
+                          type="text"
+                          value={simulationCart.frame.subCategory || ''}
+                          onChange={(e) => setSimulationCart({
+                            ...simulationCart,
+                            frame: { ...simulationCart.frame, subCategory: e.target.value || null }
+                          })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                          placeholder="ADVANCED"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">MRP (₹)</label>
+                        <input
+                          type="number"
+                          value={simulationCart.frame.mrp}
+                          onChange={(e) => setSimulationCart({
+                            ...simulationCart,
+                            frame: { ...simulationCart.frame, mrp: parseFloat(e.target.value) || 0 }
+                          })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Lens Input */}
+                    <div className="space-y-4">
+                      <h4 className="font-semibold text-gray-900">Lens Details</h4>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">IT Code</label>
+                        <input
+                          type="text"
+                          value={simulationCart.lens.itCode}
+                          onChange={(e) => setSimulationCart({
+                            ...simulationCart,
+                            lens: { ...simulationCart.lens, itCode: e.target.value }
+                          })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                          placeholder="D360ASV"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Brand Line</label>
+                        <input
+                          type="text"
+                          value={simulationCart.lens.brandLine}
+                          onChange={(e) => setSimulationCart({
+                            ...simulationCart,
+                            lens: { ...simulationCart.lens, brandLine: e.target.value }
+                          })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                          placeholder="DIGI360_ADVANCED"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Price (₹)</label>
+                        <input
+                          type="number"
+                          value={simulationCart.lens.price}
+                          onChange={(e) => setSimulationCart({
+                            ...simulationCart,
+                            lens: { ...simulationCart.lens, price: parseFloat(e.target.value) || 0 }
+                          })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                        />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          id="yopoEligible"
+                          checked={simulationCart.lens.yopoEligible}
+                          onChange={(e) => setSimulationCart({
+                            ...simulationCart,
+                            lens: { ...simulationCart.lens, yopoEligible: e.target.checked }
+                          })}
+                          className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                        />
+                        <label htmlFor="yopoEligible" className="text-sm font-medium text-gray-700">
+                          YOPO Eligible
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    {/* Customer Category */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Customer Category</label>
+                      <select
+                        value={simulationCart.customerCategory || ''}
+                        onChange={(e) => setSimulationCart({
+                          ...simulationCart,
+                          customerCategory: e.target.value || null
+                        })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                      >
+                        <option value="">None</option>
+                        <option value="STUDENT">Student</option>
+                        <option value="DOCTOR">Doctor</option>
+                        <option value="TEACHER">Teacher</option>
+                        <option value="ARMED_FORCES">Armed Forces</option>
+                        <option value="SENIOR_CITIZEN">Senior Citizen</option>
+                        <option value="CORPORATE">Corporate</option>
+                      </select>
+                    </div>
+
+                    {/* Coupon Code */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Coupon Code</label>
+                      <input
+                        type="text"
+                        value={simulationCart.couponCode || ''}
+                        onChange={(e) => setSimulationCart({
+                          ...simulationCart,
+                          couponCode: e.target.value || null
+                        })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                        placeholder="WELCOME10"
+                      />
+                    </div>
+                  </div>
+
+                  <Button
+                    onClick={runSimulation}
+                    disabled={simulationLoading}
+                    icon={simulationLoading ? <Loader className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+                    className="w-full md:w-auto"
+                  >
+                    {simulationLoading ? 'Calculating...' : 'Run Offer Engine'}
+                  </Button>
+                </div>
+
+                {/* Simulation Results */}
+                {simulationResult && (
+                  <div className="space-y-4">
+                    <OfferBreakdownPanel result={simulationResult} />
+                    {simulationResult.upsell && (
+                      <UpsellBanner upsell={simulationResult.upsell} />
+                    )}
                   </div>
                 )}
               </div>

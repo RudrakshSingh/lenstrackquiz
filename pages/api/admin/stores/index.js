@@ -210,9 +210,21 @@ async function createStoreHandler(req, res) {
       throw createError;
     }
 
-    if (!store || !store._id) {
-      console.error('Store creation returned invalid result:', store);
-      throw new Error('Failed to create store - no ID returned');
+    // Validate store was created successfully
+    if (!store) {
+      console.error('Store creation returned null/undefined');
+      return res.status(500).json({
+        success: false,
+        error: { code: 'STORE_CREATION_FAILED', message: 'Failed to create store - store object is null' }
+      });
+    }
+    
+    if (!store._id) {
+      console.error('Store creation returned store without _id:', JSON.stringify(store, null, 2));
+      return res.status(500).json({
+        success: false,
+        error: { code: 'STORE_CREATION_FAILED', message: 'Failed to create store - no ID returned from database' }
+      });
     }
 
     return res.status(201).json({

@@ -47,12 +47,19 @@ async function listStores(req, res) {
         id: store._id.toString(),
         code: store.code,
         name: store.name,
-        city: store.city,
-        isActive: store.isActive,
+        city: store.city || null,
+        address: store.address || null,
+        state: store.state || null,
+        pincode: store.pincode || null,
+        phone: store.phone || null,
+        email: store.email || null,
+        gstNumber: store.gstNumber || null,
+        isActive: store.isActive !== false,
         status: store.status || (store.isActive ? 'ACTIVE' : 'INACTIVE'),
         qrCodeUrl: store.qrCodeUrl || null, // V1.0 Spec: QR code URL
         staffCount: staff.length,
-        createdAt: store.createdAt
+        createdAt: store.createdAt,
+        updatedAt: store.updatedAt
       };
     }));
 

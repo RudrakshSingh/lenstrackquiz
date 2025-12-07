@@ -104,16 +104,20 @@ export default function StoresPage() {
     setFormErrors({});
 
     try {
+      let result;
       if (editingStore) {
-        await storeService.update(editingStore.id || editingStore._id, formData);
+        result = await storeService.update(editingStore.id || editingStore._id, formData);
         showToast('success', 'Store updated successfully');
       } else {
-        await storeService.create(formData);
+        result = await storeService.create(formData);
         showToast('success', 'Store created successfully');
       }
       setIsCreateOpen(false);
-      fetchStores();
+      setEditingStore(null);
+      // Refresh store list
+      await fetchStores();
     } catch (error) {
+      console.error('Store save error:', error);
       if (error.code === 'RESOURCE_CONFLICT') {
         setFormErrors({ code: 'A store with this code already exists' });
       } else if (error.code === 'VALIDATION_ERROR' && error.details) {

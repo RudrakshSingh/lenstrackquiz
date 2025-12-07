@@ -139,7 +139,10 @@ async function updateStoreHandler(req, res) {
     // Fetch the updated store to ensure we have all fields
     const refreshedStore = await getStoreById(id);
     if (!refreshedStore) {
-      throw new NotFoundError('Store not found after update');
+      return res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: 'Store not found after update' }
+      });
     }
 
     return res.status(200).json({
@@ -185,9 +188,23 @@ async function deleteStoreHandler(req, res) {
       });
     }
 
+    // Validate ObjectId format
+    let objectId;
+    try {
+      objectId = typeof id === 'string' ? new ObjectId(id) : id;
+    } catch (error) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'VALIDATION_ERROR', message: 'Invalid store ID format' }
+      });
+    }
+    
     const store = await getStoreById(id);
     if (!store) {
-      throw new NotFoundError('Store not found');
+      return res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: 'Store not found' }
+      });
     }
 
     // Check organization access
@@ -216,10 +233,13 @@ async function deleteStoreHandler(req, res) {
     }
 
     // Soft delete
-    const updated = await updateStore(id, { isActive: false });
+    const updated = await updateStore(id, { isActive: false, status: 'INACTIVE' });
     
     if (!updated) {
-      throw new NotFoundError('Store not found or delete failed');
+      return res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: 'Store not found or delete failed' }
+      });
     }
 
     return res.status(200).json({
@@ -232,7 +252,7 @@ async function deleteStoreHandler(req, res) {
   }
 }
 
-export default withAuth(async function handler(req, res) {
+async function handler(req, res) {
   if (req.method === 'GET') {
     return getStore(req, res);
   }
@@ -246,5 +266,7 @@ export default withAuth(async function handler(req, res) {
     success: false,
     error: { code: 'METHOD_NOT_ALLOWED', message: 'Method not allowed' }
   });
-}, 'SUPER_ADMIN', 'ADMIN', 'STORE_MANAGER', 'SALES_EXECUTIVE');
+}
+
+export default withAuth(handler);
 

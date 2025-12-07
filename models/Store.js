@@ -174,7 +174,7 @@ export async function updateStore(id, updateData) {
     };
     
     // Only include fields that are allowed to be updated
-    const allowedFields = ['code', 'name', 'address', 'city', 'state', 'pincode', 'phone', 'email', 'gstNumber', 'isActive'];
+    const allowedFields = ['code', 'name', 'address', 'city', 'state', 'pincode', 'phone', 'email', 'gstNumber', 'isActive', 'status'];
     allowedFields.forEach(field => {
       if (updateData[field] !== undefined) {
         update[field] = updateData[field];

@@ -198,6 +198,14 @@ async function deleteStoreHandler(req, res) {
     const { id } = req.query;
     const user = req.user;
     
+    // Validate ID is provided
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'VALIDATION_ERROR', message: 'Store ID is required' }
+      });
+    }
+    
     // Check authorization
     try {
       authorize('SUPER_ADMIN', 'ADMIN')(user);
@@ -213,17 +221,29 @@ async function deleteStoreHandler(req, res) {
     try {
       objectId = typeof id === 'string' ? new ObjectId(id) : id;
     } catch (error) {
+      console.error('Invalid ObjectId format in delete:', id, error);
       return res.status(400).json({
         success: false,
-        error: { code: 'VALIDATION_ERROR', message: 'Invalid store ID format' }
+        error: { code: 'VALIDATION_ERROR', message: `Invalid store ID format: ${id}` }
       });
     }
     
+    // Get store - check if it exists
     const store = await getStoreById(id);
     if (!store) {
+      console.error('Store not found for deletion:', id);
       return res.status(404).json({
         success: false,
-        error: { code: 'NOT_FOUND', message: 'Store not found' }
+        error: { code: 'NOT_FOUND', message: `Store with ID ${id} not found` }
+      });
+    }
+    
+    // Check if already deleted (idempotent operation)
+    if (store.isActive === false || store.status === 'INACTIVE') {
+      return res.status(200).json({
+        success: true,
+        message: 'Store is already deleted',
+        alreadyDeleted: true
       });
     }
 

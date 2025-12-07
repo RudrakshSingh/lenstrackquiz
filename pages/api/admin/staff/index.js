@@ -27,11 +27,13 @@ async function listStaff(req, res) {
     if (status) filter.status = status;
 
     // Filter by organization if user is authenticated
-    if (user.organizationId) {
+    // For SUPER_ADMIN and ADMIN, show all staff (no organization filter)
+    if (user.organizationId && user.role !== 'SUPER_ADMIN' && user.role !== 'ADMIN') {
       // Get stores for this organization first
       const { getAllStores } = await import('../../../../models/Store');
       const stores = await getAllStores({ organizationId: user.organizationId });
       const storeIds = stores.map(s => s._id);
+      console.log('Staff list - organization stores:', storeIds.length, storeIds.map(id => id.toString()));
       if (storeIds.length > 0) {
         if (filter.storeId) {
           // If storeId is already set, check if it's in the organization's stores
@@ -52,6 +54,8 @@ async function listStaff(req, res) {
         });
       }
     }
+    
+    console.log('Staff list filter:', JSON.stringify(filter, null, 2));
 
     const staff = await getAllStaff(filter);
 

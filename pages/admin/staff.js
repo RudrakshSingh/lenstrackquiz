@@ -80,7 +80,8 @@ export default function StaffPage() {
       setShowModal(false);
       setEditingStaff(null);
       setFormData({ storeId: '', name: '', phone: '', role: 'SALES', status: 'ACTIVE' });
-      fetchStaff();
+      // Refresh staff list after creation/update
+      await fetchStaff();
     } catch (error) {
       console.error('Failed to save staff:', error);
       alert('Failed to save staff. Please try again.');

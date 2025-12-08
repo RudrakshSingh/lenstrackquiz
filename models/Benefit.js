@@ -17,8 +17,8 @@ export async function createBenefit(benefitData) {
     name: benefitData.name,
     description: benefitData.description || null,
     pointWeight: benefitData.pointWeight || 1.0,
-    relatedProblems: benefitData.relatedProblems || [],
-    relatedUsage: benefitData.relatedUsage || [],
+    maxScore: benefitData.maxScore !== undefined ? benefitData.maxScore : 3.0,
+    isActive: benefitData.isActive !== undefined ? benefitData.isActive : true,
     createdAt: now,
     updatedAt: now
   };
@@ -39,7 +39,7 @@ export async function getBenefitByCode(code) {
 
 export async function getAllBenefits(filter = {}) {
   const collection = await getBenefitCollection();
-  return await collection.find(filter).toArray();
+  return await collection.find(filter).sort({ code: 1 }).toArray();
 }
 
 export async function updateBenefit(id, updateData) {

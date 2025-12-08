@@ -39,6 +39,9 @@ export async function createOfferRule(offerData) {
     frameBrands: offerData.frameBrands || (offerData.frameBrand ? [offerData.frameBrand] : []), // V2: Array
     frameSubCategory: offerData.frameSubCategory || null, // Legacy support
     frameSubCategories: offerData.frameSubCategories || (offerData.frameSubCategory ? [offerData.frameSubCategory] : []), // V2: Array
+    // Product type support (FRAME, SUNGLASS, CONTACT_LENS, ACCESSORY)
+    productTypes: offerData.productTypes || [], // Array of product types this rule applies to
+    // If empty, applies to all types (backward compatibility)
     minFrameMRP: offerData.minFrameMRP ? (typeof offerData.minFrameMRP === 'number' ? offerData.minFrameMRP : parseFloat(offerData.minFrameMRP)) : null,
     maxFrameMRP: offerData.maxFrameMRP ? (typeof offerData.maxFrameMRP === 'number' ? offerData.maxFrameMRP : parseFloat(offerData.maxFrameMRP)) : null,
     lensBrandLines: offerData.lensBrandLines || [],

@@ -7,7 +7,23 @@ export const questionnaireService = {
   // Questions
   listQuestions: async (params) => {
     const response = await api.get('/admin/questionnaire/questions', params);
-    return response.data?.questions || [];
+    // API returns { success: true, data: { questions: [...] } }
+    // api.get extracts data, so response is { questions: [...] }
+    // Handle various response structures
+    if (Array.isArray(response)) {
+      return response;
+    }
+    // Check for nested structure
+    if (response?.data?.questions && Array.isArray(response.data.questions)) {
+      return response.data.questions;
+    }
+    // Check for direct questions property
+    if (response?.questions && Array.isArray(response.questions)) {
+      return response.questions;
+    }
+    // Fallback to empty array
+    console.warn('Unexpected response structure from listQuestions:', response);
+    return [];
   },
   getQuestion: (id) => api.get(`/admin/questionnaire/questions/${id}`),
   createQuestion: (data) => api.post('/admin/questionnaire/questions', data),

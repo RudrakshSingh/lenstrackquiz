@@ -9,8 +9,9 @@ import { userService } from '../../services/users';
 import { storeService } from '../../services/stores';
 import { useToast } from '../../contexts/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
-import { Plus, Edit, Trash2, Search } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, Users as UsersIcon } from 'lucide-react';
 import Badge from '../../components/ui/Badge';
+import EmptyState from '../../components/ui/EmptyState';
 
 const ROLE_COLORS = {
   SUPER_ADMIN: 'purple',
@@ -210,147 +211,161 @@ export default function UsersPage() {
 
   return (
     <AdminLayout title="User Management">
-      <div className="space-y-6">
+      <div className="space-y-6 sm:space-y-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-fade-in">
           <div>
-            <h2 className="text-3xl font-bold text-gray-900">Users</h2>
-            <p className="text-sm text-gray-500 mt-1">Manage staff and administrators</p>
+            <h1 className="text-2xl font-semibold text-black">Team Members</h1>
+            <p className="text-sm text-black mt-1">Manage your staff accounts and permissions</p>
           </div>
           {getAvailableRoles().length > 0 && (
-            <Button onClick={handleCreate} icon={<Plus className="h-4 w-4" />}>
-              Add User
+            <Button onClick={handleCreate} icon={<Plus className="h-4 w-4" />} className="w-full sm:w-auto shrink-0">
+              Add Team Member
             </Button>
           )}
         </div>
 
-        {/* Filters */}
-        <div className="bg-white rounded-lg shadow-md p-4 flex gap-4 mb-6">
-          <div className="flex-1">
+        {/* Search and Filter */}
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 animate-fade-in animate-delay-100">
+          <div className="flex-1 relative min-w-0">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
             <Input
               placeholder="Search by name, email, or employee ID..."
               value={search}
               onChange={handleSearch}
-              icon={<Search className="h-5 w-5" />}
+              className="pl-10"
             />
           </div>
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
+            className="px-4 py-2.5 border border-gray-300 rounded-lg bg-white text-black focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-sm sm:text-base shrink-0 sm:w-auto w-full"
           >
-            <option value="all">All Roles</option>
+            <option value="all">Filter by role</option>
             {ROLE_OPTIONS.map(role => (
               <option key={role.value} value={role.value}>{role.label}</option>
-            ))}
-          </select>
-          <select
-            value={storeFilter}
-            onChange={(e) => setStoreFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
-          >
-            <option value="all">All Stores</option>
-            {stores.map(store => (
-              <option key={store._id} value={store._id}>{store.name}</option>
             ))}
           </select>
         </div>
 
         {/* Table */}
-        <div className="bg-white rounded-lg shadow-md">
-          <DataTable
-            columns={columns}
-            data={users}
-            loading={loading}
-            emptyMessage="No users found"
-            rowActions={(item) => (
-              <div className="flex gap-2">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleEdit(item);
-                  }}
-                  className="text-primary hover:text-primary-hover"
-                >
-                  <Edit className="h-4 w-4" />
-                </button>
-                {item.id !== currentUser?._id && item.id !== currentUser?.id && (
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="relative">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <div className="absolute inset-0 rounded-full border-2 border-blue-200 dark:border-blue-900 animate-pulse-slow"></div>
+              </div>
+            </div>
+          ) : users.length === 0 ? (
+            <div className="p-12">
+              <EmptyState
+                icon={<UsersIcon size={80} className="text-gray-300" />}
+                title="No team members"
+                description="Add your first team member to get started"
+                action={{
+                  label: 'Add Team Member',
+                  onClick: handleCreate,
+                }}
+              />
+            </div>
+          ) : (
+            <DataTable
+              columns={columns}
+              data={users}
+              loading={false}
+              emptyMessage="No users found"
+              rowActions={(item) => (
+                <div className="flex gap-2">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      setDeleteConfirm(item);
+                      handleEdit(item);
                     }}
-                    className="text-danger hover:text-red-600"
+                    className="text-primary hover:text-primary-hover"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Edit className="h-4 w-4" />
                   </button>
-                )}
-              </div>
-            )}
-          />
+                  {item.id !== currentUser?._id && item.id !== currentUser?.id && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeleteConfirm(item);
+                      }}
+                      className="text-danger hover:text-red-600"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+              )}
+            />
+          )}
         </div>
 
         {/* Create/Edit Modal */}
         <Modal
           isOpen={isCreateOpen}
           onClose={() => setIsCreateOpen(false)}
-          title={editingUser ? 'Edit User' : 'Create User'}
+          title={editingUser ? 'Edit Team Member' : 'Add Team Member'}
           size="md"
           footer={
             <>
               <Button variant="outline" onClick={() => setIsCreateOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleSubmit}>
+              <Button onClick={handleSubmit} type="submit">
                 {editingUser ? 'Update' : 'Create'}
               </Button>
             </>
           }
         >
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Input
+                label="Full Name *"
+                value={formData.name}
+                onChange={(value) => setFormData({ ...formData, name: value })}
+                required
+                error={formErrors.name}
+              />
+              <Input
+                label="Email *"
+                type="email"
+                value={formData.email}
+                onChange={(value) => setFormData({ ...formData, email: value })}
+                required
+                error={formErrors.email}
+                disabled={!!editingUser}
+              />
+            </div>
             <Input
-              label="Email"
-              type="email"
-              value={formData.email}
-              onChange={(value) => setFormData({ ...formData, email: value })}
-              required
-              error={formErrors.email}
-              disabled={!!editingUser}
-            />
-            <Input
-              label={editingUser ? 'New Password (leave blank to keep current)' : 'Password'}
+              label={editingUser ? 'New Password (leave blank to keep current)' : 'Password *'}
               type="password"
               value={formData.password}
               onChange={(value) => setFormData({ ...formData, password: value })}
               required={!editingUser}
               error={formErrors.password}
+              hint={!editingUser ? "Minimum 8 characters, 1 uppercase, 1 number" : undefined}
             />
-            <Input
-              label="Name"
-              value={formData.name}
-              onChange={(value) => setFormData({ ...formData, name: value })}
-              required
-              error={formErrors.name}
-            />
-            <Select
-              label="Role"
-              value={formData.role}
-              onChange={(value) => setFormData({ ...formData, role: value })}
-              options={getAvailableRoles()}
-              required
-              error={formErrors.role}
-            />
-            {(formData.role === 'STORE_MANAGER' || formData.role === 'SALES_EXECUTIVE') && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Select
+                label="Role *"
+                value={formData.role}
+                onChange={(value) => setFormData({ ...formData, role: value })}
+                options={getAvailableRoles()}
+                required
+                error={formErrors.role}
+              />
               <Select
                 label="Store"
                 value={formData.storeId}
                 onChange={(value) => setFormData({ ...formData, storeId: value })}
-                options={stores.map(s => ({ value: s._id, label: s.name }))}
-                required
+                options={[{ value: '', label: 'No Store (Admin)' }, ...stores.map(s => ({ value: s._id, label: s.name }))]}
                 error={formErrors.storeId}
               />
-            )}
-            <div className="grid grid-cols-2 gap-4">
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input
                 label="Employee ID"
                 value={formData.employeeId}
@@ -385,8 +400,8 @@ export default function UsersPage() {
             </>
           }
         >
-          <p className="text-gray-700">
-            Are you sure you want to delete <strong>{deleteConfirm?.name}</strong>? This action cannot be undone.
+          <p className="text-black">
+            Are you sure you want to delete <strong className="text-black">{deleteConfirm?.name}</strong>? This action cannot be undone.
           </p>
         </Modal>
       </div>

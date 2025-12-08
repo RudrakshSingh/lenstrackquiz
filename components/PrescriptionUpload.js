@@ -6,6 +6,7 @@ export default function PrescriptionUpload({onParsed}){
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [isDragging, setIsDragging] = useState(false);
+    const [processed, setProcessed] = useState(false);
     const fileInputRef = useRef(null);
 
     const handleDragEnter = (e) => {
@@ -33,7 +34,7 @@ export default function PrescriptionUpload({onParsed}){
         }
     };
 
-    const handleDrop = (e) => {
+    const handleDrop = async (e) => {
         e.preventDefault();
         e.stopPropagation();
         setIsDragging(false);
@@ -49,13 +50,16 @@ export default function PrescriptionUpload({onParsed}){
                 }
                 setFile(droppedFile);
                 setError(null);
+                setProcessed(false);
+                // Auto-process the file
+                await processFile(droppedFile);
             } else {
                 setError('Please upload an image or PDF file');
             }
         }
     };
 
-    const handleFileSelect = (e) => {
+    const handleFileSelect = async (e) => {
         const selectedFile = e.target.files[0];
         if (selectedFile) {
             // Validate file type
@@ -67,15 +71,17 @@ export default function PrescriptionUpload({onParsed}){
                 }
                 setFile(selectedFile);
                 setError(null);
+                setProcessed(false);
+                // Auto-process the file
+                await processFile(selectedFile);
             } else {
                 setError('Please upload an image or PDF file');
             }
         }
     };
 
-    async function handleUpload(e) {
-        e.preventDefault();
-        if(!file) {
+    async function processFile(fileToProcess) {
+        if(!fileToProcess) {
             setError('Please select a file first');
             return;
         }
@@ -85,7 +91,7 @@ export default function PrescriptionUpload({onParsed}){
 
         try{
             const formData = new FormData();
-            formData.append("file", file);
+            formData.append("file", fileToProcess);
 
             const res = await fetch("/api/ocr", {
                 method: "POST",
@@ -99,14 +105,23 @@ export default function PrescriptionUpload({onParsed}){
             if(!data.success) throw new Error(data.error || "OCR Failed");
 
             if(onParsed) onParsed(data);
-            setFile(null); // Reset after successful upload
-            if(fileInputRef.current) fileInputRef.current.value = '';
+            setProcessed(true);
+            // Don't reset file after successful upload - keep it visible
         }
         catch(err){
-            setError(err.message);
+            setError(err.message || 'Failed to process prescription image');
         } finally{
             setLoading(false);
         }
+    }
+
+    async function handleUpload(e) {
+        e.preventDefault();
+        if(!file) {
+            setError('Please select a file first');
+            return;
+        }
+        await processFile(file);
     }
 
     return (
@@ -152,6 +167,7 @@ export default function PrescriptionUpload({onParsed}){
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     setFile(null);
+                                    setProcessed(false);
                                     if(fileInputRef.current) fileInputRef.current.value = '';
                                 }}
                             >
@@ -172,15 +188,38 @@ export default function PrescriptionUpload({onParsed}){
                 </div>
             </div>
 
-            {file && !loading && (
-                <button 
-                    type="button"
-                    className={styles.uploadButton}
-                    onClick={handleUpload}
-                >
-                    <span>Extract Prescription Data</span>
-                    <span className={styles.buttonIcon}>→</span>
-                </button>
+            {file && !loading && processed && (
+                <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+                    <p style={{ fontSize: '0.875rem', color: '#059669', marginBottom: '0.5rem', fontWeight: '500' }}>
+                        ✓ Prescription processed automatically
+                    </p>
+                    <button 
+                        type="button"
+                        className={styles.uploadButton}
+                        onClick={handleUpload}
+                        style={{ 
+                            backgroundColor: '#f3f4f6',
+                            color: '#374151',
+                            border: '1px solid #d1d5db',
+                            fontSize: '0.875rem',
+                            padding: '0.5rem 1rem'
+                        }}
+                    >
+                        <span>Re-process Image</span>
+                    </button>
+                </div>
+            )}
+            {file && !loading && !processed && !error && (
+                <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+                    <button 
+                        type="button"
+                        className={styles.uploadButton}
+                        onClick={handleUpload}
+                    >
+                        <span>Extract Prescription Data</span>
+                        <span className={styles.buttonIcon}>→</span>
+                    </button>
+                </div>
             )}
 
             {error && (

@@ -46,7 +46,7 @@ export default function SkeletonLoader({ type = 'card', count = 1 }) {
   return (
     <div className={styles.skeletonContainer}>
       {Array.from({ length: count }).map((_, index) => (
-        <div key={index} style={{ animationDelay: `${index * 0.1}s` }}>
+        <div key={index} className="animate-fly-in" style={{ animationDelay: `${index * 100}ms` }}>
           {renderSkeleton()}
         </div>
       ))}

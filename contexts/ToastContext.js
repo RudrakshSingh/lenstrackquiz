@@ -44,29 +44,29 @@ function ToastContainer({ toasts, onRemove }) {
 
 function Toast({ toast, onRemove }) {
   const bgColors = {
-    success: 'bg-success',
-    error: 'bg-danger',
-    warning: 'bg-warning',
-    info: 'bg-info',
+    success: 'bg-green-600 dark:bg-green-500',
+    error: 'bg-red-600 dark:bg-red-500',
+    warning: 'bg-yellow-500 dark:bg-yellow-400',
+    info: 'bg-gray-800 dark:bg-gray-700',
   };
 
   const textColors = {
     success: 'text-white',
     error: 'text-white',
-    warning: 'text-white',
+    warning: 'text-white dark:text-gray-900',
     info: 'text-white',
   };
 
   return (
     <div
-      className={`${bgColors[toast.type] || 'bg-gray-700'} ${textColors[toast.type] || 'text-white'} px-4 py-3 rounded-md shadow-lg min-w-[300px] max-w-md flex items-center justify-between transition-all duration-300 ease-in-out`}
+      className={`${bgColors[toast.type] || 'bg-gray-700'} ${textColors[toast.type] || 'text-white'} px-4 py-3 rounded-xl shadow-2xl min-w-[300px] max-w-md flex items-center justify-between transition-all duration-300 ease-in-out animate-pop-in border border-white/20`}
       role="alert"
       aria-live="polite"
     >
-      <span>{toast.message}</span>
+      <span className="font-medium">{toast.message}</span>
       <button
         onClick={() => onRemove(toast.id)}
-        className="ml-4 text-white hover:text-gray-200 focus:outline-none"
+        className="ml-4 text-white hover:text-gray-200 focus:outline-none text-xl font-bold leading-none"
         aria-label="Close"
       >
         ×

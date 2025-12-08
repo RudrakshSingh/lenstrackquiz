@@ -23,9 +23,12 @@ export async function createFeature(featureData) {
   const feature = {
     code: featureData.code,
     name: featureData.name,
+    description: featureData.description || null,
     category: featureData.category,
     displayOrder: featureData.displayOrder || 0,
     icon: featureData.icon || null,
+    isActive: featureData.isActive !== undefined ? featureData.isActive : true,
+    organizationId: featureData.organizationId ? (typeof featureData.organizationId === 'string' ? new ObjectId(featureData.organizationId) : featureData.organizationId) : null,
     createdAt: now,
     updatedAt: now
   };

@@ -256,8 +256,8 @@ export default function OfferMappingPage() {
           <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-purple-500 hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">Offer Rules</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{offerRules.length}</p>
+                <p className="text-sm font-medium text-black uppercase tracking-wide">Offer Rules</p>
+                <p className="text-3xl font-bold text-black mt-2">{offerRules.length}</p>
                 <p className="text-xs text-green-600 mt-1">{activeRulesCount} active</p>
               </div>
               <div className="p-3 bg-purple-100 rounded-lg">
@@ -268,8 +268,8 @@ export default function OfferMappingPage() {
           <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500 hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">Category Discounts</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{categoryDiscounts.length}</p>
+                <p className="text-sm font-medium text-black uppercase tracking-wide">Category Discounts</p>
+                <p className="text-3xl font-bold text-black mt-2">{categoryDiscounts.length}</p>
                 <p className="text-xs text-green-600 mt-1">{activeCategoryDiscountsCount} active</p>
               </div>
               <div className="p-3 bg-blue-100 rounded-lg">
@@ -280,8 +280,8 @@ export default function OfferMappingPage() {
           <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500 hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">Coupons</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{coupons.length}</p>
+                <p className="text-sm font-medium text-black uppercase tracking-wide">Coupons</p>
+                <p className="text-3xl font-bold text-black mt-2">{coupons.length}</p>
                 <p className="text-xs text-green-600 mt-1">{activeCouponsCount} active</p>
               </div>
               <div className="p-3 bg-green-100 rounded-lg">
@@ -292,11 +292,11 @@ export default function OfferMappingPage() {
           <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-orange-500 hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">Total Active</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">
+                <p className="text-sm font-medium text-black uppercase tracking-wide">Total Active</p>
+                <p className="text-3xl font-bold text-black mt-2">
                   {activeRulesCount + activeCouponsCount + activeCategoryDiscountsCount}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">All offers</p>
+                <p className="text-xs text-black mt-1">All offers</p>
               </div>
               <div className="p-3 bg-orange-100 rounded-lg">
                 <Target className="h-8 w-8 text-orange-600" />
@@ -324,7 +324,7 @@ export default function OfferMappingPage() {
                       flex items-center gap-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors
                       ${activeTab === tab.id
                         ? 'border-indigo-600 text-indigo-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        : 'border-transparent text-black hover:text-black hover:border-gray-300'
                       }
                     `}
                   >
@@ -386,11 +386,11 @@ export default function OfferMappingPage() {
             {activeTab === 'rules' && (
               <div className="space-y-4">
                 {loading ? (
-                  <div className="text-center py-12 text-gray-500">Loading...</div>
+                  <div className="text-center py-12 text-black">Loading...</div>
                 ) : filteredRules.length === 0 ? (
                   <div className="text-center py-12">
                     <Tag className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500">No offer rules found</p>
+                    <p className="text-black">No offer rules found</p>
                     <Button
                       onClick={() => router.push('/admin/offer-entry')}
                       className="mt-4"
@@ -424,14 +424,14 @@ export default function OfferMappingPage() {
                               rule.offerType === 'PERCENT_OFF' ? 'text-orange-600' :
                               rule.offerType === 'FLAT_OFF' ? 'text-red-600' :
                               rule.offerType === 'BOGO_50' ? 'text-pink-600' :
-                              'text-gray-600'
+                              'text-black'
                             }>
                               {getOfferTypeIcon(rule.offerType)}
                             </div>
                           </div>
                             <div>
-                              <h3 className="font-bold text-lg text-gray-900">{rule.name}</h3>
-                              <p className="text-sm text-gray-500">{rule.code}</p>
+                              <h3 className="font-bold text-lg text-black">{rule.name}</h3>
+                              <p className="text-sm text-black">{rule.code}</p>
                             </div>
                           </div>
                           <Badge color={rule.isActive ? 'green' : 'gray'} variant="soft">
@@ -443,24 +443,24 @@ export default function OfferMappingPage() {
                         <div className="space-y-2 mb-4">
                           <div className="flex items-center gap-2 text-sm">
                             <Target className="h-4 w-4 text-gray-400" />
-                            <span className="text-gray-600">Priority: <strong>{rule.priority}</strong></span>
+                            <span className="text-black">Priority: <strong>{rule.priority}</strong></span>
                           </div>
                           {rule.frameBrand && (
                             <div className="flex items-center gap-2 text-sm">
                               <Package className="h-4 w-4 text-gray-400" />
-                              <span className="text-gray-600">Frame: <strong>{rule.frameBrand}</strong></span>
+                              <span className="text-black">Frame: <strong>{rule.frameBrand}</strong></span>
                             </div>
                           )}
                           {rule.minFrameMRP && (
                             <div className="flex items-center gap-2 text-sm">
                               <DollarSign className="h-4 w-4 text-gray-400" />
-                              <span className="text-gray-600">Min MRP: <strong>₹{rule.minFrameMRP}</strong></span>
+                              <span className="text-black">Min MRP: <strong>₹{rule.minFrameMRP}</strong></span>
                             </div>
                           )}
                           {rule.lensBrandLines?.length > 0 && (
                             <div className="flex items-center gap-2 text-sm">
                               <Layers className="h-4 w-4 text-gray-400" />
-                              <span className="text-gray-600">
+                              <span className="text-black">
                                 Brands: <strong>{rule.lensBrandLines.slice(0, 2).join(', ')}</strong>
                                 {rule.lensBrandLines.length > 2 && ` +${rule.lensBrandLines.length - 2}`}
                               </span>
@@ -499,11 +499,11 @@ export default function OfferMappingPage() {
             {activeTab === 'categories' && (
               <div className="space-y-4">
                 {loading ? (
-                  <div className="text-center py-12 text-gray-500">Loading...</div>
+                  <div className="text-center py-12 text-black">Loading...</div>
                 ) : categoryDiscounts.length === 0 ? (
                   <div className="text-center py-12">
                     <Users className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500">No category discounts found</p>
+                    <p className="text-black">No category discounts found</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -518,10 +518,10 @@ export default function OfferMappingPage() {
                               <Users className="h-6 w-6 text-blue-600" />
                             </div>
                             <div>
-                              <h3 className="font-bold text-lg text-gray-900">
+                              <h3 className="font-bold text-lg text-black">
                                 {discount.customerCategory?.replace(/_/g, ' ')}
                               </h3>
-                              <p className="text-sm text-gray-500">{discount.brandCode === '*' ? 'All Brands' : discount.brandCode}</p>
+                              <p className="text-sm text-black">{discount.brandCode === '*' ? 'All Brands' : discount.brandCode}</p>
                             </div>
                           </div>
                           <Badge color={discount.isActive ? 'green' : 'gray'} variant="soft">
@@ -531,11 +531,11 @@ export default function OfferMappingPage() {
                         <div className="space-y-2">
                           <div className="flex items-center gap-2">
                             <Percent className="h-5 w-5 text-blue-600" />
-                            <span className="text-2xl font-bold text-gray-900">{discount.discountPercent}%</span>
-                            <span className="text-sm text-gray-500">discount</span>
+                            <span className="text-2xl font-bold text-black">{discount.discountPercent}%</span>
+                            <span className="text-sm text-black">discount</span>
                           </div>
                           {discount.maxDiscount && (
-                            <div className="text-sm text-gray-600">
+                            <div className="text-sm text-black">
                               Max discount: <strong>₹{discount.maxDiscount}</strong>
                             </div>
                           )}
@@ -550,11 +550,11 @@ export default function OfferMappingPage() {
             {activeTab === 'coupons' && (
               <div className="space-y-4">
                 {loading ? (
-                  <div className="text-center py-12 text-gray-500">Loading...</div>
+                  <div className="text-center py-12 text-black">Loading...</div>
                 ) : filteredCoupons.length === 0 ? (
                   <div className="text-center py-12">
                     <Ticket className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500">No coupons found</p>
+                    <p className="text-black">No coupons found</p>
                     <Button
                       onClick={() => router.push('/admin/coupon-entry')}
                       className="mt-4"
@@ -574,10 +574,10 @@ export default function OfferMappingPage() {
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
                               <Ticket className="h-5 w-5 text-green-600" />
-                              <h3 className="font-bold text-lg text-gray-900 font-mono">{coupon.code}</h3>
+                              <h3 className="font-bold text-lg text-black font-mono">{coupon.code}</h3>
                             </div>
                             {coupon.description && (
-                              <p className="text-sm text-gray-600">{coupon.description}</p>
+                              <p className="text-sm text-black">{coupon.description}</p>
                             )}
                           </div>
                           <Badge color={coupon.isActive ? 'green' : 'gray'} variant="soft">
@@ -589,24 +589,24 @@ export default function OfferMappingPage() {
                             {coupon.discountType === 'PERCENTAGE' ? (
                               <>
                                 <Percent className="h-5 w-5 text-green-600" />
-                                <span className="text-xl font-bold text-gray-900">{coupon.discountValue}%</span>
-                                <span className="text-sm text-gray-500">off</span>
+                                <span className="text-xl font-bold text-black">{coupon.discountValue}%</span>
+                                <span className="text-sm text-black">off</span>
                               </>
                             ) : (
                               <>
                                 <DollarSign className="h-5 w-5 text-green-600" />
-                                <span className="text-xl font-bold text-gray-900">₹{coupon.discountValue}</span>
-                                <span className="text-sm text-gray-500">off</span>
+                                <span className="text-xl font-bold text-black">₹{coupon.discountValue}</span>
+                                <span className="text-sm text-black">off</span>
                               </>
                             )}
                           </div>
                           {coupon.minCartValue && (
-                            <div className="text-sm text-gray-600">
+                            <div className="text-sm text-black">
                               Min cart: <strong>₹{coupon.minCartValue}</strong>
                             </div>
                           )}
                           {coupon.maxDiscount && (
-                            <div className="text-sm text-gray-600">
+                            <div className="text-sm text-black">
                               Max discount: <strong>₹{coupon.maxDiscount}</strong>
                             </div>
                           )}
@@ -639,20 +639,20 @@ export default function OfferMappingPage() {
             {activeTab === 'simulation' && (
               <div className="space-y-6">
                 <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border-2 border-blue-200">
-                  <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <h3 className="text-xl font-bold text-black mb-4 flex items-center gap-2">
                     <Play className="h-6 w-6 text-blue-600" />
                     Offer Engine Simulation
                   </h3>
-                  <p className="text-gray-600 mb-6">
+                  <p className="text-black mb-6">
                     Test how offers are calculated with sample cart data. This helps validate rules before going live.
                   </p>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     {/* Frame Input */}
                     <div className="space-y-4">
-                      <h4 className="font-semibold text-gray-900">Frame Details</h4>
+                      <h4 className="font-semibold text-black">Frame Details</h4>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Brand</label>
+                        <label className="block text-sm font-medium text-black mb-1">Brand</label>
                         <input
                           type="text"
                           value={simulationCart.frame.brand}
@@ -665,7 +665,7 @@ export default function OfferMappingPage() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Sub Category</label>
+                        <label className="block text-sm font-medium text-black mb-1">Sub Category</label>
                         <input
                           type="text"
                           value={simulationCart.frame.subCategory || ''}
@@ -678,7 +678,7 @@ export default function OfferMappingPage() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">MRP (₹)</label>
+                        <label className="block text-sm font-medium text-black mb-1">MRP (₹)</label>
                         <input
                           type="number"
                           value={simulationCart.frame.mrp}
@@ -693,9 +693,9 @@ export default function OfferMappingPage() {
 
                     {/* Lens Input */}
                     <div className="space-y-4">
-                      <h4 className="font-semibold text-gray-900">Lens Details</h4>
+                      <h4 className="font-semibold text-black">Lens Details</h4>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">IT Code</label>
+                        <label className="block text-sm font-medium text-black mb-1">IT Code</label>
                         <input
                           type="text"
                           value={simulationCart.lens.itCode}
@@ -708,7 +708,7 @@ export default function OfferMappingPage() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Brand Line</label>
+                        <label className="block text-sm font-medium text-black mb-1">Brand Line</label>
                         <input
                           type="text"
                           value={simulationCart.lens.brandLine}
@@ -721,7 +721,7 @@ export default function OfferMappingPage() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Price (₹)</label>
+                        <label className="block text-sm font-medium text-black mb-1">Price (₹)</label>
                         <input
                           type="number"
                           value={simulationCart.lens.price}
@@ -743,7 +743,7 @@ export default function OfferMappingPage() {
                           })}
                           className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
                         />
-                        <label htmlFor="yopoEligible" className="text-sm font-medium text-gray-700">
+                        <label htmlFor="yopoEligible" className="text-sm font-medium text-black">
                           YOPO Eligible
                         </label>
                       </div>
@@ -753,7 +753,7 @@ export default function OfferMappingPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     {/* Customer Category */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Customer Category</label>
+                      <label className="block text-sm font-medium text-black mb-1">Customer Category</label>
                       <select
                         value={simulationCart.customerCategory || ''}
                         onChange={(e) => setSimulationCart({
@@ -774,7 +774,7 @@ export default function OfferMappingPage() {
 
                     {/* Coupon Code */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Coupon Code</label>
+                      <label className="block text-sm font-medium text-black mb-1">Coupon Code</label>
                       <input
                         type="text"
                         value={simulationCart.couponCode || ''}
@@ -801,7 +801,7 @@ export default function OfferMappingPage() {
                       
                       {/* Show applicable offers count */}
                       {offerRules.length > 0 && (
-                        <div className="text-sm text-gray-600">
+                        <div className="text-sm text-black">
                           <span className="font-semibold">{offerRules.filter(r => r.isActive).length}</span> active rules, 
                           <span className="font-semibold text-indigo-600 ml-1">{applicableOffers.length}</span> applicable
                         </div>
@@ -811,7 +811,7 @@ export default function OfferMappingPage() {
                     {/* Show Applicable Offers */}
                     {applicableOffers.length > 0 && (
                       <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
-                        <h5 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                        <h5 className="font-semibold text-black mb-2 flex items-center gap-2">
                           <Target className="h-4 w-4 text-blue-600" />
                           Applicable Offer Rules ({applicableOffers.length})
                         </h5>
@@ -823,17 +823,17 @@ export default function OfferMappingPage() {
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                   {getOfferTypeIcon(rule.offerType)}
-                                  <span className="text-sm font-medium text-gray-900">{rule.name || rule.code}</span>
+                                  <span className="text-sm font-medium text-black">{rule.name || rule.code}</span>
                                   <Badge color={getOfferTypeColor(rule.offerType)} variant="soft" className="text-xs">
                                     {rule.offerType}
                                   </Badge>
                                 </div>
-                                <span className="text-xs text-gray-500">Priority: {rule.priority || 100}</span>
+                                <span className="text-xs text-black">Priority: {rule.priority || 100}</span>
                               </div>
                             </div>
                           ))}
                         </div>
-                        <p className="text-xs text-gray-600 mt-2">
+                        <p className="text-xs text-black mt-2">
                           Offers are applied in priority order. The highest priority (lowest number) offer will be applied first.
                         </p>
                       </div>
@@ -865,7 +865,7 @@ export default function OfferMappingPage() {
                         {/* Applied Offers Display */}
                         {simulationResult.appliedOffers && simulationResult.appliedOffers.length > 0 ? (
                           <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border-2 border-green-200">
-                            <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                            <h4 className="text-lg font-bold text-black mb-4 flex items-center gap-2">
                               <CheckCircle className="h-5 w-5 text-green-600" />
                               Offers Applied ({simulationResult.appliedOffers.length})
                             </h4>
@@ -876,9 +876,9 @@ export default function OfferMappingPage() {
                                     <div className="flex items-center gap-3">
                                       {getOfferTypeIcon(offer.offerType)}
                                       <div>
-                                        <div className="font-semibold text-gray-900">{offer.description || offer.ruleCode}</div>
+                                        <div className="font-semibold text-black">{offer.description || offer.ruleCode}</div>
                                         {offer.ruleCode && (
-                                          <div className="text-sm text-gray-500">Code: {offer.ruleCode}</div>
+                                          <div className="text-sm text-black">Code: {offer.ruleCode}</div>
                                         )}
                                       </div>
                                     </div>
@@ -928,7 +928,7 @@ export default function OfferMappingPage() {
                         {/* Debug Info (for development) */}
                         {process.env.NODE_ENV === 'development' && (
                           <details className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                            <summary className="cursor-pointer font-semibold text-gray-700">Debug Info</summary>
+                            <summary className="cursor-pointer font-semibold text-black">Debug Info</summary>
                             <pre className="mt-2 text-xs overflow-auto bg-white p-4 rounded border">
                               {JSON.stringify(simulationResult, null, 2)}
                             </pre>
@@ -968,8 +968,8 @@ export default function OfferMappingPage() {
               <AlertCircle className="h-6 w-6 text-red-600" />
             </div>
             <div>
-              <p className="font-medium text-gray-900">Are you sure?</p>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="font-medium text-black">Are you sure?</p>
+              <p className="text-sm text-black mt-1">
                 This will permanently delete "{deleteConfirm?.name}". This action cannot be undone.
               </p>
             </div>

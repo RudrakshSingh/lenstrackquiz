@@ -140,7 +140,7 @@ export default function StaffPage() {
       <div className="flex h-screen">
         <Sidebar />
         <div className="flex-1 flex items-center justify-center">
-          <div className="text-gray-500">Loading...</div>
+          <div className="text-black">Loading...</div>
         </div>
       </div>
     );
@@ -153,8 +153,8 @@ export default function StaffPage() {
         <div className="p-8">
           <div className="flex justify-between items-center mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Staff Management</h1>
-              <p className="text-gray-600">Manage store staff members</p>
+              <h1 className="text-3xl font-bold text-black mb-2">Staff Management</h1>
+              <p className="text-black">Manage store staff members</p>
             </div>
             <button
               onClick={() => {
@@ -175,34 +175,34 @@ export default function StaffPage() {
               <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Store</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phone</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase">Name</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase">Store</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase">Role</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase">Phone</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {staff.length === 0 ? (
                     <tr>
-                      <td colSpan="6" className="px-6 py-8 text-center text-gray-500">
+                      <td colSpan="6" className="px-6 py-8 text-center text-black">
                         No staff members found
                       </td>
                     </tr>
                   ) : (
                     staff.map((member) => (
                       <tr key={member.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-black">
                           {member.name}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-black">
                           {member.storeName || 'N/A'}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-black">
                           {getRoleLabel(member.role)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-black">
                           {member.phone || 'N/A'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -242,12 +242,12 @@ export default function StaffPage() {
           {showModal && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
               <div className="bg-white rounded-xl p-6 w-full max-w-md">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">
+                <h2 className="text-xl font-bold text-black mb-4">
                   {editingStaff ? 'Edit Staff' : 'Add Staff'}
                 </h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-black mb-1">
                       Store *
                     </label>
                     <select
@@ -265,7 +265,7 @@ export default function StaffPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-black mb-1">
                       Name *
                     </label>
                     <input
@@ -277,7 +277,7 @@ export default function StaffPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-black mb-1">
                       Phone
                     </label>
                     <input
@@ -288,7 +288,7 @@ export default function StaffPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-black mb-1">
                       Role *
                     </label>
                     <select
@@ -305,7 +305,7 @@ export default function StaffPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-black mb-1">
                       Status *
                     </label>
                     <select
@@ -331,7 +331,7 @@ export default function StaffPage() {
                         setShowModal(false);
                         setEditingStaff(null);
                       }}
-                      className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                      className="flex-1 px-4 py-2 bg-gray-200 text-black rounded-lg hover:bg-gray-300"
                     >
                       Cancel
                     </button>

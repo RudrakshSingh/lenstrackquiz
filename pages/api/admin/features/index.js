@@ -7,36 +7,57 @@ import { handleError, ConflictError, ValidationError } from '../../../../lib/err
 import { z } from 'zod';
 
 const CreateFeatureSchema = z.object({
-  key: z.string().min(1, 'Feature key is required'),
+  code: z.string().min(1, 'Feature code is required').optional(),
+  key: z.string().min(1, 'Feature key is required').optional(), // For backward compatibility
   name: z.string().min(1, 'Feature name is required'),
   description: z.string().optional(),
-  category: z.enum(['EYEGLASSES', 'SUNGLASSES', 'CONTACT_LENSES', 'ACCESSORIES'])
+  category: z.enum(['DURABILITY', 'COATING', 'PROTECTION', 'LIFESTYLE', 'VISION']).optional(),
+  displayOrder: z.number().optional(),
+  isActive: z.boolean().optional()
+}).refine((data) => data.code || data.key, {
+  message: 'Either code or key is required',
+  path: ['code']
 });
 
 // GET /api/admin/features
 async function listFeatures(req, res) {
   try {
-    const { category, isActive } = req.query;
+    const { isActive } = req.query;
     const user = req.user;
 
-    const filter = { organizationId: user.organizationId };
-    if (category) filter.category = category;
+    // Features are lens-only, no product-type filtering
+    const filter = {};
     if (isActive !== undefined) filter.isActive = isActive === 'true';
 
     const features = await getAllFeatures(filter);
 
+    // Get product counts for each feature
+    const { getProductFeatureCollection } = await import('../../../../models/ProductFeature');
+    const productFeatureCollection = await getProductFeatureCollection();
+    
+    const featuresWithCounts = await Promise.all(
+      features.map(async (f) => {
+        const productCount = await productFeatureCollection.countDocuments({ featureId: f._id });
+        
+        return {
+          id: f._id.toString(),
+          code: f.code,
+          key: f.code, // For backward compatibility
+          name: f.name,
+          description: f.description || null,
+          category: f.category,
+          displayOrder: f.displayOrder || 0,
+          isActive: f.isActive !== false,
+          productCount,
+          createdAt: f.createdAt
+        };
+      })
+    );
+
     return res.status(200).json({
       success: true,
       data: {
-        features: features.map(f => ({
-          id: f._id.toString(),
-          key: f.key,
-          name: f.name,
-          description: f.description,
-          category: f.category,
-          isActive: f.isActive,
-          createdAt: f.createdAt
-        }))
+        features: featuresWithCounts
       }
     });
   } catch (error) {
@@ -65,30 +86,38 @@ async function createFeatureHandler(req, res) {
       });
     }
 
-    // Check if feature key already exists
-    const existing = await getFeatureByKey(
-      user.organizationId, 
-      validationResult.data.key, 
-      validationResult.data.category
-    );
+    // Map key to code for backward compatibility
+    const featureData = {
+      ...validationResult.data,
+      code: validationResult.data.code || validationResult.data.key,
+      name: validationResult.data.name,
+      description: validationResult.data.description || null,
+      category: validationResult.data.category || 'LIFESTYLE',
+      displayOrder: validationResult.data.displayOrder || 0,
+      isActive: validationResult.data.isActive !== undefined ? validationResult.data.isActive : true
+    };
+    // Remove key if present to avoid confusion
+    delete featureData.key;
+
+    // Check if feature code already exists (globally, not per organization)
+    const { getFeatureByCode } = await import('../../../../models/Feature');
+    const existing = await getFeatureByCode(featureData.code);
     if (existing) {
-      throw new ConflictError('Feature key already exists for this category');
+      throw new ConflictError('Feature code already exists');
     }
 
-    const feature = await createFeature({
-      ...validationResult.data,
-      organizationId: user.organizationId
-    });
+    const feature = await createFeature(featureData);
 
     return res.status(201).json({
       success: true,
       data: {
         id: feature._id.toString(),
-        key: feature.key,
+        code: feature.code,
+        key: feature.code, // For backward compatibility
         name: feature.name,
         description: feature.description,
         category: feature.category,
-        isActive: feature.isActive,
+        isActive: feature.isActive !== false,
         createdAt: feature.createdAt
       }
     });

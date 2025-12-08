@@ -31,20 +31,44 @@ export async function deleteProductFeaturesByProduct(productId) {
   return await collection.deleteMany({ productId: pId });
 }
 
-export async function syncProductFeatures(productId, featureIds) {
+export async function syncProductFeatures(productId, featureCodes) {
   const collection = await getProductFeatureCollection();
   const pId = typeof productId === 'string' ? new ObjectId(productId) : productId;
   
   // Delete existing
   await collection.deleteMany({ productId: pId });
   
-  // Insert new
-  if (featureIds && featureIds.length > 0) {
-    const features = featureIds.map(featureId => ({
-      productId: pId,
-      featureId: typeof featureId === 'string' ? new ObjectId(featureId) : featureId
-    }));
-    await collection.insertMany(features);
+  // Insert new - featureCodes can be array of codes (F01, F02, etc.) or feature IDs
+  if (featureCodes && featureCodes.length > 0) {
+    const { getFeatureByCode, getAllFeatures } = await import('./Feature');
+    const featureRecords = [];
+    
+    for (const featureCodeOrId of featureCodes) {
+      let featureId;
+      
+      // Check if it's a code (starts with F) or an ID
+      if (typeof featureCodeOrId === 'string' && featureCodeOrId.match(/^F\d{2}$/)) {
+        // It's a feature code (F01, F02, etc.)
+        const feature = await getFeatureByCode(featureCodeOrId);
+        if (feature) {
+          featureId = feature._id;
+        }
+      } else {
+        // It's a feature ID (ObjectId string)
+        featureId = typeof featureCodeOrId === 'string' ? new ObjectId(featureCodeOrId) : featureCodeOrId;
+      }
+      
+      if (featureId) {
+        featureRecords.push({
+          productId: pId,
+          featureId: featureId
+        });
+      }
+    }
+    
+    if (featureRecords.length > 0) {
+      await collection.insertMany(featureRecords);
+    }
   }
   
   return await getProductFeaturesByProduct(productId);

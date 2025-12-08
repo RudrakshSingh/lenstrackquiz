@@ -40,7 +40,10 @@ export async function createAnswerNew(answerData) {
   const answer = {
     questionId: typeof answerData.questionId === 'string' ? new ObjectId(answerData.questionId) : answerData.questionId,
     text: text,
-    displayOrder: answerData.displayOrder || 0
+    displayOrder: answerData.displayOrder !== undefined ? answerData.displayOrder : 0,
+    isActive: answerData.isActive !== undefined ? answerData.isActive : true,
+    triggersSubQuestion: answerData.triggersSubQuestion || false,
+    subQuestionId: answerData.subQuestionId ? (typeof answerData.subQuestionId === 'string' ? new ObjectId(answerData.subQuestionId) : answerData.subQuestionId) : null
   };
   const result = await collection.insertOne(answer);
   return { ...answer, _id: result.insertedId };

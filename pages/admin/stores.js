@@ -6,8 +6,9 @@ import Modal from '../../components/ui/Modal';
 import Input from '../../components/ui/Input';
 import { storeService } from '../../services/stores';
 import { useToast } from '../../contexts/ToastContext';
-import { Plus, Edit, Trash2, Search } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, Store } from 'lucide-react';
 import Badge from '../../components/ui/Badge';
+import EmptyState from '../../components/ui/EmptyState';
 
 export default function StoresPage() {
   const [stores, setStores] = useState([]);
@@ -183,7 +184,7 @@ export default function StoresPage() {
             </a>
           </div>
         ) : (
-          <span className="text-gray-400 text-sm">Not generated</span>
+          <span className="text-black text-sm">Not generated</span>
         )
       ),
     },
@@ -200,99 +201,112 @@ export default function StoresPage() {
 
   return (
     <AdminLayout title="Store Management">
-      <div className="space-y-6">
+      <div className="space-y-6 sm:space-y-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-fade-in">
           <div>
-            <h2 className="text-3xl font-bold text-gray-900">Stores</h2>
-            <p className="text-sm text-gray-500 mt-1">Manage your store locations and settings</p>
+            <h1 className="text-2xl font-semibold text-black">Store Locations</h1>
+            <p className="text-sm text-black mt-1">Manage your retail locations and store information</p>
           </div>
-          <Button onClick={handleCreate} icon={<Plus className="h-4 w-4" />}>
-            Add Store
+          <Button onClick={handleCreate} icon={<Plus className="h-4 w-4" />} className="w-full sm:w-auto shrink-0">
+            Add Store Location
           </Button>
         </div>
 
-        {/* Filters */}
-        <div className="bg-white rounded-lg shadow-md p-4 flex gap-4 mb-6">
-          <div className="flex-1">
+        {/* Search */}
+        <div className="animate-fade-in animate-delay-100">
+          <div className="relative max-w-md">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 z-10" size={20} />
             <Input
-              placeholder="Search by name, code, or city..."
+              placeholder="Search stores by name, code, or city..."
               value={search}
               onChange={handleSearch}
-              icon={<Search className="h-5 w-5" />}
+              className="pl-12"
             />
           </div>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
-          >
-            <option value="all">All Status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
         </div>
 
         {/* Table */}
-        <div className="bg-white rounded-lg shadow-md">
-          <DataTable
-            columns={columns}
-            data={stores}
-            loading={loading}
-            emptyMessage="No stores found"
-            rowActions={(item) => (
-              <div className="flex gap-2">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleEdit(item);
-                  }}
-                  className="text-primary hover:text-primary-hover"
-                >
-                  <Edit className="h-4 w-4" />
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setDeleteConfirm(item);
-                  }}
-                  className="text-danger hover:text-red-600"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="relative">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <div className="absolute inset-0 rounded-full border-2 border-blue-200 dark:border-blue-900 animate-pulse-slow"></div>
               </div>
-            )}
-          />
+            </div>
+          ) : stores.length === 0 ? (
+            <div className="p-12">
+              <EmptyState
+                icon={<Store size={80} className="text-gray-300" />}
+                title="No store locations"
+                description="Add your first retail location to get started"
+                action={{
+                  label: 'Add Store Location',
+                  onClick: handleCreate,
+                }}
+              />
+            </div>
+          ) : (
+            <DataTable
+              columns={columns}
+              data={stores}
+              loading={false}
+              emptyMessage="No stores found"
+              rowActions={(item) => (
+                <div className="flex gap-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEdit(item);
+                    }}
+                    className="text-primary hover:text-primary-hover"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDeleteConfirm(item);
+                    }}
+                    className="text-danger hover:text-red-600"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              )}
+            />
+          )}
         </div>
 
         {/* Create/Edit Modal */}
         <Modal
           isOpen={isCreateOpen}
           onClose={() => setIsCreateOpen(false)}
-          title={editingStore ? 'Edit Store' : 'Create Store'}
+          title={editingStore ? 'Edit Store Location' : 'Add Store Location'}
           size="md"
           footer={
             <>
               <Button variant="outline" onClick={() => setIsCreateOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleSubmit}>
+              <Button onClick={handleSubmit} type="submit">
                 {editingStore ? 'Update' : 'Create'}
               </Button>
             </>
           }
         >
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input
-                label="Store Code"
+                label="Store Code *"
                 value={formData.code}
                 onChange={(value) => setFormData({ ...formData, code: value })}
                 required
                 error={formErrors.code}
               />
               <Input
-                label="Store Name"
+                label="Store Name *"
                 value={formData.name}
                 onChange={(value) => setFormData({ ...formData, name: value })}
                 required
@@ -305,7 +319,7 @@ export default function StoresPage() {
               onChange={(value) => setFormData({ ...formData, address: value })}
               error={formErrors.address}
             />
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <Input
                 label="City"
                 value={formData.city}
@@ -325,7 +339,7 @@ export default function StoresPage() {
                 error={formErrors.pincode}
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input
                 label="Phone"
                 type="tel"
@@ -355,7 +369,7 @@ export default function StoresPage() {
                 onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
                 className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
               />
-              <label htmlFor="isActive" className="ml-2 text-sm text-gray-700">
+              <label htmlFor="isActive" className="ml-2 text-sm text-black">
                 Active
               </label>
             </div>
@@ -379,7 +393,7 @@ export default function StoresPage() {
             </>
           }
         >
-          <p className="text-gray-700">
+          <p className="text-black">
             Are you sure you want to delete <strong>{deleteConfirm?.name}</strong>? This action cannot be undone.
           </p>
         </Modal>

@@ -8,7 +8,7 @@ import { handleError } from '../../../../lib/errors';
 // POST /api/admin/benefits
 async function createBenefitHandler(req, res) {
   try {
-    const { code, name, description, pointWeight, relatedProblems, relatedUsage } = req.body;
+    const { code, name, description, pointWeight, maxScore, isActive } = req.body;
 
     // Validation
     if (!code || !name) {
@@ -32,15 +32,16 @@ async function createBenefitHandler(req, res) {
       name,
       description,
       pointWeight: pointWeight || 1.0,
-      relatedProblems: relatedProblems || [],
-      relatedUsage: relatedUsage || []
+      maxScore: maxScore !== undefined ? maxScore : 3.0,
+      isActive: isActive !== undefined ? isActive : true
     });
 
     return res.status(201).json({
       success: true,
       data: {
         id: benefit._id.toString(),
-        code: benefit.code
+        code: benefit.code,
+        name: benefit.name
       }
     });
   } catch (error) {
@@ -51,20 +52,44 @@ async function createBenefitHandler(req, res) {
 // GET /api/admin/benefits or /api/benefits
 async function listBenefitsHandler(req, res) {
   try {
-    const benefits = await getAllBenefits({});
+    const { isActive } = req.query;
+    const filter = {};
+    if (isActive !== undefined) {
+      filter.isActive = isActive === 'true';
+    }
+    
+    const benefits = await getAllBenefits(filter);
+    
+    // Get counts for question mappings and product mappings
+    const { getAnswerBenefitCollection } = await import('../../../../models/AnswerBenefit');
+    const { getProductBenefitCollection } = await import('../../../../models/ProductBenefit');
+    const answerBenefitCollection = await getAnswerBenefitCollection();
+    const productBenefitCollection = await getProductBenefitCollection();
+    
+    const benefitsWithCounts = await Promise.all(
+      benefits.map(async (b) => {
+        const questionMappings = await answerBenefitCollection.countDocuments({ benefitId: b._id });
+        const productMappings = await productBenefitCollection.countDocuments({ benefitId: b._id });
+        
+        return {
+          id: b._id.toString(),
+          code: b.code,
+          name: b.name,
+          description: b.description || null,
+          pointWeight: b.pointWeight || 1.0,
+          maxScore: b.maxScore !== undefined ? b.maxScore : 3.0,
+          isActive: b.isActive !== undefined ? b.isActive : true,
+          questionMappings,
+          productMappings,
+          createdAt: b.createdAt
+        };
+      })
+    );
     
     return res.status(200).json({
       success: true,
       data: {
-        benefits: benefits.map(b => ({
-          id: b._id.toString(),
-          code: b.code,
-          name: b.name,
-          description: b.description,
-          pointWeight: b.pointWeight,
-          relatedProblems: b.relatedProblems,
-          relatedUsage: b.relatedUsage
-        }))
+        benefits: benefitsWithCounts
       }
     });
   } catch (error) {

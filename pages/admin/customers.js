@@ -102,7 +102,7 @@ export default function CustomerList() {
         <div>
           <div>{item.number || 'N/A'}</div>
           {item.email && (
-            <div className="text-sm text-gray-500">{item.email}</div>
+            <div className="text-sm text-black">{item.email}</div>
           )}
         </div>
       ),
@@ -120,7 +120,7 @@ export default function CustomerList() {
       key: 'salesperson',
       header: 'Salesperson',
       render: (item) => (
-        <span className="text-sm text-gray-700">{item.salespersonName || 'N/A'}</span>
+        <span className="text-sm text-black">{item.salespersonName || 'N/A'}</span>
       ),
     },
     {
@@ -206,8 +206,8 @@ export default function CustomerList() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-3xl font-bold text-gray-900">Customers</h2>
-            <p className="text-sm text-gray-500 mt-1">View customer data and lens recommendations</p>
+            <h2 className="text-3xl font-bold text-black">Customers</h2>
+            <p className="text-sm text-black mt-1">View customer data and lens recommendations</p>
           </div>
         </div>
 
@@ -218,8 +218,8 @@ export default function CustomerList() {
               <Users className="h-8 w-8 text-primary" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">Total Customers</p>
-              <p className="text-3xl font-bold text-gray-900 mt-1">{customers.length}</p>
+              <p className="text-sm font-medium text-black uppercase tracking-wide">Total Customers</p>
+              <p className="text-3xl font-bold text-black mt-1">{customers.length}</p>
             </div>
           </div>
           <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 flex items-center border-l-4 border-success hover-lift animate-fade-in" style={{ animationDelay: '0.1s' }}>
@@ -227,8 +227,8 @@ export default function CustomerList() {
               <Users className="h-8 w-8 text-success" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">Lens Selected</p>
-              <p className="text-3xl font-bold text-gray-900 mt-1">
+              <p className="text-sm font-medium text-black uppercase tracking-wide">Lens Selected</p>
+              <p className="text-3xl font-bold text-black mt-1">
                 {customers.filter(c => c.selectedLensId).length}
               </p>
             </div>
@@ -238,8 +238,8 @@ export default function CustomerList() {
               <Users className="h-8 w-8 text-info" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">With Recommendations</p>
-              <p className="text-3xl font-bold text-gray-900 mt-1">
+              <p className="text-sm font-medium text-black uppercase tracking-wide">With Recommendations</p>
+              <p className="text-3xl font-bold text-black mt-1">
                 {customers.filter(c => c.recommendation?.perfectMatch).length}
               </p>
             </div>

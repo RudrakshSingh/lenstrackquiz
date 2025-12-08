@@ -137,7 +137,7 @@ export default function LensEntry() {
     return (
       <AdminLayout title={id ? 'Edit Lens Product' : 'Add New Lens Product'}>
         <div className="flex items-center justify-center py-12">
-          <div className="text-gray-500">Loading...</div>
+          <div className="text-black">Loading...</div>
         </div>
       </AdminLayout>
     );
@@ -161,7 +161,7 @@ export default function LensEntry() {
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Basic Information */}
           <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 animate-fade-in">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
+            <h3 className="text-lg font-semibold text-black mb-4">Basic Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Input
                 label="IT Code *"
@@ -199,7 +199,7 @@ export default function LensEntry() {
                     label: value
                   }))}
                 />
-                <p className="text-xs text-gray-500 mt-1">Select brand: Lenstrack, Kodak, or Zeiss</p>
+                <p className="text-xs text-black mt-1">Select brand: Lenstrack, Kodak, or Zeiss</p>
               </div>
               <Select
                 label="Vision Type *"
@@ -247,7 +247,7 @@ export default function LensEntry() {
 
           {/* Pricing */}
           <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Pricing</h3>
+            <h3 className="text-lg font-semibold text-black mb-4">Pricing</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <Input
                 label="MRP (₹) *"
@@ -277,7 +277,7 @@ export default function LensEntry() {
 
           {/* Power Range */}
           <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Power Support Range</h3>
+            <h3 className="text-lg font-semibold text-black mb-4">Power Support Range</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <Input
                 label="SPH Min"
@@ -326,13 +326,13 @@ export default function LensEntry() {
               )}
             </div>
             {formData.visionType === 'SINGLE_VISION' && (
-              <p className="text-sm text-gray-500 mt-2">ADD (Addition) fields are only applicable for Progressive, Bifocal, and other near-vision lens types.</p>
+              <p className="text-sm text-black mt-2">ADD (Addition) fields are only applicable for Progressive, Bifocal, and other near-vision lens types.</p>
             )}
           </div>
 
           {/* Additional Information */}
           <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Additional Information</h3>
+            <h3 className="text-lg font-semibold text-black mb-4">Additional Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Input
                 label="Delivery Days"
@@ -352,7 +352,7 @@ export default function LensEntry() {
 
           {/* Options */}
           <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Options</h3>
+            <h3 className="text-lg font-semibold text-black mb-4">Options</h3>
             <div className="space-y-4">
               <label className="flex items-center">
                 <input
@@ -361,7 +361,7 @@ export default function LensEntry() {
                   onChange={(e) => handleChange('yopoEligible', e.target.checked)}
                   className="mr-2 h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
                 />
-                <span className="text-sm text-gray-700">YOPO Eligible (You Only Pay for One)</span>
+                <span className="text-sm text-black">YOPO Eligible (You Only Pay for One)</span>
               </label>
               <label className="flex items-center">
                 <input
@@ -370,7 +370,7 @@ export default function LensEntry() {
                   onChange={(e) => handleChange('isActive', e.target.checked)}
                   className="mr-2 h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
                 />
-                <span className="text-sm text-gray-700">Active (Show in catalog)</span>
+                <span className="text-sm text-black">Active (Show in catalog)</span>
               </label>
             </div>
           </div>

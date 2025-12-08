@@ -77,18 +77,16 @@ async function listCategoryDiscountsHandler(req, res) {
   }
 }
 
-async function handler(req, res) {
+export default withAuth(async function handler(req, res) {
   if (req.method === 'GET') {
-    return withAuth(listCategoryDiscountsHandler, 'SUPER_ADMIN', 'ADMIN')(req, res);
+    return listCategoryDiscountsHandler(req, res);
   }
   if (req.method === 'POST') {
-    return withAuth(createCategoryDiscountHandler, 'SUPER_ADMIN', 'ADMIN')(req, res);
+    return createCategoryDiscountHandler(req, res);
   }
   return res.status(405).json({
     success: false,
     error: { code: 'METHOD_NOT_ALLOWED', message: 'Method not allowed' }
   });
-}
-
-export default handler;
+}, 'SUPER_ADMIN', 'ADMIN');
 

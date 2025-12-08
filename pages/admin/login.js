@@ -5,16 +5,16 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
-import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Glasses } from 'lucide-react';
 
 export default function LoginPage() {
+  const router = useRouter();
+  const { login, isAuthenticated } = useAuth();
+  const { showToast } = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { login, isAuthenticated } = useAuth();
-  const { showToast } = useToast();
-  const router = useRouter();
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -31,139 +31,161 @@ export default function LoginPage() {
       showToast('success', 'Login successful!');
       router.push('/admin');
     } catch (error) {
-      showToast('error', error.message || 'Login failed. Please check your credentials.');
+      showToast('error', error.message || 'Login failed');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left side - Form */}
-      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-gray-100">
-        <div className="max-w-md w-full space-y-8">
-            <div>
-              <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                Lenstrack Admin
-              </h2>
-              <p className="mt-2 text-center text-sm text-gray-600">
-                Sign in to your account
-              </p>
-            </div>
-            <div className="text-center">
-              <p className="text-sm text-gray-600">
-                Don't have an account?{' '}
-                <Link
-                  href="/admin/register"
-                  className="font-medium text-primary hover:text-primary-hover"
-                >
-                  Create one
-                </Link>
-              </p>
-            </div>
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-            <div className="space-y-4">
-              <Input
-                label="Email address"
-                type="email"
-                value={email}
-                onChange={setEmail}
-                placeholder="Enter your email"
-                required
-                icon={<Mail className="h-5 w-5" />}
-                disabled={loading}
-              />
-              <div className="relative">
-                <Input
-                  label="Password"
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={setPassword}
-                  placeholder="Enter your password"
-                  required
-                  icon={<Lock className="h-5 w-5" />}
-                  disabled={loading}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-9 text-gray-400 hover:text-gray-600"
-                  tabIndex={-1}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5" />
-                  ) : (
-                    <Eye className="h-5 w-5" />
-                  )}
-                </button>
+    <div className="min-h-screen flex bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-black dark:to-zinc-900">
+      {/* Left Side - Login Form */}
+      <div className="flex-1 flex items-center justify-center p-8 bg-white dark:bg-black relative overflow-hidden">
+        {/* Animated background gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-purple-50/50 dark:from-blue-950/20 dark:via-transparent dark:to-purple-950/20 animate-pulse" />
+        
+        <div className="w-full max-w-md relative z-10">
+          {/* Logo - Interactive */}
+          <div className="flex items-center gap-3 mb-8 group">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity duration-300" />
+              <div className="relative w-12 h-12 bg-gradient-to-br from-blue-500 via-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
+                <Glasses className="text-white" size={28} />
               </div>
             </div>
-
             <div>
-              <Button
-                type="submit"
-                fullWidth
-                loading={loading}
-                disabled={loading}
-              >
-                Sign in
-              </Button>
+              <h1 className="text-2xl font-bold text-slate-900 dark:text-zinc-50">
+                LensTrack
+              </h1>
+              <p className="text-sm text-slate-600 dark:text-zinc-400">Optical Store Management</p>
+            </div>
+          </div>
+
+          {/* Login Form */}
+          <div className="mb-8 animate-fade-in">
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-zinc-50 mb-2 tracking-tight">
+              Welcome Back
+            </h2>
+            <p className="text-base text-slate-600 dark:text-zinc-400">
+              Sign in to access your dashboard
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-5 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+            <div className="transform transition-all duration-300 hover:scale-[1.02]">
+              <Input
+                id="email"
+                type="email"
+                label="Email Address"
+                placeholder="admin@lenstrack.com"
+                value={email}
+                onChange={(value) => setEmail(value)}
+                required
+                className="transition-all duration-300 focus-within:shadow-lg"
+              />
             </div>
 
-            <div className="text-center">
-              <p className="text-sm text-gray-600">
-                Don't have an account?{' '}
-                <Link
-                  href="/admin/register"
-                  className="font-medium text-primary hover:text-primary-hover transition-colors"
-                >
-                  Create one
-                </Link>
-              </p>
+            <div className="relative transform transition-all duration-300 hover:scale-[1.02]">
+              <Input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                label="Password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(value) => setPassword(value)}
+                required
+                className="transition-all duration-300 focus-within:shadow-lg"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-9 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 transform hover:scale-110 active:scale-95"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
             </div>
+
+            <Button 
+              type="submit" 
+              fullWidth 
+              loading={loading} 
+              className="rounded-full h-12 text-base font-semibold shadow-xl hover:shadow-2xl transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
+            >
+              Sign In
+            </Button>
           </form>
+
+          {/* Register Link */}
+          <div className="mt-6 text-center animate-fade-in" style={{ animationDelay: '0.3s' }}>
+            <p className="text-sm text-slate-600 dark:text-zinc-400">
+              Don't have an account?{' '}
+              <Link
+                href="/admin/register"
+                className="font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 underline-offset-4 hover:underline transition-all duration-200 transform inline-block hover:scale-105"
+              >
+                Create one
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Right side - Visual (hidden on mobile) */}
-      <div className="hidden lg:block lg:w-2/5 bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-700 p-12 flex items-center justify-center relative overflow-hidden">
-        {/* Decorative background pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-64 h-64 bg-white rounded-full -translate-x-1/2 -translate-y-1/2"></div>
-          <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full translate-x-1/2 translate-y-1/2"></div>
+      {/* Right Side - Branding */}
+      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-blue-600 via-purple-600 to-purple-700 p-12 items-center justify-center relative overflow-hidden">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-400/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
         </div>
         
-        <div className="text-white text-center relative z-10">
-          <div className="mb-8">
-            <div className="w-24 h-24 mx-auto bg-white bg-opacity-30 rounded-full flex items-center justify-center mb-6 shadow-lg">
-              <svg className="w-14 h-14 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
-            </div>
+        <div className="max-w-lg text-white relative z-10">
+          {/* Lenstrack Logo */}
+          <div className="mb-8 text-center">
+            <h1 className="text-5xl font-extrabold mb-2 tracking-tight">
+              Lenstrack<sup className="text-2xl align-super">®</sup>
+            </h1>
           </div>
-          <h3 className="text-4xl font-bold mb-4 text-white drop-shadow-lg">Welcome to Lenstrack</h3>
-          <p className="text-xl mb-8 text-white opacity-95 leading-relaxed">
-            Manage your optical stores, products, and customer recommendations
+          
+          <h2 className="text-4xl font-bold mb-6 leading-tight transform hover:scale-105 transition-transform duration-300">
+            Intelligent Product Recommendations
+          </h2>
+          <p className="text-lg mb-10 text-blue-100 leading-relaxed">
+            Streamline your optical store operations with AI-powered questionnaires
+            and smart product recommendations.
           </p>
-          <div className="space-y-4 text-left max-w-sm mx-auto">
-            <div className="flex items-start bg-white bg-opacity-10 rounded-lg p-4 backdrop-blur-sm">
-              <div className="flex-shrink-0 w-7 h-7 rounded-full bg-white bg-opacity-30 flex items-center justify-center mr-4 mt-0.5 shadow-md">
-                <span className="text-white text-base font-bold">✓</span>
+          <div className="space-y-5">
+            <div className="flex items-start gap-4 group cursor-default transform hover:translate-x-2 transition-all duration-300">
+              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0 backdrop-blur-sm border-2 border-white/30 group-hover:bg-white/30 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg">
+                <span className="text-white font-bold text-lg">✓</span>
               </div>
-              <p className="text-base text-white font-medium">Multi-store management</p>
+              <div className="flex-1">
+                <h3 className="font-bold mb-1 text-lg group-hover:text-blue-100 transition-colors">5-Minute Customer Journey</h3>
+                <p className="text-sm text-blue-100 leading-relaxed">
+                  Complete assessment and recommendations in under 5 minutes
+                </p>
+              </div>
             </div>
-            <div className="flex items-start bg-white bg-opacity-10 rounded-lg p-4 backdrop-blur-sm">
-              <div className="flex-shrink-0 w-7 h-7 rounded-full bg-white bg-opacity-30 flex items-center justify-center mr-4 mt-0.5 shadow-md">
-                <span className="text-white text-base font-bold">✓</span>
+            <div className="flex items-start gap-4 group cursor-default transform hover:translate-x-2 transition-all duration-300" style={{ transitionDelay: '0.1s' }}>
+              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0 backdrop-blur-sm border-2 border-white/30 group-hover:bg-white/30 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg">
+                <span className="text-white font-bold text-lg">✓</span>
               </div>
-              <p className="text-base text-white font-medium">Advanced analytics & reports</p>
+              <div className="flex-1">
+                <h3 className="font-bold mb-1 text-lg group-hover:text-blue-100 transition-colors">Multi-Store Management</h3>
+                <p className="text-sm text-blue-100 leading-relaxed">
+                  Manage multiple stores with role-based access control
+                </p>
+              </div>
             </div>
-            <div className="flex items-start bg-white bg-opacity-10 rounded-lg p-4 backdrop-blur-sm">
-              <div className="flex-shrink-0 w-7 h-7 rounded-full bg-white bg-opacity-30 flex items-center justify-center mr-4 mt-0.5 shadow-md">
-                <span className="text-white text-base font-bold">✓</span>
+            <div className="flex items-start gap-4 group cursor-default transform hover:translate-x-2 transition-all duration-300" style={{ transitionDelay: '0.2s' }}>
+              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0 backdrop-blur-sm border-2 border-white/30 group-hover:bg-white/30 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg">
+                <span className="text-white font-bold text-lg">✓</span>
               </div>
-              <p className="text-base text-white font-medium">Role-based access control</p>
+              <div className="flex-1">
+                <h3 className="font-bold mb-1 text-lg group-hover:text-blue-100 transition-colors">Comprehensive Analytics</h3>
+                <p className="text-sm text-blue-100 leading-relaxed">
+                  Track performance, conversion rates, and customer insights
+                </p>
+              </div>
             </div>
           </div>
         </div>

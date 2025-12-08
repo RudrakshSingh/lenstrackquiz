@@ -6,116 +6,149 @@ import Button from '../../components/ui/Button';
 import Modal from '../../components/ui/Modal';
 import Input from '../../components/ui/Input';
 import Select from '../../components/ui/Select';
-import { productService } from '../../services/products';
-import { lensProductService } from '../../services/lensProducts';
-import { featureService } from '../../services/features';
-import { useToast } from '../../contexts/ToastContext';
-import { Plus, Edit, Trash2, Search, Package } from 'lucide-react';
 import Badge from '../../components/ui/Badge';
+import EmptyState from '../../components/ui/EmptyState';
+import Spinner from '../../components/ui/Spinner';
+import { useToast } from '../../contexts/ToastContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { Plus, Edit, Trash2, Search, Package, Frame, Sun, Eye, ShoppingCart } from 'lucide-react';
+
+const PRODUCT_TYPES = [
+  { value: 'FRAME', label: 'Frames', icon: Frame },
+  { value: 'SUNGLASS', label: 'Sunglasses', icon: Sun },
+  { value: 'CONTACT_LENS', label: 'Contact Lenses', icon: Eye },
+  { value: 'ACCESSORY', label: 'Accessories', icon: ShoppingCart }
+];
 
 export default function ProductsPage() {
   const router = useRouter();
+  const { showToast } = useToast();
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState('FRAME');
   const [products, setProducts] = useState([]);
-  const [lensProducts, setLensProducts] = useState([]);
-  const [features, setFeatures] = useState([]);
+  const [brands, setBrands] = useState([]);
+  const [subBrands, setSubBrands] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('all');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [formData, setFormData] = useState({
-    sku: '',
+    type: 'FRAME',
+    brandId: '',
+    subBrandId: '',
     name: '',
-    category: '',
-    brand: '',
-    basePrice: 0,
-    description: '',
-    imageUrl: '',
-    features: [],
+    sku: '',
+    mrp: '',
+    hsnCode: '',
+    isActive: true
   });
   const [formErrors, setFormErrors] = useState({});
-  const { showToast } = useToast();
 
   useEffect(() => {
-    fetchProducts();
-    fetchLensProducts();
-    fetchFeatures();
-  }, [categoryFilter]);
+    if (user?.organizationId) {
+      fetchProducts();
+      fetchBrands();
+    }
+  }, [user, activeTab]);
+
+  useEffect(() => {
+    if (formData.brandId) {
+      fetchSubBrands(formData.brandId);
+    } else {
+      setSubBrands([]);
+      setFormData(prev => ({ ...prev, subBrandId: '' }));
+    }
+  }, [formData.brandId]);
 
   const fetchProducts = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const params = {};
-      if (categoryFilter !== 'all') {
-        params.category = categoryFilter;
+      const token = typeof window !== 'undefined' ? localStorage.getItem('lenstrack_token') : null;
+      const response = await fetch(`/api/admin/retail-products?type=${activeTab}&organizationId=${user.organizationId}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {}
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setProducts(Array.isArray(data.data?.products) ? data.data.products : []);
+      } else {
+        showToast('error', data.error?.message || 'Failed to load products');
       }
-      if (search) {
-        params.search = search;
-      }
-      const data = await productService.list(params);
-      setProducts(Array.isArray(data) ? data : data?.products || []);
     } catch (error) {
+      console.error('Failed to load products:', error);
       showToast('error', 'Failed to load products');
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchLensProducts = async () => {
+  const fetchBrands = async () => {
     try {
-      const data = await lensProductService.list({});
-      setLensProducts(data || []);
+      const token = typeof window !== 'undefined' ? localStorage.getItem('lenstrack_token') : null;
+      const response = await fetch('/api/admin/brands?isActive=true', {
+        headers: token ? { Authorization: `Bearer ${token}` } : {}
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setBrands(Array.isArray(data.data) ? data.data : []);
+      }
     } catch (error) {
-      console.error('Failed to load lens products:', error);
+      console.error('Failed to load brands:', error);
     }
   };
 
-  const fetchFeatures = async () => {
+  const fetchSubBrands = async (brandId) => {
     try {
-      const data = await featureService.list();
-      setFeatures(Array.isArray(data) ? data : data?.features || []);
+      const token = typeof window !== 'undefined' ? localStorage.getItem('lenstrack_token') : null;
+      const response = await fetch(`/api/admin/brands/${brandId}/subbrands`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {}
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setSubBrands(Array.isArray(data.data) ? data.data : []);
+      }
     } catch (error) {
-      console.error('Failed to load features:', error);
+      console.error('Failed to load sub-brands:', error);
     }
   };
 
-  const handleSearch = (value) => {
-    setSearch(value);
-    setTimeout(() => {
-      fetchProducts();
-    }, 300);
+  const handleTabChange = (type) => {
+    setActiveTab(type);
+    setSearch('');
   };
 
   const handleCreate = () => {
+    setEditingProduct(null);
     setFormData({
-      sku: '',
+      type: activeTab,
+      brandId: '',
+      subBrandId: '',
       name: '',
-      category: '',
-      brand: '',
-      basePrice: 0,
-      description: '',
-      imageUrl: '',
-      features: [],
+      sku: '',
+      mrp: '',
+      hsnCode: '',
+      isActive: true
     });
     setFormErrors({});
-    setEditingProduct(null);
     setIsCreateOpen(true);
   };
 
   const handleEdit = (product) => {
+    setEditingProduct(product);
     setFormData({
-      sku: product.sku,
-      name: product.name,
-      category: product.category || '',
-      brand: product.brand || '',
-      basePrice: product.basePrice || 0,
-      description: product.description || '',
-      imageUrl: product.imageUrl || '',
-      features: product.features || [],
+      type: product.type,
+      brandId: product.brandId,
+      subBrandId: product.subBrandId || '',
+      name: product.name || '',
+      sku: product.sku || '',
+      mrp: product.mrp?.toString() || '',
+      hsnCode: product.hsnCode || '',
+      isActive: product.isActive !== undefined ? product.isActive : true
     });
     setFormErrors({});
-    setEditingProduct(product);
     setIsCreateOpen(true);
   };
 
@@ -123,275 +156,370 @@ export default function ProductsPage() {
     e.preventDefault();
     setFormErrors({});
 
+    // Validation
+    const errors = {};
+    if (!formData.brandId) errors.brandId = 'Brand is required';
+    if (!formData.mrp || isNaN(parseFloat(formData.mrp)) || parseFloat(formData.mrp) < 0) {
+      errors.mrp = 'Valid MRP is required';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+
     try {
-      if (editingProduct) {
-        await productService.update(editingProduct.id || editingProduct._id, formData);
-        showToast('success', 'Product updated successfully');
+      const token = typeof window !== 'undefined' ? localStorage.getItem('lenstrack_token') : null;
+      const url = editingProduct 
+        ? `/api/admin/retail-products/${editingProduct.id}`
+        : '/api/admin/retail-products';
+      
+      const method = editingProduct ? 'PUT' : 'POST';
+      const payload = {
+        type: formData.type,
+        brandId: formData.brandId,
+        subBrandId: formData.subBrandId || null,
+        name: formData.name || null,
+        sku: formData.sku || null,
+        mrp: parseFloat(formData.mrp),
+        hsnCode: formData.hsnCode || null,
+        isActive: formData.isActive
+      };
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        showToast('success', editingProduct ? 'Product updated successfully' : 'Product created successfully');
+        setIsCreateOpen(false);
+        fetchProducts();
       } else {
-        await productService.create(formData);
-        showToast('success', 'Product created successfully');
+        showToast('error', data.error?.message || 'Failed to save product');
       }
-      setIsCreateOpen(false);
-      fetchProducts();
     } catch (error) {
-      if (error.code === 'VALIDATION_ERROR' && error.details) {
-        setFormErrors(error.details);
-      } else {
-        showToast('error', error.message || 'Failed to save product');
-      }
+      console.error('Failed to save product:', error);
+      showToast('error', 'Failed to save product');
     }
   };
 
-  const handleDelete = async () => {
+  const handleDelete = async (productId) => {
     try {
-      if (deleteConfirm.type === 'lens') {
-        await lensProductService.delete(deleteConfirm.id || deleteConfirm._id);
+      const token = typeof window !== 'undefined' ? localStorage.getItem('lenstrack_token') : null;
+      const response = await fetch(`/api/admin/retail-products/${productId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        showToast('success', 'Product deleted successfully');
+        setDeleteConfirm(null);
+        fetchProducts();
       } else {
-        await productService.delete(deleteConfirm.id || deleteConfirm._id);
+        showToast('error', data.error?.message || 'Failed to delete product');
       }
-      showToast('success', 'Product deleted successfully');
-      setDeleteConfirm(null);
-      fetchProducts();
-      fetchLensProducts();
     } catch (error) {
-      showToast('error', error.message || 'Failed to delete product');
+      console.error('Failed to delete product:', error);
+      showToast('error', 'Failed to delete product');
     }
   };
 
-  // Combine regular products and lens products for display
-  const allProducts = [
-    ...products.map(p => ({ ...p, type: 'product', displayName: p.name })),
-    ...lensProducts.map(p => ({ ...p, type: 'lens', displayName: p.name, sku: p.itCode, category: 'LENS', brand: p.brandLine }))
-  ];
+  const getProductTypeLabel = (type) => {
+    const productType = PRODUCT_TYPES.find(pt => pt.value === type);
+    return productType ? productType.label : type;
+  };
 
-  const filteredProducts = allProducts.filter(product => {
-    if (search) {
-      const searchLower = search.toLowerCase();
-      return (
-        product.name?.toLowerCase().includes(searchLower) ||
-        product.sku?.toLowerCase().includes(searchLower) ||
-        product.itCode?.toLowerCase().includes(searchLower) ||
-        product.brand?.toLowerCase().includes(searchLower) ||
-        product.brandLine?.toLowerCase().includes(searchLower)
-      );
-    }
-    if (categoryFilter !== 'all') {
-      return product.category === categoryFilter || (categoryFilter === 'LENS' && product.type === 'lens');
-    }
-    return true;
+  const getAddButtonLabel = () => {
+    const productType = PRODUCT_TYPES.find(pt => pt.value === activeTab);
+    return `Add ${productType ? productType.label.slice(0, -1) : 'Product'}`;
+  };
+
+  const filteredProducts = products.filter(product => {
+    if (!search) return true;
+    const searchLower = search.toLowerCase();
+    return (
+      (product.name && product.name.toLowerCase().includes(searchLower)) ||
+      (product.sku && product.sku.toLowerCase().includes(searchLower)) ||
+      (product.brandName && product.brandName.toLowerCase().includes(searchLower)) ||
+      (product.subBrandName && product.subBrandName.toLowerCase().includes(searchLower))
+    );
   });
 
   const columns = [
-    { 
-      key: 'sku', 
-      header: 'SKU/IT Code',
-      render: (item) => item.sku || item.itCode || 'N/A'
-    },
-    { 
-      key: 'name', 
-      header: 'Name',
-      render: (item) => (
+    {
+      key: 'name',
+      label: 'Product Name',
+      render: (product) => (
         <div>
-          <div className="font-medium">{item.displayName || item.name}</div>
-          {item.type === 'lens' && (
-            <Badge color="blue" variant="soft" size="sm" className="mt-1">
-              Lens Product
-            </Badge>
-          )}
+          <div className="font-medium text-black">{product.name || 'N/A'}</div>
+          {product.sku && <div className="text-sm text-gray-500">{product.sku}</div>}
         </div>
       )
     },
-    { 
-      key: 'category', 
-      header: 'Category',
-      render: (item) => item.category || (item.type === 'lens' ? 'LENS' : 'N/A')
-    },
-    { 
-      key: 'brand', 
-      header: 'Brand',
-      render: (item) => item.brand || item.brandLine || 'N/A'
+    {
+      key: 'brand',
+      label: 'Brand / Sub-Brand',
+      render: (product) => (
+        <div>
+          <div className="font-medium text-black">{product.brandName || 'N/A'}</div>
+          {product.subBrandName && <div className="text-sm text-gray-500">{product.subBrandName}</div>}
+        </div>
+      )
     },
     {
-      key: 'price',
-      header: 'Price',
-      render: (item) => {
-        if (item.type === 'lens') {
-          return `₹${item.offerPrice || item.mrp || 0}`;
-        }
-        return `₹${item.basePrice || 0}`;
-      },
+      key: 'mrp',
+      label: 'MRP',
+      render: (product) => <span className="text-black">₹{product.mrp?.toLocaleString() || '0'}</span>
     },
+    {
+      key: 'type',
+      label: 'Type',
+      render: (product) => (
+        <Badge color="blue" size="sm">
+          {getProductTypeLabel(product.type)}
+        </Badge>
+      )
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      render: (product) => (
+        <Badge color={product.isActive ? 'green' : 'gray'} size="sm">
+          {product.isActive ? 'Active' : 'Inactive'}
+        </Badge>
+      )
+    },
+    {
+      key: 'actions',
+      label: 'Actions',
+      render: (product) => (
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            icon={<Edit size={14} />}
+            onClick={() => handleEdit(product)}
+            className="rounded-full"
+          >
+            Edit
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            icon={<Trash2 size={14} />}
+            onClick={() => setDeleteConfirm(product)}
+            className="rounded-full text-red-600 hover:text-red-700"
+          >
+            Delete
+          </Button>
+        </div>
+      )
+    }
   ];
 
   return (
-    <AdminLayout title="Product Management">
+    <AdminLayout title="Products Management">
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-3xl font-bold text-gray-900">Products</h2>
-            <p className="text-sm text-gray-500 mt-1">Manage product catalog and inventory</p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-fade-in">
+          <div className="space-y-1.5">
+            <h1 className="text-2xl font-semibold text-black">Products</h1>
+            <p className="text-sm text-black mt-1">Manage frames, sunglasses, contact lenses, and accessories</p>
           </div>
-          <div className="flex gap-2">
-            <Button onClick={handleCreate} icon={<Plus className="h-4 w-4" />}>
-              Add Product
-            </Button>
-            <Button 
-              onClick={() => router.push('/admin/lens-entry')} 
-              icon={<Plus className="h-4 w-4" />}
-              variant="primary"
-            >
-              Add Lens Product
-            </Button>
+          <Button
+            icon={<Plus size={18} />}
+            onClick={handleCreate}
+            className="rounded-full w-full sm:w-auto shrink-0"
+          >
+            {getAddButtonLabel()}
+          </Button>
+        </div>
+
+        {/* Product Type Tabs */}
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-1">
+          <div className="flex flex-wrap gap-2">
+            {PRODUCT_TYPES.map((type) => {
+              const Icon = type.icon;
+              const isActive = activeTab === type.value;
+              if (!Icon) {
+                console.error(`Icon not found for product type: ${type.value}`);
+                return null;
+              }
+              return (
+                <button
+                  key={type.value}
+                  onClick={() => handleTabChange(type.value)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                    isActive
+                      ? 'bg-blue-600 text-white shadow-md'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  <Icon size={18} />
+                  {type.label}
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Filters */}
-        <div className="bg-white rounded-lg shadow-md p-4 flex gap-4 mb-6">
-          <div className="flex-1">
+        {/* Search */}
+        <div className="mb-6">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
             <Input
-              placeholder="Search by name, SKU, or brand..."
+              placeholder="Search products by name, SKU, or brand..."
               value={search}
-              onChange={handleSearch}
-              icon={<Search className="h-5 w-5" />}
+              onChange={(value) => setSearch(value)}
+              className="pl-10"
             />
           </div>
-          <select
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
-          >
-            <option value="all">All Categories</option>
-            <option value="LENS">Lens Products</option>
-            <option value="EYEGLASSES">Eyeglasses</option>
-            <option value="SUNGLASSES">Sunglasses</option>
-            <option value="CONTACT_LENSES">Contact Lenses</option>
-            <option value="ACCESSORIES">Accessories</option>
-          </select>
         </div>
 
-        {/* Table */}
-        <div className="bg-white rounded-lg shadow-md">
-          <DataTable
-            columns={columns}
-            data={filteredProducts}
-            loading={loading}
-            emptyMessage="No products found"
-            rowActions={(item) => (
-              <div className="flex gap-2">
-                {item.type === 'lens' ? (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      router.push(`/admin/lens-entry?id=${item.id}`);
-                    }}
-                    className="text-primary hover:text-primary-hover"
-                  >
-                    <Edit className="h-4 w-4" />
-                  </button>
-                ) : (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleEdit(item);
-                    }}
-                    className="text-primary hover:text-primary-hover"
-                  >
-                    <Edit className="h-4 w-4" />
-                  </button>
-                )}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setDeleteConfirm(item);
-                  }}
-                  className="text-danger hover:text-red-600"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              </div>
-            )}
-          />
+        {/* Products Table */}
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <Spinner />
+            </div>
+          ) : filteredProducts.length === 0 ? (
+            <div className="p-12">
+              <EmptyState
+                icon={<Package size={64} className="text-gray-400" />}
+                title={`No ${getProductTypeLabel(activeTab).toLowerCase()} found`}
+                description={`Create your first ${getProductTypeLabel(activeTab).toLowerCase().slice(0, -1)} to get started`}
+                action={{
+                  label: getAddButtonLabel(),
+                  onClick: handleCreate
+                }}
+              />
+            </div>
+          ) : (
+            <DataTable
+              columns={columns}
+              data={filteredProducts}
+              keyField="id"
+            />
+          )}
         </div>
 
         {/* Create/Edit Modal */}
         <Modal
           isOpen={isCreateOpen}
           onClose={() => setIsCreateOpen(false)}
-          title={editingProduct ? 'Edit Product' : 'Create Product'}
+          title={editingProduct ? 'Edit Product' : getAddButtonLabel()}
           size="lg"
           footer={
             <>
-              <Button variant="outline" onClick={() => setIsCreateOpen(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setIsCreateOpen(false)}
+                className="rounded-full"
+              >
                 Cancel
               </Button>
-              <Button onClick={handleSubmit}>
+              <Button
+                onClick={handleSubmit}
+                className="rounded-full"
+              >
                 {editingProduct ? 'Update' : 'Create'}
               </Button>
             </>
           }
         >
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <Input
-                label="SKU"
-                value={formData.sku}
-                onChange={(value) => setFormData({ ...formData, sku: value })}
-                required
-                error={formErrors.sku}
-              />
-              <Input
-                label="Name"
-                value={formData.name}
-                onChange={(value) => setFormData({ ...formData, name: value })}
-                required
-                error={formErrors.name}
-              />
+            <div>
+              <label className="block text-sm font-medium text-black mb-2">
+                Product Type
+              </label>
+              <Badge color="blue" size="md">
+                {getProductTypeLabel(formData.type)}
+              </Badge>
+              <p className="text-xs text-gray-500 mt-1">Product type is determined by the active tab</p>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <Select
-                label="Category"
-                value={formData.category}
-                onChange={(value) => setFormData({ ...formData, category: value })}
-                options={[
-                  { value: 'EYEGLASSES', label: 'Eyeglasses' },
-                  { value: 'SUNGLASSES', label: 'Sunglasses' },
-                  { value: 'CONTACT_LENSES', label: 'Contact Lenses' },
-                  { value: 'ACCESSORIES', label: 'Accessories' },
-                ]}
-                required
-                error={formErrors.category}
-              />
-              <Input
-                label="Brand"
-                value={formData.brand}
-                onChange={(value) => setFormData({ ...formData, brand: value })}
-                error={formErrors.brand}
-              />
-            </div>
-            <Input
-              label="Base Price"
-              type="number"
-              value={formData.basePrice}
-              onChange={(value) => setFormData({ ...formData, basePrice: parseFloat(value) || 0 })}
+
+            <Select
+              label="Brand *"
+              value={formData.brandId}
+              onChange={(value) => setFormData({ ...formData, brandId: value, subBrandId: '' })}
+              options={[
+                { value: '', label: 'Select a brand...' },
+                ...brands.map(brand => ({
+                  value: brand.id,
+                  label: brand.name
+                }))
+              ]}
+              error={formErrors.brandId}
               required
-              error={formErrors.basePrice}
             />
+
+            <Select
+              label="Sub-Brand"
+              value={formData.subBrandId}
+              onChange={(value) => setFormData({ ...formData, subBrandId: value })}
+              options={[
+                { value: '', label: 'No sub-brand' },
+                ...subBrands.map(sb => ({
+                  value: sb.id,
+                  label: sb.name
+                }))
+              ]}
+              disabled={!formData.brandId || subBrands.length === 0}
+            />
+
             <Input
-              label="Description"
-              value={formData.description}
-              onChange={(value) => setFormData({ ...formData, description: value })}
-              error={formErrors.description}
+              label="Product Name / Model"
+              placeholder="e.g., Wayfarer 5121"
+              value={formData.name}
+              onChange={(value) => setFormData({ ...formData, name: value })}
             />
+
             <Input
-              label="Image URL"
-              type="url"
-              value={formData.imageUrl}
-              onChange={(value) => setFormData({ ...formData, imageUrl: value })}
-              error={formErrors.imageUrl}
+              label="SKU"
+              placeholder="e.g., RB-5121-BLK"
+              value={formData.sku}
+              onChange={(value) => setFormData({ ...formData, sku: value })}
             />
-            <div className="text-sm text-gray-500">
-              Note: Feature assignment and store-specific settings can be configured after creating the product.
+
+            <Input
+              label="MRP *"
+              type="number"
+              step="0.01"
+              min="0"
+              placeholder="0.00"
+              value={formData.mrp}
+              onChange={(value) => setFormData({ ...formData, mrp: value })}
+              error={formErrors.mrp}
+              required
+            />
+
+            <Input
+              label="HSN Code"
+              placeholder="e.g., 9001"
+              value={formData.hsnCode}
+              onChange={(value) => setFormData({ ...formData, hsnCode: value })}
+            />
+
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="isActive"
+                checked={formData.isActive}
+                onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                className="rounded border-gray-300"
+              />
+              <label htmlFor="isActive" className="text-sm font-medium text-black">
+                Active
+              </label>
             </div>
           </form>
         </Modal>
@@ -404,21 +532,27 @@ export default function ProductsPage() {
           size="sm"
           footer={
             <>
-              <Button variant="outline" onClick={() => setDeleteConfirm(null)}>
+              <Button
+                variant="outline"
+                onClick={() => setDeleteConfirm(null)}
+                className="rounded-full"
+              >
                 Cancel
               </Button>
-              <Button variant="danger" onClick={handleDelete}>
+              <Button
+                onClick={() => handleDelete(deleteConfirm.id)}
+                className="rounded-full bg-red-600 hover:bg-red-700"
+              >
                 Delete
               </Button>
             </>
           }
         >
-          <p className="text-gray-700">
-            Are you sure you want to delete <strong>{deleteConfirm?.name}</strong>? This action cannot be undone.
+          <p className="text-black">
+            Are you sure you want to delete <strong>{deleteConfirm?.name || 'this product'}</strong>? This action cannot be undone.
           </p>
         </Modal>
       </div>
     </AdminLayout>
   );
 }
-

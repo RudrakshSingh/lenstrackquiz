@@ -1,12 +1,15 @@
 import Sidebar from './Sidebar';
-import Header from './Header';
-import PageContainer from './PageContainer';
 import { useAuth } from '../../contexts/AuthContext';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
-import Spinner from '../ui/Spinner';
+import { PageLoader } from '../ui/Spinner';
+import dynamic from 'next/dynamic';
 
-export default function AdminLayout({ children, title = 'Admin' }) {
+const AdminBackground = dynamic(() => import('../three/AdminBackground'), {
+  ssr: false,
+});
+
+export default function AdminLayout({ children }) {
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
 
@@ -17,11 +20,7 @@ export default function AdminLayout({ children, title = 'Admin' }) {
   }, [isAuthenticated, isLoading, router]);
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Spinner size="lg" />
-      </div>
-    );
+    return <PageLoader />;
   }
 
   if (!isAuthenticated) {
@@ -29,19 +28,16 @@ export default function AdminLayout({ children, title = 'Admin' }) {
   }
 
   return (
-    <PageContainer>
-      <div className="flex h-screen overflow-hidden">
-        <Sidebar />
-        <div className="flex-1 flex flex-col overflow-hidden lg:ml-0">
-          <Header title={title} />
-          <main className="flex-1 overflow-y-auto p-6 bg-gray-50">
-            <div className="max-w-7xl mx-auto">
-              {children}
-            </div>
-          </main>
+    <div className="flex min-h-screen bg-gray-50 relative overflow-hidden">
+      <Sidebar />
+      <main className="flex-1 min-w-0 lg:ml-64 transition-all duration-300 ease-out relative z-10 bg-gray-50">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+          <div className="animate-fade-in">
+            {children}
+          </div>
         </div>
-      </div>
-    </PageContainer>
+      </main>
+    </div>
   );
 }
 

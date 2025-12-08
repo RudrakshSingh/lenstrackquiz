@@ -7,6 +7,11 @@ import { parsePrescription } from "@/lib/prescriptionParser";
 import SeverityMeter from "../components/SeverityMeter";
 import Loader from "../components/Loader";
 import SkeletonLoader from "../components/SkeletonLoader";
+import dynamic from 'next/dynamic';
+
+const CustomerBackground = dynamic(() => import('../components/three/CustomerBackground'), {
+  ssr: false,
+});
 import { 
   calculateDeviceSeverity, 
   calculateOutdoorSeverity, 
@@ -1298,7 +1303,9 @@ export default function Quiz() {
   };
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} style={{ position: 'relative', minHeight: '100vh' }}>
+      <CustomerBackground />
+      <div style={{ position: 'relative', zIndex: 10 }}>
       <div className={styles.header}>
         <h1 className={styles.title}>{t.title}</h1>
         <p className={styles.subtitle}>{t.subtitle}</p>
@@ -1337,6 +1344,7 @@ export default function Quiz() {
           </div>
         </Popup>
       )}
+      </div>
     </div>
   );
 }

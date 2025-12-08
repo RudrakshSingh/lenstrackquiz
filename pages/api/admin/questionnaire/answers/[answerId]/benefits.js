@@ -21,16 +21,49 @@ async function updateAnswerBenefitsHandler(req, res) {
       });
     }
 
-    // Validate benefits format
-    if (!Array.isArray(benefits)) {
+    // Validate benefits format - support both array and object format
+    let benefitsArray = [];
+    
+    if (Array.isArray(benefits)) {
+      benefitsArray = benefits;
+    } else if (benefits && typeof benefits === 'object') {
+      // Convert benefitMapping object to array format
+      for (const [benefitCode, points] of Object.entries(benefits)) {
+        const pointsValue = parseFloat(points) || 0;
+        const clampedPoints = Math.max(0, Math.min(3, pointsValue));
+        if (clampedPoints > 0) {
+          benefitsArray.push({
+            benefitCode,
+            points: clampedPoints
+          });
+        }
+      }
+    } else {
       return res.status(400).json({
         success: false,
-        error: { code: 'VALIDATION_ERROR', message: 'benefits must be an array' }
+        error: { code: 'VALIDATION_ERROR', message: 'benefits must be an array or object (benefitMapping)' }
       });
     }
 
+    // Validate benefit points
+    for (const benefit of benefitsArray) {
+      if (!benefit.benefitCode || !/^B\d{2}$/.test(benefit.benefitCode)) {
+        return res.status(400).json({
+          success: false,
+          error: { code: 'VALIDATION_ERROR', message: `Invalid benefit code: ${benefit.benefitCode}` }
+        });
+      }
+      const points = parseFloat(benefit.points);
+      if (isNaN(points) || points < 0 || points > 3) {
+        return res.status(400).json({
+          success: false,
+          error: { code: 'VALIDATION_ERROR', message: `Benefit points for ${benefit.benefitCode} must be between 0 and 3` }
+        });
+      }
+    }
+
     // Sync benefits
-    await syncAnswerBenefits(answerId, benefits);
+    await syncAnswerBenefits(answerId, benefitsArray);
 
     return res.status(200).json({
       success: true,

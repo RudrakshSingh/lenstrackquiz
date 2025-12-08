@@ -99,7 +99,7 @@ export default function CategoryDiscountEntry() {
     return (
       <AdminLayout title="Add Category Discount">
         <div className="flex items-center justify-center py-12">
-          <div className="text-gray-500">Loading...</div>
+          <div className="text-black">Loading...</div>
         </div>
       </AdminLayout>
     );
@@ -132,7 +132,7 @@ export default function CategoryDiscountEntry() {
 
           {/* Basic Information */}
           <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 animate-fade-in">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <h3 className="text-lg font-semibold text-black mb-4 flex items-center gap-2">
               <Users className="h-5 w-5 text-indigo-600" />
               Discount Configuration
             </h3>
@@ -179,7 +179,7 @@ export default function CategoryDiscountEntry() {
 
           {/* Validity */}
           <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Validity Period</h3>
+            <h3 className="text-lg font-semibold text-black mb-4">Validity Period</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Input
                 label="Start Date"
@@ -198,7 +198,7 @@ export default function CategoryDiscountEntry() {
 
           {/* Status */}
           <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Status</h3>
+            <h3 className="text-lg font-semibold text-black mb-4">Status</h3>
             <label className="flex items-center gap-3 cursor-pointer group">
               <input
                 type="checkbox"
@@ -207,10 +207,10 @@ export default function CategoryDiscountEntry() {
                 className="w-5 h-5 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded cursor-pointer"
               />
               <div>
-                <span className="text-sm font-medium text-gray-700 group-hover:text-indigo-600 transition-colors">
+                <span className="text-sm font-medium text-black group-hover:text-indigo-600 transition-colors">
                   Active (Enable this discount)
                 </span>
-                <p className="text-xs text-gray-500 mt-1">Inactive discounts will not be applied</p>
+                <p className="text-xs text-black mt-1">Inactive discounts will not be applied</p>
               </div>
             </label>
           </div>

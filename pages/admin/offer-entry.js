@@ -174,7 +174,7 @@ export default function OfferEntry() {
     return (
       <AdminLayout title={id ? 'Edit Offer' : 'Add New Offer'}>
         <div className="flex items-center justify-center py-12">
-          <div className="text-gray-500">Loading...</div>
+          <div className="text-black">Loading...</div>
         </div>
       </AdminLayout>
     );
@@ -207,7 +207,7 @@ export default function OfferEntry() {
 
           {/* Basic Information */}
           <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 animate-fade-in">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <h3 className="text-lg font-semibold text-black mb-4 flex items-center gap-2">
               <Tag className="h-5 w-5 text-indigo-600" />
               Basic Information
             </h3>
@@ -272,7 +272,7 @@ export default function OfferEntry() {
 
           {/* Target Filters */}
           <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <h3 className="text-lg font-semibold text-black mb-4 flex items-center gap-2">
               <Target className="h-5 w-5 text-indigo-600" />
               Target Filters
             </h3>
@@ -309,7 +309,7 @@ export default function OfferEntry() {
           {/* Dynamic Fields - FREE LENS */}
           {formData.offerType === 'FREE_LENS' && (
             <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-black mb-4 flex items-center gap-2">
                 <Gift className="h-5 w-5 text-indigo-600" />
                 Free Lens Configuration
               </h3>
@@ -349,7 +349,7 @@ export default function OfferEntry() {
           {/* Dynamic Fields - BONUS FREE PRODUCT */}
           {formData.offerType === 'BONUS_FREE_PRODUCT' && (
             <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-black mb-4 flex items-center gap-2">
                 <Gift className="h-5 w-5 text-indigo-600" />
                 Bonus Product Configuration
               </h3>
@@ -380,7 +380,7 @@ export default function OfferEntry() {
 
           {/* Dynamic Fields - Upsell Configuration */}
           <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <h3 className="text-lg font-semibold text-black mb-4 flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-indigo-600" />
               Upsell Engine Configuration
             </h3>
@@ -392,7 +392,7 @@ export default function OfferEntry() {
                   onChange={(e) => handleChange('upsellEnabled', e.target.checked)}
                   className="mr-2 h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
                 />
-                <span className="text-sm text-gray-700">Enable upsell for this offer</span>
+                <span className="text-sm text-black">Enable upsell for this offer</span>
               </label>
               {formData.upsellEnabled && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pl-6 border-l-2 border-indigo-200">
@@ -416,7 +416,7 @@ export default function OfferEntry() {
 
           {/* Second Pair Rule */}
           <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 animate-fade-in" style={{ animationDelay: '0.25s' }}>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Second Pair Rule</h3>
+            <h3 className="text-lg font-semibold text-black mb-4">Second Pair Rule</h3>
             <div className="space-y-4">
               <label className="flex items-center">
                 <input
@@ -425,7 +425,7 @@ export default function OfferEntry() {
                   onChange={(e) => handleChange('isSecondPairRule', e.target.checked)}
                   className="mr-2 h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
                 />
-                <span className="text-sm text-gray-700">This is a second pair rule</span>
+                <span className="text-sm text-black">This is a second pair rule</span>
               </label>
               {formData.isSecondPairRule && (
                 <Input
@@ -441,7 +441,7 @@ export default function OfferEntry() {
 
           {/* Validity */}
           <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <h3 className="text-lg font-semibold text-black mb-4 flex items-center gap-2">
               <Calendar className="h-5 w-5 text-indigo-600" />
               Validity Period
             </h3>
@@ -463,7 +463,7 @@ export default function OfferEntry() {
 
           {/* Status */}
           <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <h3 className="text-lg font-semibold text-black mb-4 flex items-center gap-2">
               <CheckCircle className="h-5 w-5 text-indigo-600" />
               Status
             </h3>
@@ -475,10 +475,10 @@ export default function OfferEntry() {
                 className="w-5 h-5 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded cursor-pointer"
               />
               <div>
-                <span className="text-sm font-medium text-gray-700 group-hover:text-indigo-600 transition-colors">
+                <span className="text-sm font-medium text-black group-hover:text-indigo-600 transition-colors">
                   Active (Enable this offer)
                 </span>
-                <p className="text-xs text-gray-500 mt-1">Inactive offers will not be applied to calculations</p>
+                <p className="text-xs text-black mt-1">Inactive offers will not be applied to calculations</p>
               </div>
             </label>
           </div>

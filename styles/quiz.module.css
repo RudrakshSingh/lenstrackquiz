@@ -7,7 +7,7 @@
 /* Base Container */
 .container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 50%, #f3e8ff 100%);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   padding: 2rem 1rem;
   display: flex;
@@ -15,6 +15,7 @@
   align-items: center;
   position: relative;
   animation: fadeIn 0.6s ease-out;
+  overflow-x: hidden;
 }
 
 .container::before {
@@ -25,10 +26,17 @@
   right: 0;
   bottom: 0;
   background: 
-    radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+    radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.08) 0%, transparent 60%);
   pointer-events: none;
   z-index: 0;
+  animation: pulse 8s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
 }
 
 .container > * {
@@ -45,11 +53,11 @@
 }
 
 .title {
-  font-size: 2.5rem;
-  font-weight: 700;
+  font-size: 3rem;
+  font-weight: 900;
   color: var(--text-primary);
   margin-bottom: 0.5rem;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+  background: linear-gradient(135deg, #3b82f6, #6366f1, #8b5cf6, #a855f7);
   background-size: 200% 200%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -57,7 +65,9 @@
   line-height: 1.2;
   margin-top: 70px;
   animation: gradientShift 3s ease infinite, fadeInDown 0.8s ease-out;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
+  text-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+  filter: drop-shadow(0 4px 8px rgba(59, 130, 246, 0.2));
 }
 
 @keyframes gradientShift {
@@ -157,25 +167,17 @@
 
 /* Step Card */
 .stepCard {
-  background: var(--surface-elevated);
-  border-radius: var(--radius-2xl);
-  padding: 2.5rem;
-  box-shadow: var(--shadow-lg);
-  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 2rem;
+  padding: 3rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.2), 0 0 100px rgba(59, 130, 246, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.3);
   position: relative;
   overflow: hidden;
-  animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
 }
 
 .stepCard::before {
@@ -184,8 +186,38 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+  height: 5px;
+  background: linear-gradient(90deg, #3b82f6, #6366f1, #8b5cf6, #a855f7);
+  background-size: 200% 100%;
+  animation: gradientShift 3s ease infinite;
+}
+
+.stepCard::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+  animation: rotate 20s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 /* Step Header */
@@ -264,21 +296,23 @@
 
 .inputField {
   width: 100%;
-  padding: 1rem 1.25rem;
-  border: 2px solid var(--border);
-  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  border: 2px solid rgba(226, 232, 240, 0.8);
+  border-radius: 1rem;
   font-size: 1rem;
-  font-weight: 400;
-  color: var(--text-primary);
-  background: var(--surface-elevated);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 500;
+  color: #1e293b;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
 .inputField:focus {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15), 0 4px 12px rgba(99, 102, 241, 0.1);
-  transform: translateY(-1px);
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2), 0 10px 25px -5px rgba(59, 130, 246, 0.2);
+  transform: translateY(-2px) scale(1.01);
   background: #ffffff;
 }
 
@@ -302,21 +336,38 @@
 .optionLabel {
   display: flex;
   align-items: center;
-  padding: 1rem 1.25rem;
-  border: 2px solid var(--border);
-  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  border: 2px solid rgba(226, 232, 240, 0.8);
+  border-radius: 1rem;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  background: var(--surface-elevated);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
   overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.optionLabel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.5s;
+}
+
+.optionLabel:hover::before {
+  left: 100%;
 }
 
 .optionLabel:hover {
-  border-color: var(--primary-color);
-  background: rgba(99, 102, 241, 0.05);
-  transform: translateY(-2px) scale(1.01);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
 }
 
 .optionLabel:active {
@@ -371,11 +422,11 @@
 }
 
 .optionLabel:has(input[type="radio"]:checked) {
-  border-color: var(--primary-color);
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(139, 92, 246, 0.05));
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15), 0 4px 12px rgba(99, 102, 241, 0.2);
-  transform: translateY(-1px);
-  animation: selectedPulse 0.4s ease-out;
+  border-color: #3b82f6;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.08));
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2), 0 10px 25px -5px rgba(59, 130, 246, 0.3);
+  transform: translateY(-2px) scale(1.02);
+  animation: selectedPulse 0.5s ease-out;
 }
 
 @keyframes selectedPulse {
@@ -396,29 +447,31 @@
   display: flex !important;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 1rem 2rem !important;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+  gap: 0.75rem;
+  padding: 1.25rem 2.5rem !important;
+  background: linear-gradient(135deg, #3b82f6, #6366f1, #8b5cf6) !important;
+  background-size: 200% 100% !important;
   color: white !important;
   border: none !important;
-  border-radius: 12px !important;
-  font-size: 1rem !important;
-  font-weight: 600 !important;
+  border-radius: 1rem !important;
+  font-size: 1.125rem !important;
+  font-weight: 700 !important;
   cursor: pointer !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
   position: relative;
   overflow: hidden;
   width: 100%;
-  max-width: 300px;
-  margin: 1.5rem auto 0;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  max-width: 350px;
+  margin: 2rem auto 0;
+  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1) !important;
+  animation: gradientShift 3s ease infinite !important;
 }
 
 .nextButton:hover,
 .submitButton:hover {
-  transform: translateY(-3px) scale(1.02) !important;
-  box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.4), 0 8px 10px -6px rgba(99, 102, 241, 0.3) !important;
-  background: linear-gradient(135deg, #4f46e5, #7c3aed) !important;
+  transform: translateY(-4px) scale(1.05) !important;
+  box-shadow: 0 20px 40px -5px rgba(59, 130, 246, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.2) !important;
+  background-position: 100% 0 !important;
 }
 
 .nextButton:active,

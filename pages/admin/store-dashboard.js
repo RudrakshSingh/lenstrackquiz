@@ -142,7 +142,7 @@ export default function StoreDashboard() {
       <div className="flex h-screen">
         <Sidebar />
         <div className="flex-1 flex items-center justify-center">
-          <div className="text-gray-500">Loading...</div>
+          <div className="text-black">Loading...</div>
         </div>
       </div>
     );
@@ -155,13 +155,13 @@ export default function StoreDashboard() {
         <div className="p-8">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Store Dashboard</h1>
-            <p className="text-gray-600">Monitor orders and performance</p>
+            <h1 className="text-3xl font-bold text-black mb-2">Store Dashboard</h1>
+            <p className="text-black">Monitor orders and performance</p>
           </div>
 
           {/* Store Selector */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-black mb-2">
               Select Store
             </label>
             <select
@@ -187,7 +187,7 @@ export default function StoreDashboard() {
                   className={`px-4 py-2 rounded-lg font-medium ${
                     dateRange === 'today'
                       ? 'bg-blue-600 text-white'
-                      : 'bg-white text-gray-700 border border-gray-300'
+                      : 'bg-white text-black border border-gray-300'
                   }`}
                 >
                   Today
@@ -197,7 +197,7 @@ export default function StoreDashboard() {
                   className={`px-4 py-2 rounded-lg font-medium ${
                     dateRange === 'week'
                       ? 'bg-blue-600 text-white'
-                      : 'bg-white text-gray-700 border border-gray-300'
+                      : 'bg-white text-black border border-gray-300'
                   }`}
                 >
                   Last 7 Days
@@ -207,7 +207,7 @@ export default function StoreDashboard() {
                   className={`px-4 py-2 rounded-lg font-medium ${
                     dateRange === 'month'
                       ? 'bg-blue-600 text-white'
-                      : 'bg-white text-gray-700 border border-gray-300'
+                      : 'bg-white text-black border border-gray-300'
                   }`}
                 >
                   Last 30 Days
@@ -220,8 +220,8 @@ export default function StoreDashboard() {
                 <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Total Orders</p>
-                      <p className="text-3xl font-bold text-gray-900 mt-2">{stats.total}</p>
+                      <p className="text-sm font-medium text-black">Total Orders</p>
+                      <p className="text-3xl font-bold text-black mt-2">{stats.total}</p>
                     </div>
                     <div className="bg-blue-100 p-3 rounded-lg">
                       <ShoppingCart className="w-6 h-6 text-blue-600" />
@@ -233,8 +233,8 @@ export default function StoreDashboard() {
                 <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Total Revenue</p>
-                      <p className="text-3xl font-bold text-gray-900 mt-2">
+                      <p className="text-sm font-medium text-black">Total Revenue</p>
+                      <p className="text-3xl font-bold text-black mt-2">
                         ₹{stats.totalRevenue.toLocaleString('en-IN')}
                       </p>
                     </div>
@@ -248,8 +248,8 @@ export default function StoreDashboard() {
                 <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Self-Service</p>
-                      <p className="text-3xl font-bold text-gray-900 mt-2">
+                      <p className="text-sm font-medium text-black">Self-Service</p>
+                      <p className="text-3xl font-bold text-black mt-2">
                         {stats.bySalesMode.SELF_SERVICE}
                       </p>
                     </div>
@@ -263,8 +263,8 @@ export default function StoreDashboard() {
                 <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Staff-Assisted</p>
-                      <p className="text-3xl font-bold text-gray-900 mt-2">
+                      <p className="text-sm font-medium text-black">Staff-Assisted</p>
+                      <p className="text-3xl font-bold text-black mt-2">
                         {stats.bySalesMode.STAFF_ASSISTED}
                       </p>
                     </div>
@@ -277,7 +277,7 @@ export default function StoreDashboard() {
 
               {/* Order Status Breakdown */}
               <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200 mb-8">
-                <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <h2 className="text-xl font-bold text-black mb-4 flex items-center gap-2">
                   <BarChart3 className="w-5 h-5" />
                   Orders by Status
                 </h2>
@@ -286,9 +286,9 @@ export default function StoreDashboard() {
                     <div key={status} className="text-center p-4 bg-gray-50 rounded-lg">
                       <div className="flex items-center justify-center gap-2 mb-2">
                         {getStatusIcon(status)}
-                        <span className="text-sm font-medium text-gray-600">{status}</span>
+                        <span className="text-sm font-medium text-black">{status}</span>
                       </div>
-                      <p className="text-2xl font-bold text-gray-900">{count}</p>
+                      <p className="text-2xl font-bold text-black">{count}</p>
                     </div>
                   ))}
                 </div>
@@ -297,31 +297,31 @@ export default function StoreDashboard() {
               {/* Recent Orders */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
                 <div className="p-6 border-b border-gray-200">
-                  <h2 className="text-xl font-bold text-gray-900">Recent Orders</h2>
+                  <h2 className="text-xl font-bold text-black">Recent Orders</h2>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
                           Order ID
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
                           Customer
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
                           Mode
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
                           Staff
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
                           Status
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
                           Amount
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
                           Date
                         </th>
                       </tr>
@@ -329,17 +329,17 @@ export default function StoreDashboard() {
                     <tbody className="bg-white divide-y divide-gray-200">
                       {orders.length === 0 ? (
                         <tr>
-                          <td colSpan="7" className="px-6 py-8 text-center text-gray-500">
+                          <td colSpan="7" className="px-6 py-8 text-center text-black">
                             No orders found
                           </td>
                         </tr>
                       ) : (
                         orders.map((order) => (
                           <tr key={order.id} className="hover:bg-gray-50">
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-black">
                               {order.id.substring(0, 8)}...
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-black">
                               {order.customerName || 'N/A'}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
@@ -351,7 +351,7 @@ export default function StoreDashboard() {
                                 {order.salesMode}
                               </span>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-black">
                               {order.assistedByName || order.assistedByStaffId || 'N/A'}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
@@ -359,10 +359,10 @@ export default function StoreDashboard() {
                                 {order.status}
                               </span>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-black">
                               ₹{order.finalPrice?.toLocaleString('en-IN') || '0'}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-black">
                               {new Date(order.createdAt).toLocaleDateString()}
                             </td>
                           </tr>
